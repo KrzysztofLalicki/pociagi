@@ -79,28 +79,45 @@ nazwa_przewoznika VARCHAR
 );
 
 CREATE TABLE historia_cen (
-id_przewoznika INTEGER REFERENCES przewoznicy(id_przewoznika),
+id_przewoznika INTEGER,
 data_od DATE NOT NULL,
 data_do DATE,
 cena_za_km_kl1 NUMERIC(10,2) NOT NULL CHECK (cena_za_km_kl1 > 0),
 cena_za_km_kl2 NUMERIC(10,2) NOT NULL CHECK (cena_za_km_kl2 > 0),
 cena_za_rower NUMERIC(10,2) NOT NULL CHECK (cena_za_rower > 0),
-PRIMARY KEY(id_przewoznika, data_od)
+PRIMARY KEY(id_przewoznika, data_od),
+    CONSTRAINT fk_historia_przewoznik
+        FOREIGN KEY (id_przewoznika)
+        REFERENCES przewoznicy(id_przewoznika)
+        DEFERRABLE INITIALLY DEFERRED
 );
 
 CREATE TABLE polaczenia (
     id_polaczenia SERIAL PRIMARY KEY,
-    id_trasy INTEGER NOT NULL REFERENCES trasy(id_trasy),
+    id_trasy INTEGER NOT NULL,
     godzina_startu TIME NOT NULL,
-    id_harmonogramu INTEGER NOT NULL REFERENCES harmonogramy(id_harmonogramu),
-    id_przewoznika INTEGER NOT NULL REFERENCES przewoznicy(id_przewoznika)
+    id_harmonogramu INTEGER NOT NULL,
+    id_przewoznika INTEGER NOT NULL,
+    CONSTRAINT fk_polaczenia_trasy FOREIGN KEY (id_trasy)
+        REFERENCES trasy(id_trasy)
+        DEFERRABLE INITIALLY DEFERRED,
+    CONSTRAINT fk_polaczenia_harmonogram FOREIGN KEY (id_harmonogramu)
+        REFERENCES harmonogramy(id_harmonogramu)
+        DEFERRABLE INITIALLY DEFERRED,
+    CONSTRAINT fk_polaczenia_przewoznik FOREIGN KEY (id_przewoznika)
+        REFERENCES przewoznicy(id_przewoznika)
+        DEFERRABLE INITIALLY DEFERRED
 );
 
 CREATE TABLE historia_polaczenia (
-    id_polaczenia INTEGER NOT NULL REFERENCES polaczenia(id_polaczenia),
+    id_polaczenia INTEGER NOT NULL,
     data_od DATE NOT NULL,
     data_do DATE,
-    PRIMARY KEY (id_polaczenia, data_od)
+    PRIMARY KEY (id_polaczenia, data_od),
+    CONSTRAINT fk_historia_polaczenia_polaczenia
+        FOREIGN KEY (id_polaczenia)
+        REFERENCES polaczenia(id_polaczenia)
+        DEFERRABLE INITIALLY DEFERRED
 );
 
 CREATE TABLE bilety (
@@ -120,13 +137,16 @@ CREATE TABLE wagony(
     restauracyjny BOOLEAN NOT NULL
 );
 
-CREATE TABLE przedzialy(
+CREATE TABLE przedzialy (
     nr_przedzialu INTEGER CHECK(nr_przedzialu > 0),
-    id_wagonu INTEGER REFERENCES wagony(id_wagonu),
+    id_wagonu INTEGER NOT NULL,
     klasa INTEGER NOT NULL CHECK (klasa IN (1, 2)),
     czy_zamkniety BOOLEAN NOT NULL,
     strefa_ciszy BOOLEAN NOT NULL,
-    PRIMARY KEY (nr_przedzialu, id_wagonu)
+    PRIMARY KEY (nr_przedzialu, id_wagonu),
+    CONSTRAINT fk_przedzialy_wagony FOREIGN KEY (id_wagonu)
+        REFERENCES wagony(id_wagonu)
+        DEFERRABLE INITIALLY DEFERRED
 );
 
 CREATE TABLE miejsca(
@@ -156,12 +176,19 @@ CREATE TABLE bilety_miejsca(
     FOREIGN KEY (nr_miejsca, id_wagonu) REFERENCES miejsca(nr_miejsca, id_wagonu)
 );
 
-CREATE TABLE polaczenia_wagony(
-    id_polaczenia INTEGER NOT NULL REFERENCES polaczenia(id_polaczenia),
+CREATE TABLE polaczenia_wagony (
+    id_polaczenia INTEGER NOT NULL,
     nr_wagonu INTEGER NOT NULL,
-    id_wagonu INTEGER NOT NULL REFERENCES wagony(id_wagonu),
-    PRIMARY KEY(id_polaczenia, id_wagonu)
+    id_wagonu INTEGER NOT NULL,
+    PRIMARY KEY (id_polaczenia, id_wagonu),
+    CONSTRAINT fk_polaczenia_wagony_polaczenia FOREIGN KEY (id_polaczenia)
+        REFERENCES polaczenia(id_polaczenia)
+        DEFERRABLE INITIALLY DEFERRED,
+    CONSTRAINT fk_polaczenia_wagony_wagony FOREIGN KEY (id_wagonu)
+        REFERENCES wagony(id_wagonu)
+        DEFERRABLE INITIALLY DEFERRED
 );
+
 
 
 INSERT INTO harmonogramy (czy_robocze, czy_sobota, czy_niedziela) VALUES
@@ -301,8 +328,5 @@ INSERT INTO tmp_surnames(surname, male) VALUES
 INSERT INTO pasazerowie (imie, nazwisko, mail)
 SELECT name, surname, LOWER(TRANSLATE(name || '@' ||  surname || '.pl', 'ąęółśżźćń', 'aeolszzcn'))
 FROM tmp_names n JOIN tmp_surnames s ON n.male = s.male ORDER BY random();
-
-DROP TABLE tmp_names;
-DROP TABLE tmp_surnames;
 
 COMMIT;
