@@ -85,6 +85,12 @@ cena_za_km_kl2 NUMERIC(10,2) NOT NULL CHECK (cena_za_km_kl2 > 0),
 cena_za_rower NUMERIC(10,2) NOT NULL CHECK (cena_za_rower > 0)
 );
 
+CREATE TABLE historia_polaczenia (
+    id_polaczenia INTEGER NOT NULL REFERENCES polaczenia(id_polaczenia),
+    od DATE NOT NULL,
+    do DATE,
+    PRIMARY KEY (id_polaczenia, od)
+);
 
 CREATE TABLE polaczenia (
     id_polaczenia SERIAL PRIMARY KEY,
