@@ -1,7 +1,6 @@
 BEGIN;
 
 DROP TYPE IF EXISTS dzien_tygodnia CASCADE;
-DROP TYPE IF EXISTS KLASA CASCADE;
 
 CREATE TYPE dzien_tygodnia AS ENUM (
     'Poniedziałek',
@@ -13,12 +12,8 @@ CREATE TYPE dzien_tygodnia AS ENUM (
     'Niedziela'
 );
 
-CREATE TYPE KLASA AS ENUM('1','2');
-
-DROP TABLE IF EXISTS bilety_miejsce CASCADE;
 DROP TABLE IF EXISTS miejsca CASCADE;
 DROP TABLE IF EXISTS przedzialy CASCADE;
-DROP TABLE IF EXISTS swieta CASCADE;
 DROP TABLE IF EXISTS wagony CASCADE;
 DROP TABLE IF EXISTS polaczenia_wagony CASCADE;
 DROP TABLE IF EXISTS stacje_posrednie CASCADE;
@@ -30,8 +25,10 @@ DROP TABLE IF EXISTS pasazerowie CASCADE;
 DROP TABLE IF EXISTS bilety CASCADE;
 DROP TABLE IF EXISTS bilety_miejsca CASCADE;
 DROP TABLE IF EXISTS ulgi CASCADE;
-DROP TABLE IF EXISTS taryfy CASCADE;
 DROP TABLE IF EXISTS harmonogramy CASCADE;
+DROP TABLE IF EXISTS przewoznicy CASCADE;
+DROP TABLE IF EXISTS historia_cen CASCADE;
+DROP TABLE IF EXISTS historia_polaczenia CASCADE;
 
 CREATE TABLE harmonogramy(
 id_harmonogramu SERIAL PRIMARY KEY,
@@ -59,8 +56,6 @@ CREATE TABLE trasy (
     czas INTERVAL NOT NULL CHECK(czas > INTERVAL '0 minutes')
 );
 
-
-
 CREATE TABLE linie (
     stacja1 INTEGER NOT NULL REFERENCES stacje(id_stacji),
     stacja2 INTEGER NOT NULL REFERENCES stacje(id_stacji),
@@ -78,18 +73,19 @@ CREATE TABLE stacje_posrednie (
     PRIMARY KEY (id_trasy, id_stacji)
 );
 
-CREATE TABLE taryfy (
-id_taryfy SERIAL PRIMARY KEY,
-cena_za_km_kl1 NUMERIC(10,2) NOT NULL CHECK (cena_za_km_kl1 > 0),
-cena_za_km_kl2 NUMERIC(10,2) NOT NULL CHECK (cena_za_km_kl2 > 0),
-cena_za_rower NUMERIC(10,2) NOT NULL CHECK (cena_za_rower > 0)
+CREATE TABLE przewoznicy (
+id_przewoznika SERIAL PRIMARY KEY,
+nazwa_przewoznika VARCHAR
 );
 
-CREATE TABLE historia_polaczenia (
-    id_polaczenia INTEGER NOT NULL REFERENCES polaczenia(id_polaczenia),
-    od DATE NOT NULL,
-    do DATE,
-    PRIMARY KEY (id_polaczenia, od)
+CREATE TABLE historia_cen (
+id_przewoznika INTEGER REFERENCES przewoznicy(id_przewoznika),
+data_od DATE NOT NULL,
+data_do DATE,
+cena_za_km_kl1 NUMERIC(10,2) NOT NULL CHECK (cena_za_km_kl1 > 0),
+cena_za_km_kl2 NUMERIC(10,2) NOT NULL CHECK (cena_za_km_kl2 > 0),
+cena_za_rower NUMERIC(10,2) NOT NULL CHECK (cena_za_rower > 0),
+PRIMARY KEY(id_przewoznika, data_od)
 );
 
 CREATE TABLE polaczenia (
@@ -97,9 +93,15 @@ CREATE TABLE polaczenia (
     id_trasy INTEGER NOT NULL REFERENCES trasy(id_trasy),
     godzina_startu TIME NOT NULL,
     id_harmonogramu INTEGER NOT NULL REFERENCES harmonogramy(id_harmonogramu),
-    id_taryfy INTEGER NOT NULL REFERENCES taryfy(id_taryfy)
+    id_przewoznika INTEGER NOT NULL REFERENCES przewoznicy(id_przewoznika)
 );
 
+CREATE TABLE historia_polaczenia (
+    id_polaczenia INTEGER NOT NULL REFERENCES polaczenia(id_polaczenia),
+    data_od DATE NOT NULL,
+    data_do DATE,
+    PRIMARY KEY (id_polaczenia, data_od)
+);
 
 CREATE TABLE bilety (
 id_biletu SERIAL PRIMARY KEY,
@@ -121,7 +123,7 @@ CREATE TABLE wagony(
 CREATE TABLE przedzialy(
     nr_przedzialu INTEGER CHECK(nr_przedzialu > 0),
     id_wagonu INTEGER REFERENCES wagony(id_wagonu),
-    klasa KLASA NOT NULL,
+    klasa INTEGER NOT NULL CHECK (klasa IN (1, 2)),
     czy_zamkniety BOOLEAN NOT NULL,
     strefa_ciszy BOOLEAN NOT NULL,
     PRIMARY KEY (nr_przedzialu, id_wagonu)
@@ -190,12 +192,12 @@ INSERT INTO linie (stacja1, stacja2, odleglosc) VALUES
 INSERT INTO stacje_posrednie (id_trasy, id_stacji, przyjazd, odjazd, zatrzymanie, tor) VALUES
 (1, 3, '01:15:00', '01:20:00', TRUE, 3);
 
-INSERT INTO taryfy (cena_za_km_kl1, cena_za_km_kl2, cena_za_rower) VALUES
-(0.30, 0.20, 10.00),
-(0.35, 0.25, 12.00),
-(0.40, 0.30, 15.00);
+INSERT INTO przewoznicy (nazwa_przewoznika) VALUES
+('PKP Intercity'),
+('POLREGIO'),
+('Koleje Mazowieckie');
 
-INSERT INTO polaczenia (id_trasy, godzina_startu, id_harmonogramu, id_taryfy) VALUES
+INSERT INTO polaczenia (id_trasy, godzina_startu, id_harmonogramu, id_przewoznika) VALUES
 (1, '06:00:00', 1, 1),
 (1, '08:30:00', 1, 2),
 (1, '10:15:00', 2, 1);
@@ -210,16 +212,16 @@ INSERT INTO wagony (klimatyzacja, restauracyjny) VALUES
 (FALSE, TRUE);
 
 INSERT INTO przedzialy (nr_przedzialu, id_wagonu, klasa, czy_zamkniety, strefa_ciszy) VALUES
-(1, 1, '1', FALSE, TRUE),
-(2, 1, '1', FALSE, FALSE),
-(1, 2, '2', FALSE, FALSE),
-(2, 2, '2', FALSE, FALSE),
-(1, 3, '2', TRUE, FALSE),
-(1, 4, '1', FALSE, TRUE),
-(2, 4, '1', FALSE, TRUE),
-(1, 5, '2', FALSE, FALSE),
-(1, 6, '1', FALSE, TRUE),
-(1, 7, '2', FALSE, FALSE);
+(1, 1, 1, FALSE, TRUE),
+(2, 1, 1, FALSE, FALSE),
+(1, 2, 2, FALSE, FALSE),
+(2, 2, 2, FALSE, FALSE),
+(1, 3, 2, TRUE, FALSE),
+(1, 4, 1, FALSE, TRUE),
+(2, 4, 1, FALSE, TRUE),
+(1, 5, 2, FALSE, FALSE),
+(1, 6, 1, FALSE, TRUE),
+(1, 7, 2, FALSE, FALSE);
 
 INSERT INTO miejsca (nr_miejsca, id_wagonu, nr_przedzialu, czy_dla_niepelnosprawnych, czy_dla_rowerow) VALUES
 (1, 1, 1, FALSE, FALSE),
@@ -270,6 +272,17 @@ INSERT INTO polaczenia_wagony (id_polaczenia, nr_wagonu, id_wagonu) VALUES
 (2, 2, 5),
 (3, 1, 6),
 (3, 2, 7);
+
+INSERT INTO historia_cen (id_przewoznika, data_od, data_do, cena_za_km_kl1, cena_za_km_kl2, cena_za_rower) VALUES
+(1, '2023-01-01', '2023-12-31', 0.39, 0.29, 9.50),
+(1, '2024-01-01', NULL, 0.42, 0.32, 10.00),
+(2, '2023-01-01', '2023-12-31', 0.30, 0.20, 8.00),
+(2, '2024-01-01', NULL, 0.32, 0.22, 8.50),
+(3, '2023-01-01', '2023-12-31', 0.35, 0.25, 7.50),
+(3, '2024-01-01', NULL, 0.38, 0.28, 8.00);
+
+DROP TABLE IF EXISTS tmp_names;
+DROP TABLE IF EXISTS tmp_surnames;
 
 CREATE TABLE tmp_names (name varchar NOT NULL, male bool NOT NULL, UNIQUE(name, male));
 INSERT INTO tmp_names(name, male) VALUES
