@@ -45,7 +45,7 @@ mail varchar UNIQUE CHECK (mail LIKE '%@%.%')
 
 CREATE TABLE stacje(
     id_stacji SERIAL PRIMARY KEY,
-    nazwa VARCHAR(30) NOT NULL,
+    nazwa VARCHAR NOT NULL,
     tory INTEGER NOT NULL CHECK(tory > 0)
 );
 
