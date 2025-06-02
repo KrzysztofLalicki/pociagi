@@ -30,11 +30,18 @@ DROP TABLE IF EXISTS przewoznicy CASCADE;
 DROP TABLE IF EXISTS historia_cen CASCADE;
 DROP TABLE IF EXISTS historia_polaczenia CASCADE;
 
+
+
 CREATE TABLE harmonogramy(
 id_harmonogramu SERIAL PRIMARY KEY,
-czy_robocze BOOLEAN NOT NULL,
-czy_sobota BOOLEAN NOT NULL,
-czy_niedziela BOOLEAN NOT NULL);
+czy_poniedzialek BOOLEAN DEFAULT FALSE,
+czy_wtorek BOOLEAN DEFAULT FALSE,
+czy_sroda BOOLEAN DEFAULT FALSE,
+czy_czwartek BOOLEAN DEFAULT FALSE,
+czy_piatek BOOLEAN DEFAULT FALSE,
+czy_sobota BOOLEAN DEFAULT FALSE,
+czy_niedziela BOOLEAN DEFAULT FALSE
+);
 
 CREATE TABLE pasazerowie (
 id_pasazera SERIAL PRIMARY KEY,
@@ -191,7 +198,7 @@ CREATE TABLE polaczenia_wagony (
 
 
 
-INSERT INTO harmonogramy (czy_robocze, czy_sobota, czy_niedziela) VALUES
+INSERT INTO harmonogramy (czy_piatek, czy_sobota, czy_niedziela) VALUES
 (TRUE, FALSE, FALSE),
 (FALSE, TRUE, FALSE),
 (FALSE, FALSE, TRUE),
