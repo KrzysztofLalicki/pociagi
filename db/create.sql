@@ -40,7 +40,8 @@ czy_sroda BOOLEAN DEFAULT FALSE,
 czy_czwartek BOOLEAN DEFAULT FALSE,
 czy_piatek BOOLEAN DEFAULT FALSE,
 czy_sobota BOOLEAN DEFAULT FALSE,
-czy_niedziela BOOLEAN DEFAULT FALSE
+czy_niedziela BOOLEAN DEFAULT FALSE,
+UNIQUE(czy_poniedzialek, czy_wtorek, czy_sroda, czy_czwartek, czy_piatek, czy_sobota, czy_niedziela)
 );
 
 CREATE TABLE pasazerowie (
