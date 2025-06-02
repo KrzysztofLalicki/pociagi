@@ -59,13 +59,15 @@ CREATE TABLE stacje(
 CREATE TABLE trasy (
     id_trasy SERIAL PRIMARY KEY,
     skad INTEGER NOT NULL REFERENCES stacje(id_stacji),
-    dokad INTEGER NOT NULL REFERENCES stacje(id_stacji),
+    dokad INTEGER NOT NULL REFERENCES stacje(id_stacji)
+        CHECK(skad != dokad),
     czas INTERVAL NOT NULL CHECK(czas > INTERVAL '0 minutes')
 );
 
 CREATE TABLE linie (
     stacja1 INTEGER NOT NULL REFERENCES stacje(id_stacji),
-    stacja2 INTEGER NOT NULL REFERENCES stacje(id_stacji),
+    stacja2 INTEGER NOT NULL REFERENCES stacje(id_stacji)
+        CHECK(stacja1 != stacja2),
     odleglosc INTEGER NOT NULL CHECK(odleglosc >0),
     PRIMARY KEY (stacja1, stacja2)
 );
@@ -131,7 +133,8 @@ CREATE TABLE bilety (
 id_biletu SERIAL PRIMARY KEY,
 id_polaczenia INTEGER NOT NULL REFERENCES polaczenia (id_polaczenia),
 id_stacji_poczatkowej INTEGER NOT NULL REFERENCES stacje (id_stacji),
-id_stacji_koncowej INTEGER NOT NULL REFERENCES stacje (id_stacji),
+id_stacji_koncowej INTEGER NOT NULL REFERENCES stacje (id_stacji)
+    CHECK(id_stacji_poczatkowej != id_stacji_koncowej),
 id_pasazera INTEGER NOT NULL REFERENCES pasazerowie (id_pasazera),
 data_zakupu date NOT NULL,
 data_odjazdu date NOT NULL CHECK (data_zakupu <= data_odjazdu),
