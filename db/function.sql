@@ -1,3 +1,7 @@
+
+
+--zwraca tabele wolnych miejsc dla danego polaczenia i czasu odjazdu
+
 CREATE OR REPLACE FUNCTION wolne_miejsca(szukane_id_pol INTEGER, data_odjazdu_ DATE)
     RETURNS TABLE(id_miejsca INTEGER, nr_przedzialu INTEGER, id_wagonu INTEGER) AS $$
 BEGIN
@@ -20,6 +24,9 @@ BEGIN
         );
 END;
 $$ LANGUAGE plpgsql;
+
+
+--zwraca dlugosc drogi od dnaej stacji do innej
 
 CREATE OR REPLACE FUNCTION dlugosc_drogi(
     id_trasy_f INTEGER,
@@ -86,6 +93,9 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
+
+--Zwraca tabele wszystkich miejsc dla danego polaczenia (i opcjonalnie czasu odjazdu)
+
 CREATE OR REPLACE FUNCTION wszystkie_miejsca(szukane_id_pol INTEGER,data_odjazdu_ DATE)
 RETURNS TABLE(id_miejsca INTEGER, nr_przedzialu INTEGER, id_wagonu INTEGER) AS $$
 BEGIN
@@ -99,5 +109,35 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
---CREATE OR REPLACE FUNCTION znajdz_polaczenia(stacja_start_nazwa VARCHAR, stacja_koniec_nazwa VARCHAR)
---RETURNS INTEGER AS $$
+
+--Znajduje polaczenie po nazwach bez przesiadek i zwraca tabele
+
+CREATE OR REPLACE FUNCTION znajdz_polaczenia(
+    stacja_start_nazwa VARCHAR,
+    stacja_koniec_nazwa VARCHAR
+) RETURNS TABLE(
+                   id_polaczenia INTEGER,
+                   godzina_startu TIME,
+                   nazwa_przewoznika VARCHAR,
+                   czas_podrozy INTERVAL
+               ) AS $$
+BEGIN
+    RETURN QUERY
+        SELECT
+            p.id_polaczenia,
+            p.godzina_startu,
+            pr.nazwa_przewoznika,
+            t.czas AS czas_podrozy
+        FROM
+            polaczenia p
+                JOIN trasy t ON p.id_trasy = t.id_trasy
+                JOIN stacje s_start ON t.skad = s_start.id_stacji
+                JOIN stacje s_koniec ON t.dokad = s_koniec.id_stacji
+                JOIN przewoznicy pr ON p.id_przewoznika = pr.id_przewoznika
+        WHERE
+            s_start.nazwa = stacja_start_nazwa
+          AND s_koniec.nazwa = stacja_koniec_nazwa
+        ORDER BY
+            p.godzina_startu;
+END;
+$$ LANGUAGE plpgsql;
