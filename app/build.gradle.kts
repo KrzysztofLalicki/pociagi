@@ -31,13 +31,14 @@ application {
 }
 
 javafx {
-    version = "17.0.6"
+    version = "17.0.12"
     modules = listOf("javafx.controls", "javafx.fxml")
 }
 
 dependencies {
     testImplementation("org.junit.jupiter:junit-jupiter-api:${junitVersion}")
     testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:${junitVersion}")
+    implementation("org.postgresql:postgresql:42.7.3")
 }
 
 tasks.withType<Test> {
