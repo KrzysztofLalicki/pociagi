@@ -130,15 +130,15 @@ END;
 $$ LANGUAGE plpgsql;
 
 CREATE OR REPLACE FUNCTION get_timetable(id_stac INTEGER, data DATE)
-RETURNS TABLE(id_trasy_out INTEGER, skad_out VARCHAR, dokad_out VARCHAR, przyjazd_out TIME, odjazd_out TIME) AS $$
+RETURNS TABLE(id_pol_out INTEGER, skad_out VARCHAR, dokad_out VARCHAR, przyjazd_out TIME, odjazd_out TIME) AS $$
 DECLARE
-    id_pol INTEGER;
+    id_tra INTEGER;
     skad_id INTEGER;
     dokad_id INTEGER;
     przyjazd TIMESTAMP;
     odjazd TIMESTAMP;
 BEGIN
-    FOR id_pol, id_trasy_out IN
+    FOR id_pol_out, id_tra IN
         SELECT id_polaczenia, id_trasy
         FROM polaczenia
         WHERE id_trasy IN
@@ -146,16 +146,15 @@ BEGIN
             UNION
             (SELECT id_trasy FROM trasy WHERE skad = id_stac OR dokad = id_stac))
     LOOP
-        RAISE NOTICE 'Przetwarzam id_pol = %', id_pol;
         SELECT czas_przyjazdu, czas_odjazdu
         INTO przyjazd, odjazd
-        FROM get_czasy_stacji(id_stac, id_pol, data - 1)
+        FROM get_czasy_stacji(id_stac, id_pol_out, data - 1)
         LIMIT 1;
 
         IF DATE(przyjazd) = data OR DATE(odjazd) = data THEN
             SELECT skad, dokad
             INTO skad_id, dokad_id
-            FROM trasy WHERE id_trasy = id_trasy_out;
+            FROM trasy WHERE id_trasy = id_tra;
 
             skad_out := get_nazwa_stacji(skad_id);
             dokad_out := get_nazwa_stacji(dokad_id);
@@ -168,14 +167,14 @@ BEGIN
 
         SELECT czas_przyjazdu, czas_odjazdu
         INTO przyjazd, odjazd
-        FROM get_czasy_stacji(id_stac, id_pol, data)
+        FROM get_czasy_stacji(id_stac, id_pol_out, data)
         LIMIT 1;
 
 
         IF DATE(przyjazd) = data OR DATE(odjazd) = data THEN
             SELECT skad, dokad
             INTO skad_id, dokad_id
-            FROM trasy WHERE id_trasy = id_trasy_out;
+            FROM trasy WHERE id_trasy = id_tra;
 
             skad_out := get_nazwa_stacji(skad_id);
             dokad_out := get_nazwa_stacji(dokad_id);
