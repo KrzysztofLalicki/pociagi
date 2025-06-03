@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<HBox xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="pociagi.app.viewmodel.TimeTableViewModel" >
+    <children>
+        <fx:include fx:id="selectStationView" source="SelectStationView.fxml" HBox.hgrow="NEVER" VBox.vgrow="ALWAYS" />
+      <VBox alignment="TOP_CENTER" spacing="10.0" HBox.hgrow="ALWAYS">
+         <children>
+            <DatePicker fx:id="datePicker" VBox.vgrow="NEVER" />
+      
+              <TableView fx:id="tableView" VBox.vgrow="ALWAYS" focusTraversable="false">
+                  <columns>
+                      <TableColumn fx:id="idCol" prefWidth="100" text="id połączenia" />
+                      <TableColumn fx:id="skadCol" prefWidth="150" text="stacja początkowa" />
+                      <TableColumn fx:id="dokadCol" prefWidth="150" text="stacja końcowa" />
+                      <TableColumn fx:id="przyjazdCol" prefWidth="100" text="przyjazd" />
+                      <TableColumn fx:id="odjazdCol" prefWidth="100" text="odjazd" />
+                  </columns>
+              </TableView>
+         </children>
+         <padding>
+            <Insets left="10.0" />
+         </padding>
+      </VBox>
+    </children>
+   <padding>
+      <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+   </padding>
+</HBox>

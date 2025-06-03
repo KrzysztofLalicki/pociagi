@@ -5,9 +5,9 @@
 <?import javafx.scene.layout.*?>
 
 <BorderPane xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="pociagi.app.viewmodel.SelectStationViewModel" fx:id="root">
-    <userData>
-        <fx:reference source="controller" />
-    </userData>
+<!--    <userData>-->
+<!--        <fx:reference source="pociagi.app.viewmodel.SelectStationViewModel" />-->
+<!--    </userData>-->
 
     <top>
         <TextField fx:id="searchField" alignment="TOP_LEFT" promptText="Zacznij wpisywać nazwę stacji" BorderPane.alignment="CENTER">

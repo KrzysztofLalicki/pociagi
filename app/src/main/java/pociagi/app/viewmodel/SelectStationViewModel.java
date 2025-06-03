@@ -28,17 +28,18 @@ public class SelectStationViewModel {
     public void initialize() {
         root.setUserData(this);
 
-        searchField.setOnKeyReleased(_ -> {
+        searchField.setOnKeyTyped(_ -> {
+            tableView.getSelectionModel().clearSelection();
             String prefix = searchField.getText();
             stationList.setAll(DaoFactory.getStacjeDao().findByPrefix(prefix));
         });
 
         tableView.setItems(stationList);
 
-
         tableView.getSelectionModel().selectedItemProperty().addListener((obs, oldStacja, newStacja) -> {
             if (newStacja != null) {
                 stacja.set(newStacja);
+                searchField.setText(newStacja.getNazwa());
             }
         });
 
