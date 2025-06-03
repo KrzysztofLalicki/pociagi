@@ -2,6 +2,7 @@ module pociagi.app {
     requires javafx.controls;
     requires javafx.fxml;
     requires java.sql;
+    requires java.desktop;
 
     opens pociagi.app to javafx.fxml;
     exports pociagi.app;

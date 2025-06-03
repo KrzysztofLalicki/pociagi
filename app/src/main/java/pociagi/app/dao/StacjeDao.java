@@ -35,4 +35,25 @@ public class StacjeDao {
 
         return result;
     }
+
+    public String getNazwaStacjiById(int idStacji) {
+        String nazwaStacji = null;
+        String sql = "SELECT get_nazwa_stacji(?) AS nazwa";
+
+        try (Connection conn = DBManager.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            stmt.setInt(1, idStacji);
+            ResultSet rs = stmt.executeQuery();
+
+            if (rs.next()) {
+                nazwaStacji = rs.getString("nazwa");
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace(); // Consider logging instead of printing stacktrace
+        }
+
+        return nazwaStacji;
+    }
 }
