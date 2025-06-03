@@ -52,7 +52,7 @@ mail varchar UNIQUE CHECK (mail LIKE '%@%.%')
 
 CREATE TABLE stacje(
     id_stacji SERIAL PRIMARY KEY,
-    nazwa VARCHAR NOT NULL,
+    nazwa VARCHAR UNIQUE NOT NULL,
     tory INTEGER NOT NULL CHECK(tory > 0)
 );
 
@@ -177,8 +177,8 @@ znizka int NOT NULL CHECK (znizka >= 0 AND znizka <= 100)
 CREATE TABLE bilety_miejsca(
     id_biletu INTEGER NOT NULL REFERENCES bilety(id_biletu),
     nr_miejsca INTEGER NOT NULL,
-    id_wagonu INTEGER UNIQUE NOT NULL,
-    id_ulgi INTEGER NOT NULL REFERENCES ulgi(id_ulgi),
+    id_wagonu INTEGER NOT NULL,
+    id_ulgi INTEGER REFERENCES ulgi(id_ulgi),
     PRIMARY KEY (id_biletu, nr_miejsca, id_wagonu),
     FOREIGN KEY (nr_miejsca, id_wagonu) REFERENCES miejsca(nr_miejsca, id_wagonu)
 );
@@ -335,7 +335,6 @@ INSERT INTO tmp_surnames(surname, male) VALUES
 INSERT INTO pasazerowie (imie, nazwisko, mail)
 SELECT name, surname, LOWER(TRANSLATE(name || '@' ||  surname || '.pl', 'ąęółśżźćń', 'aeolszzcn'))
 FROM tmp_names n JOIN tmp_surnames s ON n.male = s.male ORDER BY random();
-
 
 INSERT INTO historia_polaczenia (id_polaczenia, data_od) VALUES (1, '2025-06-02');
 
