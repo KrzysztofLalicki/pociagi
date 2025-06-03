@@ -113,7 +113,6 @@ DECLARE
     lp_do INT;
     wolne BOOLEAN;
 BEGIN
-    -- Pobierz lp stacji startowej i końcowej na trasie
     SELECT lp INTO lp_od FROM stacje_dla_polaczenia(p_id_polaczenia) WHERE id_stacji = p_id_stacji_od;
     SELECT lp INTO lp_do FROM stacje_dla_polaczenia(p_id_polaczenia) WHERE id_stacji = p_id_stacji_do;
 
@@ -127,9 +126,8 @@ BEGIN
             AND bm.id_wagonu = m.id_wagonu
             AND bm.nr_miejsca = m.nr_miejsca
         WHERE pw.id_polaczenia = p_id_polaczenia
-          AND bm.id_biletu IS NULL -- miejsce nie jest zajęte
+          AND bm.id_biletu IS NULL
           AND NOT EXISTS (
-            -- Sprawdź kolizję tras biletów
             SELECT 1
             FROM bilety b2
                      JOIN bilety_miejsca bm2 ON bm2.id_biletu = b2.id_biletu
@@ -137,6 +135,7 @@ BEGIN
                      JOIN stacje_dla_polaczenia(p_id_polaczenia) s_end ON s_end.id_stacji = b2.id_stacji_koncowej
             WHERE b2.id_polaczenia = p_id_polaczenia
               AND b2.data_odjazdu = p_data_odjazdu
+              AND b2.data_zwrotu IS NULL
               AND bm2.id_wagonu = m.id_wagonu
               AND bm2.nr_miejsca = m.nr_miejsca
               AND s_start.lp < lp_do
@@ -193,6 +192,7 @@ BEGIN
               AND b2.data_odjazdu = p_data_odjazdu
               AND bm2.id_wagonu = m.id_wagonu
               AND bm2.nr_miejsca = m.nr_miejsca
+              AND b2.data_zwrotu IS NULL
               AND s_start.lp < lp_do
               AND s_end.lp > lp_od
         )
@@ -531,3 +531,55 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
+--funkcja generująca mozliwe daty biletow dla danego polaczenia
+
+CREATE OR REPLACE FUNCTION losuj_data_odjazdu_dla_polaczenia(
+    p_id_polaczenia INT,
+    p_start DATE,
+    p_end DATE
+)
+    RETURNS DATE AS $$
+DECLARE
+    h RECORD;
+    harmonogram harmonogramy;
+    daty DATE[];
+    current_date DATE := p_start;
+    pasujace_dni DATE[];
+    idx INT;
+BEGIN
+    SELECT h.* INTO harmonogram
+    FROM polaczenia p
+             JOIN harmonogramy h ON p.id_harmonogramu = h.id_harmonogramu
+    WHERE p.id_polaczenia = p_id_polaczenia;
+
+    IF NOT FOUND THEN
+        RAISE EXCEPTION 'Brak harmonogramu dla polaczenia %', p_id_polaczenia;
+    END IF;
+
+    pasujace_dni := ARRAY[]::DATE[];
+
+    WHILE current_date <= p_end LOOP
+            IF
+                (EXTRACT(DOW FROM current_date) = 1 AND harmonogram.czy_poniedzialek) OR
+                (EXTRACT(DOW FROM current_date) = 2 AND harmonogram.czy_wtorek) OR
+                (EXTRACT(DOW FROM current_date) = 3 AND harmonogram.czy_sroda) OR
+                (EXTRACT(DOW FROM current_date) = 4 AND harmonogram.czy_czwartek) OR
+                (EXTRACT(DOW FROM current_date) = 5 AND harmonogram.czy_piatek) OR
+                (EXTRACT(DOW FROM current_date) = 6 AND harmonogram.czy_sobota) OR
+                (EXTRACT(DOW FROM current_date) = 0 AND harmonogram.czy_niedziela)
+            THEN
+                pasujace_dni := pasujace_dni || current_date;
+            END IF;
+
+                    current_date := current_date + INTERVAL '1 day';
+        END LOOP;
+
+    IF array_length(pasujace_dni, 1) IS NULL THEN
+        RAISE EXCEPTION 'Brak pasujacych dni w harmonogramie dla polaczenia % w zadanym okresie', p_id_polaczenia;
+    END IF;
+
+    idx := FLOOR(random() * array_length(pasujace_dni, 1) + 1)::INT;
+
+    RETURN pasujace_dni[idx];
+END;
+$$ LANGUAGE plpgsql;
