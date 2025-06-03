@@ -336,4 +336,7 @@ INSERT INTO pasazerowie (imie, nazwisko, mail)
 SELECT name, surname, LOWER(TRANSLATE(name || '@' ||  surname || '.pl', 'ąęółśżźćń', 'aeolszzcn'))
 FROM tmp_names n JOIN tmp_surnames s ON n.male = s.male ORDER BY random();
 
+
+INSERT INTO historia_polaczenia (id_polaczenia, data_od) VALUES (1, '2025-06-02');
+
 COMMIT;
