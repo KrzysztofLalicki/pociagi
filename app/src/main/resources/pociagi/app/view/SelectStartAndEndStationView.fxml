@@ -40,7 +40,6 @@
       </HBox>
       <HBox alignment="CENTER_RIGHT" spacing="10.0" VBox.vgrow="NEVER">
          <children>
-            <Button fx:id="wsteczButton" mnemonicParsing="false" text="Wstecz" />
             <Button fx:id="dalejButton" mnemonicParsing="false" text="Dalej" />
          </children>
          <padding>

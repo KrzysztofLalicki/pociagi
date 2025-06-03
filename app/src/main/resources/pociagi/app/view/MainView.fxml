@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<TabPane fx:controller="pociagi.app.viewmodel.MainViewModel" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" tabClosingPolicy="UNAVAILABLE" xmlns:fx="http://javafx.com/fxml/1" xmlns="http://javafx.com/javafx/17.0.12">
+  <tabs>
+    <Tab fx:id="rozkladJazdy" text="Rozkład Jazdy">
+      <content>
+          <fx:include fx:id="timetableView" source="TimetableView.fxml"/>
+      </content>
+    </Tab>
+    <Tab fx:id="wyszukiwarkaPolaczen" text="Wyszukiwarka połączeń">
+      <content>
+          <fx:include fx:id="selectStartAndEndStationView" source="SelectStartAndEndStationView.fxml"/>
+      </content>
+    </Tab>
+  </tabs>
+</TabPane>
