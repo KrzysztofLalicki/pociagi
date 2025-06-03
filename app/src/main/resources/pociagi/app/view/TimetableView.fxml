@@ -4,14 +4,14 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 
-<HBox xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="pociagi.app.viewmodel.TimeTableViewModel">
+<HBox xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="pociagi.app.viewmodel.TimeTableViewModel" >
     <children>
         <fx:include fx:id="selectStationView" source="SelectStationView.fxml" HBox.hgrow="NEVER" VBox.vgrow="ALWAYS" />
       <VBox alignment="TOP_CENTER" spacing="10.0" HBox.hgrow="ALWAYS">
          <children>
             <DatePicker fx:id="datePicker" VBox.vgrow="NEVER" />
       
-              <TableView fx:id="tableView" VBox.vgrow="ALWAYS">
+              <TableView fx:id="tableView" VBox.vgrow="ALWAYS" focusTraversable="false">
                   <columns>
                       <TableColumn fx:id="idCol" prefWidth="100" text="id połączenia" />
                       <TableColumn fx:id="skadCol" prefWidth="150" text="stacja początkowa" />
