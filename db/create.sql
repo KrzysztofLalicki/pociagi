@@ -43,19 +43,9 @@ CREATE TABLE linie (
     PRIMARY KEY (stacja1, stacja2)
 );
 
-CREATE TABLE stacje_posrednie (
-    id_polaczenia INT REFERENCES polaczenia,
-    id_stacji INT REFERENCES stacje,
-    przyjazd INT CHECK(przyjazd > 0),
-    odjazd INT CHECK(odjazd >= przyjazd),
-    zatrzymanie BOOLEAN NOT NULL,
-    tor INT NOT NULL,
-    PRIMARY KEY (id_polaczenia, id_stacji)
-);
-
 CREATE TABLE przewoznicy (
     id_przewoznika SERIAL PRIMARY KEY,
-    nazwa_przewoznika VARCHAR
+    nazwa_przewoznika VARCHAR UNIQUE NOT NULL
 );
 
 CREATE TABLE historia_cen (
@@ -75,6 +65,16 @@ CREATE TABLE polaczenia (
     id_przewoznika INT NOT NULL REFERENCES przewoznicy
 );
 
+CREATE TABLE stacje_posrednie (
+                                  id_polaczenia INT REFERENCES polaczenia,
+                                  id_stacji INT REFERENCES stacje,
+                                  przyjazd INT CHECK(przyjazd > 0),
+                                  odjazd INT CHECK(odjazd >= przyjazd),
+                                  zatrzymanie BOOLEAN NOT NULL,
+                                  tor INT NOT NULL,
+                                  PRIMARY KEY (id_polaczenia, id_stacji)
+);
+
 CREATE TABLE historia_polaczenia (
     id_polaczenia INT NOT NULL REFERENCES polaczenia,
     data_od DATE NOT NULL,
@@ -92,11 +92,10 @@ CREATE TABLE bilety (
 
 CREATE TABLE przejazdy (
     id_przejazdu SERIAL PRIMARY KEY,
-    id_biletu INT REFERENCES bilety,
-    id_polaczenia INT REFERENCES polaczenia,
-    id_stacji_poczatkowej INT REFERENCES stacje,
-    id_stacji_koncowej INT REFERENCES stacje
-    CHECK (id_stacji_koncowej != id_stacji_poczatkowej)
+    id_biletu INT NOT NULL REFERENCES bilety,
+    id_polaczenia INT NOT NULL REFERENCES polaczenia,
+    id_stacji_poczatkowej INT NOT NULL REFERENCES stacje,
+    id_stacji_koncowej INT NOT NULL REFERENCES stacje CHECK (id_stacji_koncowej != id_stacji_poczatkowej)
 );
 
 CREATE TABLE wagony(
@@ -131,7 +130,7 @@ CREATE TABLE ulgi (
 );
 
 CREATE TABLE bilety_miejsca(
-    id_przejazdu INT REFERENCES przejazdy,
+    id_przejazdu INT NOT NULL REFERENCES przejazdy,
     id_wagonu INT NOT NULL,
     nr_miejsca INT NOT NULL,
     id_ulgi INTEGER REFERENCES ulgi(id_ulgi),
