@@ -1,5 +1,4 @@
--- Na jednym torze nie moze byc jednoczesnie wiele pociagow
--- Jeden pociag nie moze byc jednoczesnie na wielu stacjach
+-- Dwa pociagi na jednym torze, jeden pociag na dwoch stacjach
 
 CREATE FUNCTION sprawdz_przystanek() RETURNS TRIGGER AS
 $$
@@ -17,30 +16,62 @@ $$ LANGUAGE plpgsql;
 CREATE TRIGGER sprawdz_przystanek BEFORE INSERT ON sprawdz_przystanek
 FOR EACH ROW EXECUTE PROCEDURE sprawdz_stacje_posrednia();
 
--- Sprawdzamy, czy dane polaczenie jezdzi w danym dniu i przyjezdza najpierw na stacje poczatkowa, a potem koncowa
 
-CREATE FUNCTION sprawdz_podroz() RETURNS TRIGGER AS
+-- Stacja poczatkowa jest przed koncowa, polaczenie jest aktywne w danym okresie
+
+CREATE FUNCTION sprawdz_przejazd() RETURNS TRIGGER AS
 $$
 DECLARE
     stacja1 RECORD;
     stacja2 RECORD;
 BEGIN
-    IF (SELECT * FROM historia_polaczenia WHERE id_polaczenia = NEW.id_polaczenia
-                                            AND data_od <= NEW.data_odjazdu AND data_do >= NEW.data_odjazdu) THEN RAISE EXCEPTION ''; END IF;
-    stacja1 := (SELECT * FROM stacje_posrednie WHERE id_stacji = NEW.id_stacji_poczatkowej AND id_trasy =
-                                                                                               (SELECT id_trasy FROM polaczenia WHERE id_polaczenia = NEW.id_polaczenia));
-    stacja2 := (SELECT * FROM stacje_posrednie WHERE id_stacji = NEW.id_stacji_koncowej AND id_trasy =
-                                                                                            (SELECT id_trasy FROM polaczenia WHERE id_polaczenia = NEW.id_polaczenia));
+    IF (SELECT COUNT(*) FROM historia_polaczenia WHERE id_polaczenia = NEW.id_polaczenia
+        AND data_od <= NEW.data_odjazdu AND data_do >= NEW.data_odjazdu) = 0 THEN RAISE EXCEPTION ''; END IF;
+    stacja1 := (SELECT * FROM stacje_posrednie WHERE id_stacji = NEW.id_stacji_poczatkowej
+        AND id_polaczenia = NEW.id_polaczenia);
+    stacja2 := (SELECT * FROM stacje_posrednie WHERE id_stacji = NEW.id_stacji_koncowej
+        AND id_polaczenia = NEW.id_polaczenia);
     IF stacja1 IS NULL OR stacja2 IS NULL THEN RAISE EXCEPTION ''; END IF;
     IF stacja1.odjazd >= stacja2.przyjazd THEN RAISE EXCEPTION ''; END IF;
     RETURN NEW;
 END;
 $$ LANGUAGE plpgsql;
 
-CREATE TRIGGER sprawdz_stacje BEFORE INSERT ON bilety
-    FOR EACH ROW EXECUTE PROCEDURE sprawdz_podroz();
+CREATE TRIGGER sprawdz_przejazd BEFORE INSERT ON przejazdy
+FOR EACH ROW EXECUTE PROCEDURE sprawdz_przejazd();
 
--- Sprawdzamy, czy dane miejsce jest wolne
+
+-- Okresy aktywnosci polaczenia sa parami rozlaczne
+
+CREATE FUNCTION sprawdz_polaczenie() RETURNS TRIGGER AS
+$$
+BEGIN
+    IF (SELECT COUNT(*) FROM historia_polaczenia WHERE id_polaczenia = NEW.id_polaczenia
+        AND data_od <= NEW.data_do AND data_do >= NEW.data_od) > 0 THEN RAISE EXCEPTION ''; END IF;
+    RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE TRIGGER sprawdz_polaczenie BEFORE INSERT ON historia_polaczenia
+    FOR EACH ROW EXECUTE PROCEDURE sprawdz_polaczenie();
+
+
+-- Okresy obowiazywania cennikow sa parami rozlaczne
+
+CREATE FUNCTION sprawdz_ceny() RETURNS TRIGGER AS
+$$
+BEGIN
+    IF (SELECT COUNT(*) FROM historia_cen WHERE id_przewoznika = NEW.id_przewoznika
+        AND data_od <= NEW.data_do AND data_do >= NEW.data_od) > 0 THEN RAISE EXCEPTION ''; END IF;
+    RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE TRIGGER sprawdz_ceny BEFORE INSERT ON historia_cen
+    FOR EACH ROW EXECUTE PROCEDURE sprawdz_ceny()
+
+
+-- Niesprawdzone
 
 CREATE FUNCTION sprawdz_miejsce() RETURNS TRIGGER AS
 $$
@@ -55,32 +86,4 @@ END;
 $$ LANGUAGE plpgsql;
 
 CREATE TRIGGER sprawdz_miejsce BEFORE INSERT ON bilety_miejsca
-    FOR EACH ROW EXECUTE PROCEDURE sprawdz_miejsce();
-
--- Sprawdzamy, czy okresy aktywnosci danego polaczenia sa parami rozlaczne
-
-CREATE FUNCTION sprawdz_polaczenie() RETURNS TRIGGER AS
-$$
-BEGIN
-    IF (SELECT COUNT(*) FROM historia_polaczenia WHERE id_polaczenia = NEW.id_polaczenia
-                                                   AND data_od <= NEW.data_do AND data_do >= NEW.data_od) > 0 THEN RAISE EXCEPTION ''; END IF;
-    RETURN NEW;
-END;
-$$ LANGUAGE plpgsql;
-
-CREATE TRIGGER sprawdz_polaczenie BEFORE INSERT ON historia_polaczenia
-    FOR EACH ROW EXECUTE PROCEDURE sprawdz_polaczenie();
-
--- Sprawdzamy, czy okresy obowiazywania danych cennikow sa rozlaczne
-
-CREATE FUNCTION sprawdz_ceny() RETURNS TRIGGER AS
-$$
-BEGIN
-    IF (SELECT COUNT(*) FROM historia_cen WHERE id_przewoznika = NEW.id_przewoznika
-                                            AND data_od <= NEW.data_do AND data_do >= NEW.data_od) > 0 THEN RAISE EXCEPTION ''; END IF;
-    RETURN NEW;
-END;
-$$ LANGUAGE plpgsql;
-
-CREATE TRIGGER sprawdz_ceny BEFORE INSERT ON historia_cen
-    FOR EACH ROW EXECUTE PROCEDURE sprawdz_ceny();
+FOR EACH ROW EXECUTE PROCEDURE sprawdz_miejsce();

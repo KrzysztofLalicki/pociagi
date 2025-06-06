@@ -66,13 +66,13 @@ CREATE TABLE polaczenia (
 );
 
 CREATE TABLE stacje_posrednie (
-                                  id_polaczenia INT REFERENCES polaczenia,
-                                  id_stacji INT REFERENCES stacje,
-                                  przyjazd INT CHECK(przyjazd > 0),
-                                  odjazd INT CHECK(odjazd >= przyjazd),
-                                  zatrzymanie BOOLEAN NOT NULL,
-                                  tor INT NOT NULL,
-                                  PRIMARY KEY (id_polaczenia, id_stacji)
+    id_polaczenia INT REFERENCES polaczenia,
+    id_stacji INT REFERENCES stacje,
+    przyjazd INT,
+    odjazd INT CHECK (przyjazd IS NULL OR odjazd IS NULL OR odjazd >= przyjazd),
+    zatrzymanie BOOLEAN NOT NULL,
+    tor INT NOT NULL,
+    PRIMARY KEY (id_polaczenia, id_stacji)
 );
 
 CREATE TABLE historia_polaczenia (
