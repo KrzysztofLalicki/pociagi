@@ -1,26 +1,10 @@
 BEGIN;
 
-CREATE TYPE dzien_tygodnia AS ENUM (
-    'Poniedziałek',
-    'Wtorek',
-    'Środa',
-    'Czwartek',
-    'Piątek',
-    'Sobota',
-    'Niedziela'
-);
-
 CREATE TABLE harmonogramy(
     id_harmonogramu SERIAL PRIMARY KEY,
-    czy_poniedzialek BOOLEAN NOT NULL DEFAULT FALSE,
-    czy_wtorek BOOLEAN NOT NULL DEFAULT FALSE,
-    czy_sroda BOOLEAN NOT NULL DEFAULT FALSE,
-    czy_czwartek BOOLEAN NOT NULL DEFAULT FALSE,
-    czy_piatek BOOLEAN NOT NULL DEFAULT FALSE,
-    czy_sobota BOOLEAN NOT NULL DEFAULT FALSE,
-    czy_niedziela BOOLEAN NOT NULL DEFAULT FALSE,
-    czy_swieta BOOLEAN NOT NULL DEFAULT FALSE,
-    UNIQUE (czy_poniedzialek, czy_wtorek, czy_sroda, czy_czwartek, czy_piatek, czy_sobota, czy_niedziela)
+    czy_tydzien BOOLEAN[7] NOT NULL,
+    czy_swieta BOOLEAN NOT NULL,
+    UNIQUE (czy_tydzien, czy_swieta)
 );
 
 CREATE TABLE pasazerowie (
@@ -144,11 +128,22 @@ CREATE TABLE polaczenia_wagony (
     PRIMARY KEY (id_polaczenia, nr_wagonu)
 );
 
-CREATE TABLE swieta (
+CREATE TABLE swieta_stale (
     nazwa VARCHAR UNIQUE NOT NULL,
     dzien INT NOT NULL CHECK (dzien > 0 AND dzien <= 31),
     miesiac INT NOT NULL CHECK (miesiac > 0 AND miesiac < 12),
     UNIQUE (dzien, miesiac)
+);
+
+CREATE TABLE swieta_ruchome (
+    id_swieta SERIAL PRIMARY KEY,
+    nazwa VARCHAR UNIQUE NOT NULL
+);
+
+CREATE TABLE daty_swiat (
+    id_swieta INT REFERENCES swieta_ruchome,
+    data DATE,
+    PRIMARY KEY (id_swieta, data)
 );
 
 COMMIT;

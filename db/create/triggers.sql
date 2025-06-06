@@ -13,11 +13,10 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
-CREATE TRIGGER sprawdz_przystanek BEFORE INSERT ON sprawdz_przystanek
-FOR EACH ROW EXECUTE PROCEDURE sprawdz_stacje_posrednia();
+CREATE TRIGGER sprawdz_przystanek BEFORE INSERT ON stacje_posrednie
+FOR EACH ROW EXECUTE PROCEDURE sprawdz_przystanek();
 
-
--- Stacja poczatkowa jest przed koncowa, polaczenie jest aktywne w danym okresie
+-- Stacja poczatkowa jest przed koncowa, polaczenie obowiazuje w danym dniu
 
 CREATE FUNCTION sprawdz_przejazd() RETURNS TRIGGER AS
 $$
@@ -27,6 +26,8 @@ DECLARE
 BEGIN
     IF (SELECT COUNT(*) FROM historia_polaczenia WHERE id_polaczenia = NEW.id_polaczenia
         AND data_od <= NEW.data_odjazdu AND data_do >= NEW.data_odjazdu) = 0 THEN RAISE EXCEPTION ''; END IF;
+    IF (SELECT czy_tydzien[extract('day' FROM NEW.data_odjazdu) + 1] FROM harmonogramy NATURAL JOIN polaczenia
+        WHERE id_polaczenia = NEW.id_polaczenia) = FALSE THEN RAISE EXCEPTION ''; END IF;
     stacja1 := (SELECT * FROM stacje_posrednie WHERE id_stacji = NEW.id_stacji_poczatkowej
         AND id_polaczenia = NEW.id_polaczenia);
     stacja2 := (SELECT * FROM stacje_posrednie WHERE id_stacji = NEW.id_stacji_koncowej
@@ -40,7 +41,6 @@ $$ LANGUAGE plpgsql;
 CREATE TRIGGER sprawdz_przejazd BEFORE INSERT ON przejazdy
 FOR EACH ROW EXECUTE PROCEDURE sprawdz_przejazd();
 
-
 -- Okresy aktywnosci polaczenia sa parami rozlaczne
 
 CREATE FUNCTION sprawdz_polaczenie() RETURNS TRIGGER AS
@@ -53,8 +53,7 @@ END;
 $$ LANGUAGE plpgsql;
 
 CREATE TRIGGER sprawdz_polaczenie BEFORE INSERT ON historia_polaczenia
-    FOR EACH ROW EXECUTE PROCEDURE sprawdz_polaczenie();
-
+FOR EACH ROW EXECUTE PROCEDURE sprawdz_polaczenie();
 
 -- Okresy obowiazywania cennikow sa parami rozlaczne
 
@@ -68,22 +67,17 @@ END;
 $$ LANGUAGE plpgsql;
 
 CREATE TRIGGER sprawdz_ceny BEFORE INSERT ON historia_cen
-    FOR EACH ROW EXECUTE PROCEDURE sprawdz_ceny()
+FOR EACH ROW EXECUTE PROCEDURE sprawdz_ceny();
 
+-- Data istnieje
 
--- Niesprawdzone
-
-CREATE FUNCTION sprawdz_miejsce() RETURNS TRIGGER AS
+CREATE FUNCTION sprawdz_date() RETURNS TRIGGER AS
 $$
 BEGIN
-    IF (SELECT COUNT(*) FROM bilety b NATURAL JOIN bilety_miejsca bm NATURAL JOIN miejsca m
-        WHERE nr_miejsca = NEW.nr_miejsca AND id_wagonu = NEW.id_wagonu
-          AND id_polaczenia = (SELECT id_polaczenia FROM bilety WHERE id_biletu = NEW.id_biletu)
-          AND data_odjazdu = (SELECT data_odjazdu FROM bilety WHERE id_biletu = NEW.id_biletu)) > 0
-    THEN RAISE EXCEPTION ''; END IF;
-    RETURN NEW;
+    IF NEW.miesiac IN (2, 4, 6, 9, 11) AND NEW.dzien = 31 THEN RAISE EXCEPTION ''; END IF;
+    IF NEW.miesiac = 2 AND NEW.dzien = 30 THEN RAISE EXCEPTION ''; END IF;
 END;
 $$ LANGUAGE plpgsql;
 
-CREATE TRIGGER sprawdz_miejsce BEFORE INSERT ON bilety_miejsca
-FOR EACH ROW EXECUTE PROCEDURE sprawdz_miejsce();
+CREATE TRIGGER sprawdz_date BEFORE INSERT ON swieta_stale
+FOR EACH ROW EXECUTE PROCEDURE sprawdz_date();
