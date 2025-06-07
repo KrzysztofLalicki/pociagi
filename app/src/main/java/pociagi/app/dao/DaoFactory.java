@@ -6,4 +6,6 @@ public class DaoFactory {
         return stacjeDao;
     }
 
+    private static final TimetableDao timetableDao = new TimetableDao();
+    public static TimetableDao getTimetableDao() { return timetableDao; }
 }

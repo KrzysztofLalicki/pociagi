@@ -12,7 +12,6 @@ import pociagi.app.model.Stacja;
 public class SelectStartAndEndStationViewController {
     @FXML private Node startStationView;
     @FXML private Node endStationView;
-    @FXML private Button wsteczButton;
     @FXML private Button dalejButton;
 
     private ObjectProperty<Stacja> startStation;
