@@ -12,6 +12,32 @@ $$ LANGUAGE plpgsql;
 CREATE TRIGGER sprawdz_ceny BEFORE INSERT ON historia_cen
     FOR EACH ROW EXECUTE PROCEDURE sprawdz_ceny();
 
+-- Pociag jedzie po torach (polaczenie musi byc dodane w jednej transakcji ze stacjami posrednimi)
+
+CREATE FUNCTION sprawdz_droge() RETURNS TRIGGER AS
+$$
+DECLARE
+    poprzednia RECORD;
+    nastepna RECORD;
+BEGIN
+    poprzednia := (SELECT id_stacji, przyjazd FROM stacje_posrednie WHERE id_polaczenia = NEW.id_polaczenia
+        ORDER BY przyjazd LIMIT 1);
+    LOOP
+        nastepna := (SELECT id_stacji, przyjazd FROM stacje_posrednie WHERE id_polaczenia = NEW.id_polaczenia
+            AND przyjazd > poprzednia.przyjazd ORDER BY przyjazd LIMIT 1);
+        IF nastepna IS NULL THEN RETURN NEW; END IF;
+        IF (SELECT COUNT(*) FROM linie WHERE (stacja1 = poprzednia AND stacja2 = nastepna)
+            OR (stacja1 = nastepna AND stacja2 = poprzednia)) = 0 THEN DELETE FROM stacje_posrednie
+            WHERE id_polaczenia = NEW.id_polaczenia; DELETE FROM polaczenia WHERE id_polaczenia = NEW.id_polaczenia;
+            RAISE EXCEPTION ''; END IF;
+        poprzednia := nastepna;
+    END LOOP;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE CONSTRAINT TRIGGER sprawdz_droge AFTER INSERT ON polaczenia DEFERRABLE INITIALLY DEFERRED
+FOR EACH ROW EXECUTE PROCEDURE sprawdz_droge();
+
 -- Pociag na nieistniejacym torze, dwa pociagi na jednym torze, jeden pociag na dwoch stacjach
 
 CREATE FUNCTION sprawdz_przystanek() RETURNS TRIGGER AS
