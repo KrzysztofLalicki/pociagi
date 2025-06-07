@@ -16,7 +16,7 @@ $$ LANGUAGE plpgsql;
 CREATE TRIGGER sprawdz_przystanek BEFORE INSERT ON stacje_posrednie
 FOR EACH ROW EXECUTE PROCEDURE sprawdz_przystanek();
 
--- Stacja poczatkowa jest przed koncowa, polaczenie obowiazuje w danym dniu
+-- Odjazd po kupnie biletu, stacja poczatkowa przed koncowa, polaczenie obowiazuje w danym dniu
 
 CREATE FUNCTION sprawdz_przejazd() RETURNS TRIGGER AS
 $$
@@ -24,6 +24,8 @@ DECLARE
     stacja1 RECORD;
     stacja2 RECORD;
 BEGIN
+    IF NEW.data_odjazdu < (SELECT data_zakupu FROM bilety WHERE id_biletu = NEW.id_biletu)
+        THEN RAISE EXCEPTION ''; END IF;
     IF (SELECT COUNT(*) FROM historia_polaczenia WHERE id_polaczenia = NEW.id_polaczenia
         AND data_od <= NEW.data_odjazdu AND data_do >= NEW.data_odjazdu) = 0 THEN RAISE EXCEPTION ''; END IF;
     IF swieto(NEW.data_odjazdu) = FALSE AND (SELECT czy_tydzien[extract('day' FROM NEW.data_odjazdu) + 1]
@@ -57,6 +59,20 @@ $$ LANGUAGE plpgsql;
 
 CREATE TRIGGER sprawdz_polaczenie BEFORE INSERT ON historia_polaczenia
 FOR EACH ROW EXECUTE PROCEDURE sprawdz_polaczenie();
+
+-- Zwrot biletu przed odjazdem
+
+CREATE FUNCTION sprawdz_zwrot() RETURNS TRIGGER AS
+$$
+BEGIN
+    IF (SELECT MIN(data_odjazdu) FROM przejazdy WHERE id_biletu = NEW.id_biletu) < NEW.data_zwrotu
+        THEN RAISE EXCEPTION ''; END IF;
+    RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE TRIGGER sprawdz_zwrot BEFORE UPDATE ON bilety
+FOR EACH ROW EXECUTE PROCEDURE sprawdz_zwrot();
 
 -- Okresy obowiazywania cennikow sa parami rozlaczne
 

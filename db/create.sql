@@ -77,6 +77,7 @@ CREATE TABLE przejazdy (
     id_przejazdu SERIAL PRIMARY KEY,
     id_biletu INT NOT NULL REFERENCES bilety,
     id_polaczenia INT NOT NULL REFERENCES polaczenia,
+    data_odjazdu DATE NOT NULL,
     id_stacji_poczatkowej INT NOT NULL REFERENCES stacje,
     id_stacji_koncowej INT NOT NULL REFERENCES stacje CHECK (id_stacji_koncowej != id_stacji_poczatkowej)
 );
