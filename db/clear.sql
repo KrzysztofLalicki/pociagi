@@ -8,14 +8,14 @@ DROP TABLE przewoznicy CASCADE;
 DROP TABLE historia_cen CASCADE; --DONE
 DROP TABLE polaczenia CASCADE; --TODO
 DROP TABLE stacje_posrednie CASCADE; --DONE
-DROP TABLE historia_polaczenia CASCADE; --DONE/TODO
+DROP TABLE historia_polaczenia CASCADE; --DONE
 DROP TABLE bilety CASCADE; --DONE
 DROP TABLE przejazdy CASCADE; --DONE
 DROP TABLE wagony CASCADE;
 DROP TABLE przedzialy CASCADE;
 DROP TABLE miejsca CASCADE;
 DROP TABLE ulgi CASCADE;
-DROP TABLE bilety_miejsca CASCADE; --TODO
+DROP TABLE bilety_miejsca CASCADE; --DONE/TODO
 DROP TABLE polaczenia_wagony CASCADE;
 DROP TABLE swieta_stale CASCADE;
 DROP TABLE swieta_ruchome CASCADE;

@@ -113,19 +113,18 @@ CREATE TABLE ulgi (
     znizka INT NOT NULL CHECK (znizka >= 0 AND znizka <= 100)
 );
 
-CREATE TABLE bilety_miejsca(
-    id_przejazdu INT NOT NULL REFERENCES przejazdy,
-    nr_wagonu INT NOT NULL REFERENCES polaczenia_wagony(nr_wagonu),
-    nr_miejsca INT NOT NULL REFERENCES miejsca,
-    id_ulgi INT REFERENCES ulgi(id_ulgi),
-    data_odjazdu DATE NOT NULL
-);
-
 CREATE TABLE polaczenia_wagony (
     id_polaczenia INT NOT NULL REFERENCES polaczenia,
     nr_wagonu INT NOT NULL,
     id_wagonu INT NOT NULL REFERENCES wagony,
     PRIMARY KEY (id_polaczenia, nr_wagonu)
+);
+
+CREATE TABLE bilety_miejsca(
+    id_przejazdu INT NOT NULL REFERENCES przejazdy,
+    nr_wagonu INT NOT NULL,
+    nr_miejsca INT NOT NULL,
+    id_ulgi INT REFERENCES ulgi(id_ulgi)
 );
 
 CREATE TABLE swieta_stale (
