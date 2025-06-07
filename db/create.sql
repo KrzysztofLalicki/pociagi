@@ -69,9 +69,8 @@ CREATE TABLE historia_polaczenia (
 CREATE TABLE bilety (
     id_biletu SERIAL PRIMARY KEY,
     id_pasazera INT NOT NULL REFERENCES pasazerowie (id_pasazera),
-    data_zakupu date NOT NULL,
-    data_odjazdu date NOT NULL CHECK (data_odjazdu >= data_zakupu),
-    data_zwrotu date CHECK(data_zwrotu >= data_zakupu AND data_zwrotu <= data_odjazdu)
+    data_zakupu DATE NOT NULL,
+    data_zwrotu DATE CHECK(data_zwrotu >= data_zakupu)
 );
 
 CREATE TABLE przejazdy (
@@ -100,7 +99,7 @@ CREATE TABLE przedzialy (
 CREATE TABLE miejsca(
     nr_miejsca INT NOT NULL CHECK (nr_miejsca > 0),
     id_wagonu INT NOT NULL REFERENCES wagony (id_wagonu),
-    nr_przedzialu INTEGER NOT NULL CHECK(nr_przedzialu > 0),
+    nr_przedzialu INT NOT NULL CHECK(nr_przedzialu > 0),
     czy_dla_niepelnosprawnych BOOLEAN NOT NULL,
     czy_dla_rowerow BOOLEAN NOT NULL,
     PRIMARY KEY (nr_miejsca, id_wagonu),
@@ -115,10 +114,10 @@ CREATE TABLE ulgi (
 
 CREATE TABLE bilety_miejsca(
     id_przejazdu INT NOT NULL REFERENCES przejazdy,
-    id_wagonu INT NOT NULL,
-    nr_miejsca INT NOT NULL,
-    id_ulgi INTEGER REFERENCES ulgi(id_ulgi),
-    FOREIGN KEY (nr_miejsca, id_wagonu) REFERENCES miejsca(nr_miejsca, id_wagonu)
+    nr_wagonu INT NOT NULL REFERENCES polaczenia_wagony(nr_wagonu),
+    nr_miejsca INT NOT NULL REFERENCES miejsca,
+    id_ulgi INT REFERENCES ulgi(id_ulgi),
+    data_odjazdu DATE NOT NULL
 );
 
 CREATE TABLE polaczenia_wagony (

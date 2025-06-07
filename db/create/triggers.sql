@@ -1,4 +1,4 @@
--- Dwa pociagi na jednym torze, jeden pociag na dwoch stacjach
+-- Pociag na nieistniejacym torze, dwa pociagi na jednym torze, jeden pociag na dwoch stacjach
 
 CREATE FUNCTION sprawdz_przystanek() RETURNS TRIGGER AS
 $$
