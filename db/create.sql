@@ -130,7 +130,7 @@ CREATE TABLE bilety_miejsca(
 CREATE TABLE swieta_stale (
     nazwa VARCHAR UNIQUE NOT NULL,
     dzien INT NOT NULL CHECK (dzien > 0 AND dzien <= 31),
-    miesiac INT NOT NULL CHECK (miesiac > 0 AND miesiac < 12),
+    miesiac INT NOT NULL CHECK (miesiac > 0 AND miesiac <= 12),
     UNIQUE (dzien, miesiac)
 );
 
