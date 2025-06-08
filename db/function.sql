@@ -220,9 +220,9 @@ END;
 $$ LANGUAGE plpgsql;
 
 CREATE OR REPLACE FUNCTION wszystkie_miejsca_polaczenie(id_pol INTEGER)
-RETURNS TABLE(nr_wagonu INTEGER,nr_miejsca INTEGER, nr_przedzialu INTEGER, KLASA INTEGER ) AS $$
+RETURNS TABLE(nr_wagonu INTEGER,nr_miejsca INTEGER, nr_przedzialu INTEGER, KLASA INTEGER, czy_dla_niepelnosprawnych BOOLEAN, czy_dla_rowerow BOOLEAN ) AS $$
     BEGIN
-        RETURN QUERY SELECT pw.nr_wagonu, m.nr_miejsca, p.nr_przedzialu, p.klasa FROM polaczenia_wagony pw
+        RETURN QUERY SELECT pw.nr_wagonu, m.nr_miejsca, p.nr_przedzialu, p.klasa, m.czy_dla_niepelnosprawnych, m.czy_dla_rowerow FROM polaczenia_wagony pw
             JOIN wagony w ON pw.id_wagonu = w.id_wagonu
             JOIN miejsca m ON w.id_wagonu = m.id_wagonu
             JOIN przedzialy p ON m.nr_przedzialu = p.nr_przedzialu and m.id_wagonu = p.id_wagonu
@@ -280,12 +280,15 @@ CREATE OR REPLACE FUNCTION wszystkie_wolne_dla_polaczenia_dla_klasy(
     dzien_odjazdu DATE,
     id_stacji_start INTEGER,
     id_stacji_koniec INTEGER,
-    klasa_miejsca INTEGER
-) RETURNS TABLE(nr_wagonu INTEGER,nr_miejsca INTEGER, nr_przedzialu INTEGER, klasa INTEGER) AS $$
+    klasa_miejsca INTEGER,
+    czy_dla_niepelnosprawnych_ BOOLEAN,
+    czy_dla_rowerow_ BOOLEAN
+) RETURNS TABLE(nr_wagonu INTEGER,nr_miejsca INTEGER, nr_przedzialu INTEGER, klasa INTEGER, czy_dla_niepelnosprawnych BOOLEAN,
+    czy_dla_rowerow BOOLEAN) AS $$
     BEGIN
         RETURN QUERY SELECT * FROM wszystkie_miejsca_polaczenie(id_pol) m WHERE
         czy_miejsce_wolne(id_pol,dzien_odjazdu,id_stacji_start,id_stacji_koniec,m.nr_miejsca,m.nr_wagonu)
-        AND m.klasa = klasa_miejsca;
+        AND m.klasa = klasa_miejsca AND m.czy_dla_niepelnosprawnych =  czy_dla_niepelnosprawnych_ AND m.czy_dla_rowerow = czy_dla_rowerow_;
     END;
 $$ LANGUAGE plpgsql;
 
@@ -310,11 +313,17 @@ END;
 $$ LANGUAGE plpgsql;
 
 
-CREATE OR REPLACE FUNCTION koszt_przejazdu(id_pol INTEGER, id_stacji_start INTEGER, id_stacji_koniec INTEGER, klasa integer, data DATE)
+CREATE OR REPLACE FUNCTION koszt_przejazdu(liczba_osob INTEGER, czy_dla_rowerow BOOLEAN, id_pol INTEGER, id_stacji_start INTEGER, id_stacji_koniec INTEGER, klasa integer, data DATE)
 RETURNS NUMERIC(8,2) AS $$
 DECLARE
     koszt_km NUMERIC(8,2);
+    koszt_rower NUMERIC(8,2) = 0;
     BEGIN
+    IF czy_dla_rowerow  THEN
+        SELECT cena_za_rower INTO koszt_rower FROM polaczenia p JOIN przewoznicy pw ON pw.id_przewoznika = p.id_przewoznika
+        JOIN historia_cen h ON h.id_przewoznika = pw.id_przewoznika WHERE (data BETWEEN h.data_od AND h.data_do) OR
+            (h.data_do IS NULL AND data >= h.data_od);
+    END IF;
     IF klasa = 1 THEN
         SELECT cena_za_km_kl1 INTO koszt_km FROM polaczenia p JOIN przewoznicy pw ON pw.id_przewoznika = p.id_przewoznika
         JOIN historia_cen h ON h.id_przewoznika = pw.id_przewoznika WHERE (data BETWEEN h.data_od AND h.data_do) OR
@@ -324,7 +333,7 @@ DECLARE
         JOIN historia_cen h ON h.id_przewoznika = pw.id_przewoznika WHERE (data BETWEEN h.data_od AND h.data_do) OR
             (h.data_do IS NULL AND data >= h.data_od);
     end if;
-        RETURN dlugosc_drogi(id_pol,id_stacji_start,id_stacji_koniec) * koszt_km;
+        RETURN liczba_osob * dlugosc_drogi(id_pol,id_stacji_start,id_stacji_koniec) * koszt_km + liczba_osob * koszt_rower;
 
 
     END;
@@ -336,7 +345,9 @@ CREATE OR REPLACE FUNCTION szukaj_polaczenia(
     liczba_miejsc_klasa1 INTEGER,
     liczba_miejsc_klasa2 INTEGER,
     dzien_szukania DATE,
-    godzina TIME
+    godzina TIME,
+    czy_dla_niepelnosprawnych boolean,
+    czy_dla_rowerow boolean
 ) RETURNS TABLE (stacja_start VARCHAR, stacja_koniec VARCHAR, godzina_odjazdu TIME, czas_trasy TIME,koszt_przejazdu NUMERIC(8,2)) AS $$
 DECLARE
     id_stacji_start INTEGER;
@@ -351,8 +362,8 @@ BEGIN
             koniec.nazwa AS stacja_koniec,
             p.godzina_startu,
             czas_trasy(p.id_polaczenia,id_stacji_start,id_stacji_koniec),
-            (liczba_miejsc_klasa1 * koszt_przejazdu(p.id_polaczenia,id_stacji_start,id_stacji_koniec,1,dzien_szukania) +
-             liczba_miejsc_klasa2 * koszt_przejazdu(p.id_polaczenia,id_stacji_start,id_stacji_koniec,2,dzien_szukania))
+            koszt_przejazdu(liczba_miejsc_klasa1,czy_dla_rowerow,p.id_polaczenia,id_stacji_start,id_stacji_koniec,1,dzien_szukania) +
+            koszt_przejazdu(liczba_miejsc_klasa2,czy_dla_rowerow,p.id_polaczenia,id_stacji_start,id_stacji_koniec,2,dzien_szukania)
         FROM
             dostepne_polaczenia_dzien_aktualnosc(id_stacji_start, id_stacji_koniec, dzien_szukania) p
                 JOIN
@@ -361,11 +372,11 @@ BEGIN
             stacje koniec ON koniec.id_stacji = id_stacji_koniec
         WHERE
             (SELECT COUNT(*)
-             FROM wszystkie_wolne_dla_polaczenia_dla_klasy(p.id_polaczenia, dzien_szukania, id_stacji_start, id_stacji_koniec,1)
-            ) >= liczba_miejsc_klasa1
+             FROM wszystkie_wolne_dla_polaczenia_dla_klasy(p.id_polaczenia, dzien_szukania, id_stacji_start, id_stacji_koniec,1,czy_dla_niepelnosprawnych,czy_dla_rowerow))
+                >= liczba_miejsc_klasa1
           AND
             (SELECT COUNT(*)
-             FROM wszystkie_wolne_dla_polaczenia_dla_klasy(p.id_polaczenia, dzien_szukania, id_stacji_start, id_stacji_koniec,2)
+             FROM wszystkie_wolne_dla_polaczenia_dla_klasy(p.id_polaczenia, dzien_szukania, id_stacji_start, id_stacji_koniec,2,czy_dla_niepelnosprawnych,czy_dla_rowerow)
             ) >= liczba_miejsc_klasa2
             AND
             p.godzina_startu >= godzina
@@ -377,8 +388,8 @@ BEGIN
                 koniec.nazwa AS stacja_koniec,
                 p.godzina_startu,
                 czas_trasy(p.id_polaczenia,id_stacji_start,id_stacji_koniec),
-                (liczba_miejsc_klasa1 * koszt_przejazdu(p.id_polaczenia,id_stacji_start,id_stacji_koniec,1,dzien_szukania) +
-                 liczba_miejsc_klasa2 * koszt_przejazdu(p.id_polaczenia,id_stacji_start,id_stacji_koniec,2,dzien_szukania))
+                koszt_przejazdu(liczba_miejsc_klasa1,czy_dla_rowerow,p.id_polaczenia,id_stacji_start,id_stacji_koniec,1,dzien_szukania) +
+                koszt_przejazdu(liczba_miejsc_klasa2,czy_dla_rowerow,p.id_polaczenia,id_stacji_start,id_stacji_koniec,2,dzien_szukania)
             FROM
                 dostepne_polaczenia_dzien_aktualnosc(id_stacji_start, id_stacji_koniec, dzien_szukania) p
                     JOIN
@@ -387,11 +398,11 @@ BEGIN
                 stacje koniec ON koniec.id_stacji = id_stacji_koniec
             WHERE
                 (SELECT COUNT(*)
-                 FROM wszystkie_wolne_dla_polaczenia_dla_klasy(p.id_polaczenia, dzien_szukania, id_stacji_start, id_stacji_koniec,1)
+                 FROM wszystkie_wolne_dla_polaczenia_dla_klasy(p.id_polaczenia, dzien_szukania, id_stacji_start, id_stacji_koniec,1,czy_dla_niepelnosprawnych,czy_dla_rowerow)
                 ) >= liczba_miejsc_klasa1
               AND
                 (SELECT COUNT(*)
-                 FROM wszystkie_wolne_dla_polaczenia_dla_klasy(p.id_polaczenia, dzien_szukania, id_stacji_start, id_stacji_koniec,2)
+                 FROM wszystkie_wolne_dla_polaczenia_dla_klasy(p.id_polaczenia, dzien_szukania, id_stacji_start, id_stacji_koniec,2,czy_dla_niepelnosprawnych,czy_dla_rowerow)
                 ) >= liczba_miejsc_klasa2
               AND
                 p.godzina_startu >= godzina
@@ -402,8 +413,8 @@ BEGIN
                 koniec.nazwa AS stacja_koniec,
                 p.godzina_startu,
                 czas_trasy(p.id_polaczenia,id_stacji_start,id_stacji_koniec),
-                (liczba_miejsc_klasa1 * koszt_przejazdu(p.id_polaczenia,id_stacji_start,id_stacji_koniec,1,dzien_szukania + INTERVAL '1 day') +
-                 liczba_miejsc_klasa2 * koszt_przejazdu(p.id_polaczenia,id_stacji_start,id_stacji_koniec,2,dzien_szukania + INTERVAL '1 day'))
+                koszt_przejazdu(liczba_miejsc_klasa1,czy_dla_rowerow,p.id_polaczenia,id_stacji_start,id_stacji_koniec,1,dzien_szukania + INTERVAL '1 day') +
+                 koszt_przejazdu(liczba_miejsc_klasa2,czy_dla_rowerow,p.id_polaczenia,id_stacji_start,id_stacji_koniec,2,dzien_szukania + INTERVAL '1 day')
             FROM
                 dostepne_polaczenia_dzien_aktualnosc(id_stacji_start, id_stacji_koniec, dzien_szukania + INTERVAL '1 day') p
                     JOIN
@@ -412,11 +423,11 @@ BEGIN
                 stacje koniec ON koniec.id_stacji = id_stacji_koniec
             WHERE
                 (SELECT COUNT(*)
-                 FROM wszystkie_wolne_dla_polaczenia_dla_klasy(p.id_polaczenia, dzien_szukania + INTERVAL '1 day', id_stacji_start, id_stacji_koniec,1)
+                 FROM wszystkie_wolne_dla_polaczenia_dla_klasy(p.id_polaczenia, dzien_szukania + INTERVAL '1 day', id_stacji_start, id_stacji_koniec,1,czy_dla_niepelnosprawnych,czy_dla_rowerow)
                 ) >= liczba_miejsc_klasa1
               AND
                 (SELECT COUNT(*)
-                 FROM wszystkie_wolne_dla_polaczenia_dla_klasy(p.id_polaczenia, dzien_szukania + INTERVAL '1 day', id_stacji_start, id_stacji_koniec,2)
+                 FROM wszystkie_wolne_dla_polaczenia_dla_klasy(p.id_polaczenia, dzien_szukania + INTERVAL '1 day', id_stacji_start, id_stacji_koniec,2,czy_dla_niepelnosprawnych,czy_dla_rowerow)
                 ) >= liczba_miejsc_klasa2
             ORDER BY p.godzina_startu);
     END IF;
