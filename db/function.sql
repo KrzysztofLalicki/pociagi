@@ -301,7 +301,8 @@ $$ LANGUAGE plpgsql;
 CREATE OR REPLACE FUNCTION szukaj_polaczenia(
     stacja1 VARCHAR,
     stacja2 VARCHAR,
-    liczba_miejsc INTEGER,
+    liczba_miejsc_klasa1 INTEGER,
+    liczba_miejsc_klasa2 INTEGER,
     dzien_szukania DATE,
     godzina TIME
 ) RETURNS TABLE (stacja_start VARCHAR, stacja_koniec VARCHAR, godzina_odjazdu TIME) AS $$
@@ -311,6 +312,7 @@ DECLARE
 BEGIN
     SELECT id_stacji INTO id_stacji_start FROM stacje WHERE nazwa ILIKE stacja1;
     SELECT id_stacji INTO id_stacji_koniec FROM stacje WHERE nazwa ILIKE stacja2;
+    IF(godzina < '18:00:00') THEN
     RETURN QUERY
         SELECT
             start.nazwa AS stacja_start,
@@ -324,11 +326,59 @@ BEGIN
             stacje koniec ON koniec.id_stacji = id_stacji_koniec
         WHERE
             (SELECT COUNT(*)
-             FROM wszystkie_wolne_dla_polaczenia_dla_klasy(p.id_polaczenia, dzien_szukania, id_stacji_start, id_stacji_koniec,2)
-            ) >= liczba_miejsc
+             FROM wszystkie_wolne_dla_polaczenia_dla_klasy(p.id_polaczenia, dzien_szukania, id_stacji_start, id_stacji_koniec,1)
+            ) >= liczba_miejsc_klasa1
           AND
+            (SELECT COUNT(*)
+             FROM wszystkie_wolne_dla_polaczenia_dla_klasy(p.id_polaczenia, dzien_szukania, id_stacji_start, id_stacji_koniec,2)
+            ) >= liczba_miejsc_klasa2
+            AND
             p.godzina_startu >= godzina
         ORDER BY p.godzina_startu;
+    ELSE
+        RETURN QUERY
+            (SELECT
+                start.nazwa AS stacja_start,
+                koniec.nazwa AS stacja_koniec,
+                p.godzina_startu
+            FROM
+                dostepne_polaczenia_dzien_aktualnosc(id_stacji_start, id_stacji_koniec, dzien_szukania) p
+                    JOIN
+                stacje start ON start.id_stacji = id_stacji_start
+                    JOIN
+                stacje koniec ON koniec.id_stacji = id_stacji_koniec
+            WHERE
+                (SELECT COUNT(*)
+                 FROM wszystkie_wolne_dla_polaczenia_dla_klasy(p.id_polaczenia, dzien_szukania, id_stacji_start, id_stacji_koniec,1)
+                ) >= liczba_miejsc_klasa1
+              AND
+                (SELECT COUNT(*)
+                 FROM wszystkie_wolne_dla_polaczenia_dla_klasy(p.id_polaczenia, dzien_szukania, id_stacji_start, id_stacji_koniec,2)
+                ) >= liczba_miejsc_klasa2
+              AND
+                p.godzina_startu >= godzina
+            ORDER BY p.godzina_startu)
+        UNION
+            (SELECT
+                start.nazwa AS stacja_start,
+                koniec.nazwa AS stacja_koniec,
+                p.godzina_startu
+            FROM
+                dostepne_polaczenia_dzien_aktualnosc(id_stacji_start, id_stacji_koniec, dzien_szukania + INTERVAL '1 day') p
+                    JOIN
+                stacje start ON start.id_stacji = id_stacji_start
+                    JOIN
+                stacje koniec ON koniec.id_stacji = id_stacji_koniec
+            WHERE
+                (SELECT COUNT(*)
+                 FROM wszystkie_wolne_dla_polaczenia_dla_klasy(p.id_polaczenia, dzien_szukania + INTERVAL '1 day', id_stacji_start, id_stacji_koniec,1)
+                ) >= liczba_miejsc_klasa1
+              AND
+                (SELECT COUNT(*)
+                 FROM wszystkie_wolne_dla_polaczenia_dla_klasy(p.id_polaczenia, dzien_szukania + INTERVAL '1 day', id_stacji_start, id_stacji_koniec,2)
+                ) >= liczba_miejsc_klasa2
+            ORDER BY p.godzina_startu);
+    END IF;
 END;
 $$ LANGUAGE plpgsql;
 
