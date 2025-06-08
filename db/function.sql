@@ -101,22 +101,18 @@ DECLARE
     godzina_odjazdu INTEGER;
     wynik_godzina TIME;
 BEGIN
-    -- Pobranie godziny startu połączenia
+
     SELECT p.godzina_startu INTO godzina_startu
     FROM polaczenia p
     WHERE id_pol = p.id_polaczenia;
 
-    -- Pobranie liczby minut odjazdu (odjazd jest przechowywany jako liczba minut)
     SELECT odjazd INTO godzina_odjazdu
     FROM stacje_posrednie sp
     WHERE sp.id_polaczenia = id_pol
       AND sp.id_stacji = id_stacji_start;
 
-    -- Dodanie liczby minut do godziny startu
-    -- INTERVAL '1 minute' * godzina_odjazdu
     wynik_godzina := (godzina_startu + (godzina_odjazdu || ' minutes')::INTERVAL)::TIME;
 
-    -- Zwracamy obliczoną godzinę odjazdu
     RETURN wynik_godzina;
 END;
 $$ LANGUAGE plpgsql;
@@ -263,6 +259,15 @@ CREATE OR REPLACE FUNCTION wszystkie_wolne_dla_polaczenia(
     END;
 $$ LANGUAGE plpgsql;
 
+
+
+
+
+
+--to jest debesciak ostateczna funkcja szukająca połączen pewnie jeszcze beda modyfikacje zeby nie było problemu jeśli będzie 23
+
+
+
 CREATE OR REPLACE FUNCTION szukaj_polaczenia(
     stacja1 VARCHAR,
     stacja2 VARCHAR,
@@ -292,7 +297,8 @@ BEGIN
              FROM wszystkie_wolne_dla_polaczenia(p.id_polaczenia, dzien_szukania, id_stacji_start, id_stacji_koniec)
             ) >= liczba_miejsc
           AND
-            p.godzina_startu >= godzina;
+            p.godzina_startu >= godzina
+        ORDER BY p.godzina_startu;
 END;
 $$ LANGUAGE plpgsql;
 
