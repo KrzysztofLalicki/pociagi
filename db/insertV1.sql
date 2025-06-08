@@ -139,3 +139,15 @@ INSERT INTO daty_swiat (id_swieta, data)
 VALUES
     (1, '2025-04-20'),
     (2, '2025-06-01');
+
+
+INSERT INTO polaczenia (godzina_startu, id_harmonogramu, id_przewoznika)
+VALUES ('06:00', 1, 1) RETURNING id_polaczenia;
+
+INSERT INTO stacje_posrednie (id_polaczenia, id_stacji, przyjazd, odjazd, zatrzymanie, tor)
+VALUES
+    (3, 1, 0, 0, TRUE, 1),
+    (3, 2, 60, 62, TRUE, 1),
+    (3, 3, 120, 120, FALSE, 2);
+INSERT INTO historia_polaczenia(id_polaczenia, data_od) VALUES (3,CURRENT_DATE);
+

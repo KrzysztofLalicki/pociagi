@@ -118,6 +118,33 @@ END;
 $$ LANGUAGE plpgsql;
 
 
+CREATE OR REPLACE FUNCTION oblicz_godzine_przyjazdu(
+    id_stacji_start INTEGER,
+    id_pol INTEGER
+) RETURNS TIME AS $$
+
+DECLARE
+    godzina_startu TIME;
+    godzina_przyjazdu INTEGER;
+    wynik_godzina TIME;
+BEGIN
+
+    SELECT p.godzina_startu INTO godzina_startu
+    FROM polaczenia p
+    WHERE id_pol = p.id_polaczenia;
+
+    SELECT przyjazd INTO godzina_przyjazdu
+    FROM stacje_posrednie sp
+    WHERE sp.id_polaczenia = id_pol
+      AND sp.id_stacji = id_stacji_start;
+
+    wynik_godzina := (godzina_startu + (godzina_przyjazdu || ' minutes')::INTERVAL)::TIME;
+
+    RETURN wynik_godzina;
+END;
+$$ LANGUAGE plpgsql;
+
+
 
 --znajduje polaczenia ktore moga byc ok ale nie sprawdza czy sa aktualne
 
