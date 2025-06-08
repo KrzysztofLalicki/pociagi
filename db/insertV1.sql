@@ -1,4 +1,58 @@
 -- Tabela harmonogramy
+
+-- wagony , miejsca , przedzialy
+
+-- Wagon 4: Klasa 1
+INSERT INTO wagony (klimatyzacja, restauracyjny) VALUES (TRUE, FALSE);
+
+-- Wagon 5: Klasa 2
+INSERT INTO wagony (klimatyzacja, restauracyjny) VALUES (FALSE, FALSE);
+
+
+-- Przedziały klasy 1 w wagonie 1
+INSERT INTO przedzialy (nr_przedzialu, id_wagonu, klasa, czy_zamkniety, strefa_ciszy) VALUES
+(1, 1, 1, TRUE, FALSE),
+(2, 1, 1, TRUE, FALSE),
+(3, 1, 1, TRUE, FALSE),
+(4, 1, 1, TRUE, FALSE);
+
+-- Przedziały klasy 2 w wagonie 2
+INSERT INTO przedzialy (nr_przedzialu, id_wagonu, klasa, czy_zamkniety, strefa_ciszy) VALUES
+(1, 2, 2, FALSE, FALSE),
+(2, 2, 2, FALSE, FALSE),
+(3, 2, 2, FALSE, FALSE),
+(4, 2, 2, FALSE, FALSE);
+
+DO $$
+    DECLARE
+        przedzial INT;
+        miejsce INT;
+    BEGIN
+        FOR przedzial IN 1..4 LOOP
+                FOR miejsce IN 1..6 LOOP
+                        INSERT INTO miejsca (nr_miejsca, id_wagonu, nr_przedzialu, czy_dla_niepelnosprawnych, czy_dla_rowerow)
+                        VALUES ((przedzial - 1) * 6 + miejsce, 1, przedzial, FALSE, FALSE);
+                    END LOOP;
+            END LOOP;
+    END$$;
+
+DO $$
+    DECLARE
+        przedzial INT;
+        miejsce INT;
+    BEGIN
+        FOR przedzial IN 1..4 LOOP
+                FOR miejsce IN 1..6 LOOP
+                        INSERT INTO miejsca (nr_miejsca, id_wagonu, nr_przedzialu, czy_dla_niepelnosprawnych, czy_dla_rowerow)
+                        VALUES ((przedzial - 1) * 6 + miejsce, 2, przedzial, FALSE, FALSE);
+                    END LOOP;
+            END LOOP;
+    END$$;
+
+
+
+
+
 INSERT INTO harmonogramy (czy_tydzien, czy_swieta)
 VALUES
     ('{TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE}', TRUE),
@@ -85,23 +139,6 @@ VALUES
     (1, 1, 1, 4, '2025-06-10'),
     (2, 2, 2, 6,'2025-06-15');
 
--- Tabela wagony
-INSERT INTO wagony (klimatyzacja, restauracyjny)
-VALUES
-    (TRUE, FALSE),
-    (FALSE, TRUE);
-
--- Tabela przedzialy
-INSERT INTO przedzialy (nr_przedzialu, id_wagonu, klasa, czy_zamkniety, strefa_ciszy)
-VALUES
-    (1, 1, 1, FALSE, TRUE),
-    (2, 2, 2, TRUE, FALSE);
-
--- Tabela miejsca
-INSERT INTO miejsca (nr_miejsca, id_wagonu, nr_przedzialu, czy_dla_niepelnosprawnych, czy_dla_rowerow)
-VALUES
-    (1, 1, 1, FALSE, FALSE),
-    (2, 2, 2, TRUE, TRUE);
 
 -- Tabela ulgi
 INSERT INTO ulgi (nazwa, znizka)
@@ -151,3 +188,5 @@ VALUES
     (3, 3, 120, 120, FALSE, 2);
 INSERT INTO historia_polaczenia(id_polaczenia, data_od) VALUES (3,CURRENT_DATE);
 
+INSERT INTO polaczenia_wagony(id_polaczenia, nr_wagonu, id_wagonu) VALUES
+    (1,3,2);

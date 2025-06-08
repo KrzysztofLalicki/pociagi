@@ -220,12 +220,13 @@ END;
 $$ LANGUAGE plpgsql;
 
 CREATE OR REPLACE FUNCTION wszystkie_miejsca_polaczenie(id_pol INTEGER)
-RETURNS TABLE(nr_wagonu INTEGER,nr_miejsca INTEGER) AS $$
+RETURNS TABLE(nr_wagonu INTEGER,nr_miejsca INTEGER, nr_przedzialu INTEGER, KLASA INTEGER ) AS $$
     BEGIN
-        RETURN QUERY SELECT pw.nr_wagonu, m.nr_miejsca FROM polaczenia_wagony pw
+        RETURN QUERY SELECT pw.nr_wagonu, m.nr_miejsca, p.nr_przedzialu, p.klasa FROM polaczenia_wagony pw
             JOIN wagony w ON pw.id_wagonu = w.id_wagonu
             JOIN miejsca m ON w.id_wagonu = m.id_wagonu
-            WHERE pw.id_polaczenia = id_pol;
+            JOIN przedzialy p ON m.nr_przedzialu = p.nr_przedzialu and m.id_wagonu = p.id_wagonu
+            WHERE pw.id_polaczenia = id_pol ORDER BY nr_wagonu,nr_przedzialu,nr_miejsca;
     END;
 $$ LANGUAGE plpgsql;
 
@@ -274,15 +275,17 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
-CREATE OR REPLACE FUNCTION wszystkie_wolne_dla_polaczenia(
+CREATE OR REPLACE FUNCTION wszystkie_wolne_dla_polaczenia_dla_klasy(
     id_pol INTEGER,
     dzien_odjazdu DATE,
     id_stacji_start INTEGER,
-    id_stacji_koniec INTEGER
-) RETURNS TABLE(nr_miejsca INTEGER,nr_wagonu INTEGER) AS $$
+    id_stacji_koniec INTEGER,
+    klasa_miejsca INTEGER
+) RETURNS TABLE(nr_wagonu INTEGER,nr_miejsca INTEGER, nr_przedzialu INTEGER, klasa INTEGER) AS $$
     BEGIN
         RETURN QUERY SELECT * FROM wszystkie_miejsca_polaczenie(id_pol) m WHERE
-        czy_miejsce_wolne(id_pol,dzien_odjazdu,id_stacji_start,id_stacji_koniec,m.nr_miejsca,m.nr_wagonu);
+        czy_miejsce_wolne(id_pol,dzien_odjazdu,id_stacji_start,id_stacji_koniec,m.nr_miejsca,m.nr_wagonu)
+        AND m.klasa = klasa_miejsca;
     END;
 $$ LANGUAGE plpgsql;
 
@@ -321,7 +324,7 @@ BEGIN
             stacje koniec ON koniec.id_stacji = id_stacji_koniec
         WHERE
             (SELECT COUNT(*)
-             FROM wszystkie_wolne_dla_polaczenia(p.id_polaczenia, dzien_szukania, id_stacji_start, id_stacji_koniec)
+             FROM wszystkie_wolne_dla_polaczenia_dla_klasy(p.id_polaczenia, dzien_szukania, id_stacji_start, id_stacji_koniec,2)
             ) >= liczba_miejsc
           AND
             p.godzina_startu >= godzina
