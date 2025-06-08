@@ -107,7 +107,7 @@ END;
 $$ LANGUAGE plpgsql;
 
 CREATE OR REPLACE FUNCTION get_timetable(id_stac INTEGER, data DATE)
-RETURNS TABLE(id_pol_out INTEGER, skad_out VARCHAR, dokod_out VARCHAR, przyjazd_out TIME, odjazd_out TIME) AS $$
+RETURNS TABLE(id_pol_out INTEGER, skad_out VARCHAR, dokad_out VARCHAR, przyjazd_out TIME, odjazd_out TIME) AS $$
 BEGIN
     RETURN QUERY SELECT id_pol, get_nazwa_stacji(id_stac_start), get_nazwa_stacji(id_stac_koniec),
     CASE
