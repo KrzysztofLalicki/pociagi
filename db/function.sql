@@ -43,7 +43,7 @@ CREATE OR REPLACE FUNCTION dlugosc_drogi(
 DECLARE
     wynik INTEGER := 0;
     stacje INTEGER[];
-    odleglosc INTEGER;
+    odleglosc_ INTEGER;
     i INTEGER;
 BEGIN
 
@@ -54,12 +54,12 @@ BEGIN
 
     FOR i IN 1..array_length(stacje, 1) - 1 LOOP
             SELECT odleglosc
-            INTO odleglosc
+            INTO odleglosc_
             FROM linie
             WHERE (stacja1 = stacje[i] AND stacja2 = stacje[i + 1])
                OR (stacja1 = stacje[i + 1] AND stacja2 = stacje[i]);
 
-            wynik := wynik + odleglosc;
+            wynik := wynik + odleglosc_;
         END LOOP;
 
     RETURN wynik;
@@ -296,7 +296,39 @@ $$ LANGUAGE plpgsql;
 
 --to jest debesciak ostateczna funkcja szukająca połączen pewnie jeszcze beda modyfikacje zeby nie było problemu jeśli będzie 23
 
+CREATE OR REPLACE FUNCTION czas_trasy(id_pol INTEGER, id_stacji_start INTEGER, id_stacji_koniec INTEGER)
+RETURNS TIME AS $$
+DECLARE
+    czas_odjazdu INTEGER;
+    czas_przyjazdu INTEGER;
+BEGIN
+    SELECT odjazd INTO czas_odjazdu FROM stacje_na_polaczeniu(id_pol) WHERE id_stacji = id_stacji_start;
+    SELECT przyjazd INTO czas_przyjazdu FROM stacje_na_polaczeniu(id_pol) WHERE id_stacji = id_stacji_koniec;
 
+    RETURN (SELECT (TIME '00:00:00' + (czas_przyjazdu - czas_odjazdu || ' minutes')::INTERVAL)::TIME);
+END;
+$$ LANGUAGE plpgsql;
+
+
+CREATE OR REPLACE FUNCTION koszt_przejazdu(id_pol INTEGER, id_stacji_start INTEGER, id_stacji_koniec INTEGER, klasa integer, data DATE)
+RETURNS NUMERIC(8,2) AS $$
+DECLARE
+    koszt_km NUMERIC(8,2);
+    BEGIN
+    IF klasa = 1 THEN
+        SELECT cena_za_km_kl1 INTO koszt_km FROM polaczenia p JOIN przewoznicy pw ON pw.id_przewoznika = p.id_przewoznika
+        JOIN historia_cen h ON h.id_przewoznika = pw.id_przewoznika WHERE (data BETWEEN h.data_od AND h.data_do) OR
+        (h.data_do IS NULL AND data >= h.data_od);
+    ELSE
+        SELECT cena_za_km_kl2 INTO koszt_km FROM polaczenia p JOIN przewoznicy pw ON pw.id_przewoznika = p.id_przewoznika
+        JOIN historia_cen h ON h.id_przewoznika = pw.id_przewoznika WHERE (data BETWEEN h.data_od AND h.data_do) OR
+            (h.data_do IS NULL AND data >= h.data_od);
+    end if;
+        RETURN dlugosc_drogi(id_pol,id_stacji_start,id_stacji_koniec) * koszt_km;
+
+
+    END;
+$$ LANGUAGE plpgsql;
 
 CREATE OR REPLACE FUNCTION szukaj_polaczenia(
     stacja1 VARCHAR,
@@ -305,7 +337,7 @@ CREATE OR REPLACE FUNCTION szukaj_polaczenia(
     liczba_miejsc_klasa2 INTEGER,
     dzien_szukania DATE,
     godzina TIME
-) RETURNS TABLE (stacja_start VARCHAR, stacja_koniec VARCHAR, godzina_odjazdu TIME) AS $$
+) RETURNS TABLE (stacja_start VARCHAR, stacja_koniec VARCHAR, godzina_odjazdu TIME, czas_trasy TIME,koszt_przejazdu NUMERIC(8,2)) AS $$
 DECLARE
     id_stacji_start INTEGER;
     id_stacji_koniec INTEGER;
@@ -317,7 +349,10 @@ BEGIN
         SELECT
             start.nazwa AS stacja_start,
             koniec.nazwa AS stacja_koniec,
-            p.godzina_startu
+            p.godzina_startu,
+            czas_trasy(p.id_polaczenia,id_stacji_start,id_stacji_koniec),
+            (liczba_miejsc_klasa1 * koszt_przejazdu(p.id_polaczenia,id_stacji_start,id_stacji_koniec,1,dzien_szukania) +
+             liczba_miejsc_klasa2 * koszt_przejazdu(p.id_polaczenia,id_stacji_start,id_stacji_koniec,2,dzien_szukania))
         FROM
             dostepne_polaczenia_dzien_aktualnosc(id_stacji_start, id_stacji_koniec, dzien_szukania) p
                 JOIN
@@ -340,7 +375,10 @@ BEGIN
             (SELECT
                 start.nazwa AS stacja_start,
                 koniec.nazwa AS stacja_koniec,
-                p.godzina_startu
+                p.godzina_startu,
+                czas_trasy(p.id_polaczenia,id_stacji_start,id_stacji_koniec),
+                (liczba_miejsc_klasa1 * koszt_przejazdu(p.id_polaczenia,id_stacji_start,id_stacji_koniec,1,dzien_szukania) +
+                 liczba_miejsc_klasa2 * koszt_przejazdu(p.id_polaczenia,id_stacji_start,id_stacji_koniec,2,dzien_szukania))
             FROM
                 dostepne_polaczenia_dzien_aktualnosc(id_stacji_start, id_stacji_koniec, dzien_szukania) p
                     JOIN
@@ -362,7 +400,10 @@ BEGIN
             (SELECT
                 start.nazwa AS stacja_start,
                 koniec.nazwa AS stacja_koniec,
-                p.godzina_startu
+                p.godzina_startu,
+                czas_trasy(p.id_polaczenia,id_stacji_start,id_stacji_koniec),
+                (liczba_miejsc_klasa1 * koszt_przejazdu(p.id_polaczenia,id_stacji_start,id_stacji_koniec,1,dzien_szukania + INTERVAL '1 day') +
+                 liczba_miejsc_klasa2 * koszt_przejazdu(p.id_polaczenia,id_stacji_start,id_stacji_koniec,2,dzien_szukania + INTERVAL '1 day'))
             FROM
                 dostepne_polaczenia_dzien_aktualnosc(id_stacji_start, id_stacji_koniec, dzien_szukania + INTERVAL '1 day') p
                     JOIN
