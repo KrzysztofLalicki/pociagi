@@ -62,7 +62,7 @@ CREATE TABLE stacje_posrednie (
 CREATE TABLE historia_polaczenia (
     id_polaczenia INT NOT NULL REFERENCES polaczenia,
     data_od DATE NOT NULL,
-    data_do DATE NOT NULL CHECK (data_do >= data_od),
+    data_do DATE CHECK (COALESCE(data_do,'infinity'::date) >= data_od),
     PRIMARY KEY (id_polaczenia, data_od)
 );
 
@@ -130,7 +130,7 @@ CREATE TABLE bilety_miejsca(
 CREATE TABLE swieta_stale (
     nazwa VARCHAR UNIQUE NOT NULL,
     dzien INT NOT NULL CHECK (dzien > 0 AND dzien <= 31),
-    miesiac INT NOT NULL CHECK (miesiac > 0 AND miesiac < 12),
+    miesiac INT NOT NULL CHECK (miesiac > 0 AND miesiac <= 12),
     UNIQUE (dzien, miesiac)
 );
 
