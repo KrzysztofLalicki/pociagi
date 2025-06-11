@@ -115,34 +115,6 @@ INSERT INTO trasy (skad, dokad, czas) VALUES
 (4, 80, '05:10:00'),
 (5, 90, '05:45:00');
 
-INSERT INTO stacje_posrednie (id_trasy, id_stacji, przyjazd, odjazd, zatrzymanie, tor) VALUES
-(1, 14, '00:40:00', '00:45:00', TRUE, 2),
-(1, 47, '01:10:00', '01:15:00', TRUE, 1),
-(1, 97, '01:45:00', '01:50:00', TRUE, 1),
-(1, 102, '02:15:00', '02:20:00', TRUE, 2),
-(1, 103, '02:50:00', '02:55:00', TRUE, 2),
-(1, 50, '03:25:00', '03:30:00', TRUE, 3);
-
-INSERT INTO stacje_posrednie (id_trasy, id_stacji, przyjazd, odjazd, zatrzymanie, tor) VALUES
-(2, 15, '00:35:00', '00:40:00', TRUE, 2),
-(2, 19, '01:10:00', '01:15:00', TRUE, 1),
-(2, 27, '01:50:00', '01:55:00', TRUE, 2),
-(2, 54, '02:25:00', '02:30:00', TRUE, 2),
-(2, 71, '03:00:00', '03:05:00', TRUE, 3);
-
-INSERT INTO stacje_posrednie (id_trasy, id_stacji, przyjazd, odjazd, zatrzymanie, tor) VALUES
-(3, 46, '00:30:00', '00:35:00', TRUE, 2),
-(3, 59, '01:05:00', '01:10:00', TRUE, 1),
-(3, 77, '01:45:00', '01:50:00', TRUE, 1),
-(3, 100, '02:20:00', '02:25:00', FALSE, 1);
-INSERT INTO stacje_posrednie (id_trasy, id_stacji, przyjazd, odjazd, zatrzymanie, tor) VALUES
-(4, 38, '00:40:00', '00:45:00', TRUE, 1),
-(4, 27, '01:15:00', '01:20:00', TRUE, 2),
-(4, 80, '01:50:00', '01:55:00', TRUE, 1);
-INSERT INTO stacje_posrednie (id_trasy, id_stacji, przyjazd, odjazd, zatrzymanie, tor) VALUES
-(5, 53, '00:30:00', '00:35:00', TRUE, 1),
-(5, 90, '01:15:00', '01:20:00', FALSE, 2);
-
 INSERT INTO trasy (skad, dokad, czas) VALUES
 (6, 40, '05:30:00'),
 (7, 50, '07:10:00'),
@@ -155,14 +127,42 @@ INSERT INTO trasy (skad, dokad, czas) VALUES
 (14, 45, '04:15:00'),
 (15, 75, '05:45:00');
 
-INSERT INTO stacje_posrednie (id_trasy, id_stacji, przyjazd, odjazd, zatrzymanie, tor) VALUES
+INSERT INTO stacje_posrednie (id_polaczenia, id_stacji, przyjazd, odjazd, zatrzymanie, tor) VALUES
+(1, 14, '00:40:00', '00:45:00', TRUE, 2),
+(1, 47, '01:10:00', '01:15:00', TRUE, 1),
+(1, 97, '01:45:00', '01:50:00', TRUE, 1),
+(1, 102, '02:15:00', '02:20:00', TRUE, 2),
+(1, 103, '02:50:00', '02:55:00', TRUE, 2),
+(1, 50, '03:25:00', '03:30:00', TRUE, 3);
+
+INSERT INTO stacje_posrednie (id_polaczenia, id_stacji, przyjazd, odjazd, zatrzymanie, tor) VALUES
+(2, 15, '00:35:00', '00:40:00', TRUE, 2),
+(2, 19, '01:10:00', '01:15:00', TRUE, 1),
+(2, 27, '01:50:00', '01:55:00', TRUE, 2),
+(2, 54, '02:25:00', '02:30:00', TRUE, 2),
+(2, 71, '03:00:00', '03:05:00', TRUE, 3);
+
+INSERT INTO stacje_posrednie (id_polaczenia, id_stacji, przyjazd, odjazd, zatrzymanie, tor) VALUES
+(3, 46, '00:30:00', '00:35:00', TRUE, 2),
+(3, 59, '01:05:00', '01:10:00', TRUE, 1),
+(3, 77, '01:45:00', '01:50:00', TRUE, 1),
+(3, 100, '02:20:00', '02:25:00', FALSE, 1);
+INSERT INTO stacje_posrednie (id_polaczenia, id_stacji, przyjazd, odjazd, zatrzymanie, tor) VALUES
+(4, 38, '00:40:00', '00:45:00', TRUE, 1),
+(4, 27, '01:15:00', '01:20:00', TRUE, 2),
+(4, 80, '01:50:00', '01:55:00', TRUE, 1);
+INSERT INTO stacje_posrednie (id_polaczenia, id_stacji, przyjazd, odjazd, zatrzymanie, tor) VALUES
+(5, 53, '00:30:00', '00:35:00', TRUE, 1),
+(5, 90, '01:15:00', '01:20:00', FALSE, 2);
+
+INSERT INTO stacje_posrednie (id_polaczenia, id_stacji, przyjazd, odjazd, zatrzymanie, tor) VALUES
 (6, 7, '00:25:00', '00:30:00', TRUE, 1),
 (6, 11, '00:55:00', '01:00:00', TRUE, 1),
 (6, 15, '01:30:00', '01:35:00', TRUE, 2),
 (6, 19, '02:05:00', '02:10:00', TRUE, 2),
 (6, 23, '02:40:00', '02:45:00', TRUE, 3);
 
-INSERT INTO stacje_posrednie (id_trasy, id_stacji, przyjazd, odjazd, zatrzymanie, tor) VALUES
+INSERT INTO stacje_posrednie (id_polaczenia, id_stacji, przyjazd, odjazd, zatrzymanie, tor) VALUES
 (7, 8, '00:20:00', '00:25:00', TRUE, 1),
 (7, 12, '00:55:00', '01:00:00', TRUE, 1),
 (7, 16, '01:30:00', '01:35:00', TRUE, 2),
@@ -173,7 +173,7 @@ INSERT INTO stacje_posrednie (id_trasy, id_stacji, przyjazd, odjazd, zatrzymanie
 (7, 36, '04:25:00', '04:30:00', TRUE, 4),
 (7, 40, '05:00:00', '05:05:00', TRUE, 5);
 
-INSERT INTO stacje_posrednie (id_trasy, id_stacji, przyjazd, odjazd, zatrzymanie, tor) VALUES
+INSERT INTO stacje_posrednie (id_polaczenia, id_stacji, przyjazd, odjazd, zatrzymanie, tor) VALUES
 (8, 9, '00:30:00', '00:35:00', TRUE, 1),
 (8, 14, '01:05:00', '01:10:00', TRUE, 1),
 (8, 19, '01:40:00', '01:45:00', TRUE, 2),
@@ -181,7 +181,7 @@ INSERT INTO stacje_posrednie (id_trasy, id_stacji, przyjazd, odjazd, zatrzymanie
 (8, 29, '02:50:00', '02:55:00', TRUE, 3),
 (8, 34, '03:25:00', '03:30:00', TRUE, 3);
 
-INSERT INTO stacje_posrednie (id_trasy, id_stacji, przyjazd, odjazd, zatrzymanie, tor) VALUES
+INSERT INTO stacje_posrednie (id_polaczenia, id_stacji, przyjazd, odjazd, zatrzymanie, tor) VALUES
 (9, 10, '00:25:00', '00:30:00', TRUE, 1),
 (9, 15, '00:55:00', '01:00:00', TRUE, 1),
 (9, 20, '01:30:00', '01:35:00', TRUE, 2),
@@ -190,14 +190,14 @@ INSERT INTO stacje_posrednie (id_trasy, id_stacji, przyjazd, odjazd, zatrzymanie
 (9, 35, '03:15:00', '03:20:00', TRUE, 3),
 (9, 40, '03:50:00', '03:55:00', TRUE, 4);
 
-INSERT INTO stacje_posrednie (id_trasy, id_stacji, przyjazd, odjazd, zatrzymanie, tor) VALUES
+INSERT INTO stacje_posrednie (id_polaczenia, id_stacji, przyjazd, odjazd, zatrzymanie, tor) VALUES
 (10, 11, '00:20:00', '00:25:00', TRUE, 1),
 (10, 16, '00:50:00', '00:55:00', TRUE, 1),
 (10, 21, '01:25:00', '01:30:00', TRUE, 2),
 (10, 26, '02:00:00', '02:05:00', TRUE, 2),
 (10, 31, '02:35:00', '02:40:00', TRUE, 3);
 
-INSERT INTO stacje_posrednie (id_trasy, id_stacji, przyjazd, odjazd, zatrzymanie, tor) VALUES
+INSERT INTO stacje_posrednie (id_polaczenia, id_stacji, przyjazd, odjazd, zatrzymanie, tor) VALUES
 (11, 12, '00:30:00', '00:35:00', TRUE, 1),
 (11, 17, '01:00:00', '01:05:00', TRUE, 1),
 (11, 22, '01:35:00', '01:40:00', TRUE, 2),
@@ -205,13 +205,13 @@ INSERT INTO stacje_posrednie (id_trasy, id_stacji, przyjazd, odjazd, zatrzymanie
 (11, 32, '02:45:00', '02:50:00', TRUE, 3),
 (11, 37, '03:20:00', '03:25:00', TRUE, 3);
 
-INSERT INTO stacje_posrednie (id_trasy, id_stacji, przyjazd, odjazd, zatrzymanie, tor) VALUES
+INSERT INTO stacje_posrednie (id_polaczenia, id_stacji, przyjazd, odjazd, zatrzymanie, tor) VALUES
 (12, 13, '00:40:00', '00:45:00', TRUE, 1),
 (12, 18, '01:10:00', '01:15:00', TRUE, 1),
 (12, 23, '01:45:00', '01:50:00', TRUE, 2),
 (12, 28, '02:15:00', '02:20:00', TRUE, 2);
 
-INSERT INTO stacje_posrednie (id_trasy, id_stacji, przyjazd, odjazd, zatrzymanie, tor) VALUES
+INSERT INTO stacje_posrednie (id_polaczenia, id_stacji, przyjazd, odjazd, zatrzymanie, tor) VALUES
 (13, 14, '00:20:00', '00:25:00', TRUE, 1),
 (13, 19, '00:55:00', '01:00:00', TRUE, 1),
 (13, 24, '01:30:00', '01:35:00', TRUE, 2),
@@ -220,14 +220,14 @@ INSERT INTO stacje_posrednie (id_trasy, id_stacji, przyjazd, odjazd, zatrzymanie
 (13, 39, '03:15:00', '03:20:00', TRUE, 3),
 (13, 44, '03:50:00', '03:55:00', TRUE, 4);
 
-INSERT INTO stacje_posrednie (id_trasy, id_stacji, przyjazd, odjazd, zatrzymanie, tor) VALUES
+INSERT INTO stacje_posrednie (id_polaczenia, id_stacji, przyjazd, odjazd, zatrzymanie, tor) VALUES
 (14, 15, '00:25:00', '00:30:00', TRUE, 1),
 (14, 20, '00:55:00', '01:00:00', TRUE, 1),
 (14, 25, '01:30:00', '01:35:00', TRUE, 2),
 (14, 30, '02:05:00', '02:10:00', TRUE, 2),
 (14, 35, '02:40:00', '02:45:00', TRUE, 3);
 
-INSERT INTO stacje_posrednie (id_trasy, id_stacji, przyjazd, odjazd, zatrzymanie, tor) VALUES
+INSERT INTO stacje_posrednie (id_polaczenia, id_stacji, przyjazd, odjazd, zatrzymanie, tor) VALUES
 (15, 16, '00:20:00', '00:25:00', TRUE, 1),
 (15, 21, '00:50:00', '00:55:00', TRUE, 1),
 (15, 26, '01:25:00', '01:30:00', TRUE, 2),

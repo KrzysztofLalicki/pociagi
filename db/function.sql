@@ -449,7 +449,7 @@ DECLARE
     h RECORD;
     harmonogram harmonogramy;
     daty DATE[];
-    current_date DATE := p_start;
+    "current_date" DATE := p_start;
     pasujace_dni DATE[];
     idx INT;
 BEGIN
@@ -466,18 +466,18 @@ BEGIN
 
     WHILE current_date <= p_end LOOP
             IF
-                (EXTRACT(DOW FROM current_date) = 1 AND harmonogram.czy_tydzien[1]) OR
-                (EXTRACT(DOW FROM current_date) = 2 AND harmonogram.czy_tydzien[2]) OR
-                (EXTRACT(DOW FROM current_date) = 3 AND harmonogram.czy_tydzien[3]) OR
-                (EXTRACT(DOW FROM current_date) = 4 AND harmonogram.czy_tydzien[4]) OR
-                (EXTRACT(DOW FROM current_date) = 5 AND harmonogram.czy_tydzien[5]) OR
-                (EXTRACT(DOW FROM current_date) = 6 AND harmonogram.czy_tydzien[6]) OR
-                (EXTRACT(DOW FROM current_date) = 0 AND harmonogram.czy_tydzien[7])
+                (EXTRACT(DOW FROM "current_date") = 1 AND harmonogram.czy_tydzien[1]) OR
+                (EXTRACT(DOW FROM "current_date") = 2 AND harmonogram.czy_tydzien[2]) OR
+                (EXTRACT(DOW FROM "current_date") = 3 AND harmonogram.czy_tydzien[3]) OR
+                (EXTRACT(DOW FROM "current_date") = 4 AND harmonogram.czy_tydzien[4]) OR
+                (EXTRACT(DOW FROM "current_date") = 5 AND harmonogram.czy_tydzien[5]) OR
+                (EXTRACT(DOW FROM "current_date") = 6 AND harmonogram.czy_tydzien[6]) OR
+                (EXTRACT(DOW FROM "current_date") = 0 AND harmonogram.czy_tydzien[7])
             THEN
-                pasujace_dni := pasujace_dni || current_date;
+                pasujace_dni := pasujace_dni || "current_date";
             END IF;
 
-                    current_date := current_date + INTERVAL '1 day';
+                    "current_date" := "current_date" + INTERVAL '1 day';
         END LOOP;
 
     IF array_length(pasujace_dni, 1) IS NULL THEN
@@ -487,5 +487,37 @@ BEGIN
     idx := FLOOR(random() * array_length(pasujace_dni, 1) + 1)::INT;
 
     RETURN pasujace_dni[idx];
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE OR REPLACE FUNCTION get_timetable(id_stac INTEGER, data DATE)
+    RETURNS TABLE(id_pol_out INTEGER, skad_out VARCHAR, dokad_out VARCHAR, przyjazd_out TIME, odjazd_out TIME) AS $$
+BEGIN
+    RETURN QUERY SELECT id_pol, get_nazwa_stacji(id_stac_start), get_nazwa_stacji(id_stac_koniec),
+                        CASE
+                            WHEN id_stac = id_stac_start THEN NULL
+                            ELSE oblicz_godzine_przyjazdu(id_stac,id_pol)
+                            END,
+                        CASE
+                            WHEN id_stac = id_stac_koniec THEN NULL
+                            ELSE oblicz_godzine_odjazdu(id_stac,id_pol)
+                            END
+                 FROM polaczenia_wraz_z_dana_stacja(id_stac) WHERE is_poloczenie_active(id_pol,data);
+
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE OR REPLACE FUNCTION get_stacje_by_prefix(prefix TEXT)
+    RETURNS TABLE (
+                      id_stacji INTEGER,
+                      nazwa VARCHAR,
+                      tory INTEGER
+                  ) AS $$
+BEGIN
+    RETURN QUERY
+        SELECT s.id_stacji, s.nazwa, s.tory
+        FROM stacje s
+        WHERE s.nazwa ILIKE prefix || '%'
+        ORDER BY s.tory DESC, s.nazwa;
 END;
 $$ LANGUAGE plpgsql;
