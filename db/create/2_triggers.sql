@@ -67,9 +67,9 @@ BEGIN
         AND data_od <= NEW.data_do AND data_do >= NEW.data_od) > 0 THEN RAISE EXCEPTION ''; END IF;
     data := NEW.data_od;
     LOOP
-        okres := (SELECT data_od, data_do FROM historia_cen WHERE id_przewoznika = (SELECT id_przewoznika
+        SELECT data_od, data_do INTO okres FROM historia_cen WHERE id_przewoznika = (SELECT id_przewoznika
             FROM polaczenia WHERE id_polaczenia = NEW.id_polaczenia) AND data_do >= NEW.data_od ORDER BY data_od
-            LIMIT 1);
+            LIMIT 1;
         IF okres.data_od > data + 1 THEN RAISE EXCEPTION ''; END IF;
         data := okres.data_do;
         IF data >= NEW.data_do THEN RETURN NEW; END IF;

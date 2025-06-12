@@ -14,22 +14,22 @@ INSERT INTO przewoznicy (nazwa_przewoznika) VALUES
 
 INSERT INTO historia_cen (id_przewoznika, data_od, data_do, cena_za_km_kl1, cena_za_km_kl2, cena_za_rower) VALUES
 -- PKP Intercity
-(1, '2023-01-01', '2023-12-31', 0.45, 0.30, 10.00),
+(1, '2001-01-01', '2023-12-31', 0.45, 0.30, 10.00),
 (1, '2024-01-01', '2024-12-31', 0.50, 0.35, 12.00),
-(1, '2025-01-01', '2026-12-31',        0.55, 0.38, 13.00),
+(1, '2025-01-01', '2027-12-31',        0.55, 0.38, 13.00),
 -- PolRegio
-(2, '2022-06-01', '2023-05-31', 0.35, 0.25, 8.00),
+(2, '2001-06-01', '2023-05-31', 0.35, 0.25, 8.00),
 (2, '2023-06-01', '2024-05-31', 0.37, 0.27, 9.00),
-(2, '2024-06-01', '2026-12-31',         0.40, 0.30, 10.00),
+(2, '2024-06-01', '2027-12-31',         0.40, 0.30, 10.00),
 -- Koleje Mazowieckie
-(3, '2023-03-01', '2024-02-29', 0.38, 0.28, 8.50),
-(3, '2024-03-01', '2026-12-31',         0.40, 0.30, 9.00),
+(3, '2001-03-01', '2024-02-29', 0.38, 0.28, 8.50),
+(3, '2024-03-01', '2027-12-31',         0.40, 0.30, 9.00),
 -- SKM Trójmiasto
-(4, '2023-07-01', '2024-06-30', 0.42, 0.32, 7.00),
-(4, '2024-07-01', '2026-12-31',         0.44, 0.34, 7.50),
+(4, '2001-07-01', '2024-06-30', 0.42, 0.32, 7.00),
+(4, '2024-07-01', '2027-12-31',         0.44, 0.34, 7.50),
 -- Koleje Dolnośląskie
-(5, '2023-01-01', '2024-01-31', 0.39, 0.29, 9.00),
-(5, '2024-02-01', '2026-12-31',         0.43, 0.32, 9.50);
+(5, '2001-01-01', '2024-01-31', 0.39, 0.29, 9.00),
+(5, '2024-02-01', '2027-12-31',         0.43, 0.32, 9.50);
 
 INSERT INTO stacje (nazwa, tory) VALUES
 ('Warszawa Centralna', 8),
@@ -348,7 +348,7 @@ INSERT INTO stacje_posrednie VALUES
                                  (1, 13, 245, 247, true, 2), -- Częstochowa Osobowa
                                  (1, 2, 365, 370, true, 4);  -- Kraków Główny
 INSERT INTO historia_polaczenia (id_polaczenia, data_od, data_do) VALUES
-    (1, '2023-01-01', NULL);
+    (1, '2023-01-01', '2026-12-31');
 INSERT INTO polaczenia_wagony(id_polaczenia, nr_wagonu, id_wagonu) VALUES
                                                                        (1, 1, 1), (1, 2, 2), (1, 3, 3);
 COMMIT;
@@ -363,7 +363,7 @@ INSERT INTO stacje_posrednie VALUES
                                  (2, 4, 355, 360, true, 3);  -- Wrocław Główny
 INSERT INTO historia_polaczenia (id_polaczenia, data_od, data_do) VALUES
                                                                       (2, '2023-01-01', '2023-06-30'),
-                                                                      (2, '2023-09-01', NULL);
+                                                                      (2, '2023-09-01', '2026-12-31');
 INSERT INTO polaczenia_wagony(id_polaczenia, nr_wagonu, id_wagonu) VALUES
                                                                        (2, 1, 2), (2, 2, 2), (2, 3, 2);
 COMMIT;
@@ -378,7 +378,7 @@ INSERT INTO stacje_posrednie VALUES
                                  (3, 16, 135, 137, true, 3), -- Toruń Główny
                                  (3, 6, 285, 290, true, 5);  -- Gdańsk Główny
 INSERT INTO historia_polaczenia (id_polaczenia, data_od, data_do) VALUES
-    (3, '2023-03-15', NULL);
+    (3, '2023-03-15', '2026-12-31');
 INSERT INTO polaczenia_wagony(id_polaczenia, nr_wagonu, id_wagonu) VALUES
                                                                        (3, 1, 1), (3, 2, 3), (3, 3, 3);
 COMMIT;
@@ -394,7 +394,7 @@ INSERT INTO stacje_posrednie VALUES
                                  (4, 46, 280, 280, false, 2),-- Skierniewice
                                  (4, 1, 365, 370, true, 3);  -- Warszawa Centralna
 INSERT INTO historia_polaczenia (id_polaczenia, data_od, data_do) VALUES
-    (4, '2022-12-01', NULL);
+    (4, '2022-12-01', '2026-12-31');
 INSERT INTO polaczenia_wagony(id_polaczenia, nr_wagonu, id_wagonu) VALUES
                                                                        (4, 1, 2), (4, 2, 2), (4, 3, 2);
 COMMIT;
@@ -408,7 +408,7 @@ INSERT INTO stacje_posrednie VALUES
                                  (5, 46, 85, 85, false, 2),  -- Skierniewice
                                  (5, 3, 135, 140, true, 1);  -- Łódź Fabryczna
 INSERT INTO historia_polaczenia (id_polaczenia, data_od, data_do) VALUES
-    (5, '2023-01-01', NULL);
+    (5, '2023-01-01', '2026-12-31');
 INSERT INTO polaczenia_wagony(id_polaczenia, nr_wagonu, id_wagonu) VALUES
                                                                        (5, 1, 4), (5, 2, 4), (5, 3, 3);
 COMMIT;
@@ -422,7 +422,7 @@ INSERT INTO stacje_posrednie VALUES
                                  (6, 15, 15, 15, false, 2),  -- Sosnowiec Główny
                                  (6, 2, 85, 90, true, 3);    -- Kraków Główny
 INSERT INTO historia_polaczenia (id_polaczenia, data_od, data_do) VALUES
-    (6, '2023-01-15', NULL);
+    (6, '2023-01-15', '2026-12-31');
 INSERT INTO polaczenia_wagony(id_polaczenia, nr_wagonu, id_wagonu) VALUES
                                                                        (6, 1, 5), (6, 2, 5), (6, 3, 3);
 COMMIT;
@@ -436,7 +436,7 @@ INSERT INTO stacje_posrednie VALUES
                                  (7, 102, 45, 45, false, 1),-- Łowicz Główny
                                  (7, 46, 85, 90, true, 2);   -- Skierniewice
 INSERT INTO historia_polaczenia (id_polaczenia, data_od, data_do) VALUES
-    (7, '2023-03-01', NULL);
+    (7, '2023-03-01', '2026-12-31');
 INSERT INTO polaczenia_wagony(id_polaczenia, nr_wagonu, id_wagonu) VALUES
                                                                        (7, 1, 4), (7, 2, 4), (7, 3, 3);
 COMMIT;
@@ -451,7 +451,7 @@ INSERT INTO stacje_posrednie VALUES
                                  (8, 12, 45, 50, true, 2);   -- Gdynia Główna Osobowa
 INSERT INTO historia_polaczenia (id_polaczenia, data_od, data_do) VALUES
                                                                       (8, '2023-01-01', '2023-10-31'),
-                                                                      (8, '2024-01-01', NULL);
+                                                                      (8, '2024-01-01', '2026-12-31');
 INSERT INTO polaczenia_wagony(id_polaczenia, nr_wagonu, id_wagonu) VALUES
                                                                        (8, 1, 5), (8, 2, 5), (8, 3, 2);
 COMMIT;
@@ -465,7 +465,7 @@ INSERT INTO stacje_posrednie VALUES
                                  (9, 56, 30, 30, false, 1),  -- Głogów
                                  (9, 33, 70, 75, true, 3);   -- Wałbrzych Główny
 INSERT INTO historia_polaczenia (id_polaczenia, data_od, data_do) VALUES
-    (9, '2023-02-01', NULL);
+    (9, '2023-02-01', '2026-12-31');
 INSERT INTO polaczenia_wagony(id_polaczenia, nr_wagonu, id_wagonu) VALUES
                                                                        (9, 1, 4), (9, 2, 4), (9, 3, 3);
 COMMIT;
@@ -486,7 +486,7 @@ INSERT INTO stacje_posrednie VALUES
                                  (10, 69, 155, 160, true, 2), -- Świętochłowice
                                  (10, 77, 175, 180, true, 1); -- Żory
 INSERT INTO historia_polaczenia (id_polaczenia, data_od, data_do) VALUES
-    (10, '2023-01-01', NULL);
+    (10, '2023-01-01', '2026-12-31');
 INSERT INTO polaczenia_wagony(id_polaczenia, nr_wagonu, id_wagonu) VALUES
                                                                        (10, 1, 5), (10, 2, 4), (10, 3, 2);
 COMMIT;
@@ -507,7 +507,7 @@ INSERT INTO stacje_posrednie VALUES
                                  (11, 105, 230, 235, true, 2),-- Gostynin
                                  (11, 106, 250, 255, true, 1);-- Kozienice
 INSERT INTO historia_polaczenia (id_polaczenia, data_od, data_do) VALUES
-    (11, '2023-04-01', NULL);
+    (11, '2023-04-01', '2026-12-31');
 INSERT INTO polaczenia_wagony(id_polaczenia, nr_wagonu, id_wagonu) VALUES
                                                                        (11, 1, 4), (11, 2, 5), (11, 3, 2);
 COMMIT;
@@ -525,7 +525,7 @@ INSERT INTO stacje_posrednie VALUES
                                  (12, 107, 220, 225, true, 1),-- Szczytno
                                  (12, 108, 250, 255, true, 2);-- Mrągowo
 INSERT INTO historia_polaczenia (id_polaczenia, data_od, data_do) VALUES
-    (12, '2023-01-01', NULL);
+    (12, '2023-01-01', '2026-12-31');
 INSERT INTO polaczenia_wagony(id_polaczenia, nr_wagonu, id_wagonu) VALUES
                                                                        (12, 1, 2), (12, 2, 2), (12, 3, 2);
 COMMIT;
@@ -543,7 +543,7 @@ INSERT INTO stacje_posrednie VALUES
                                  (13, 83, 190, 195, true, 1),-- Nysa
                                  (13, 84, 210, 215, true, 2);-- Brzeg
 INSERT INTO historia_polaczenia (id_polaczenia, data_od, data_do) VALUES
-    (13, '2023-02-10', NULL);
+    (13, '2023-02-10', '2026-12-31');
 INSERT INTO polaczenia_wagony(id_polaczenia, nr_wagonu, id_wagonu) VALUES
                                                                        (13, 1, 5), (13, 2, 4), (13, 3, 2);
 COMMIT;
@@ -560,7 +560,7 @@ INSERT INTO stacje_posrednie VALUES
                                  (14, 54, 150, 155, true, 2),-- Gniezno
                                  (14, 103, 180, 185, true, 1);-- Kutno
 INSERT INTO historia_polaczenia (id_polaczenia, data_od, data_do) VALUES
-    (14, '2023-01-01', NULL);
+    (14, '2023-01-01', '2026-12-31');
 INSERT INTO polaczenia_wagony(id_polaczenia, nr_wagonu, id_wagonu) VALUES
                                                                        (14, 1, 5), (14, 2, 5), (14, 3, 3);
 COMMIT;
@@ -577,7 +577,7 @@ INSERT INTO stacje_posrednie VALUES
                                  (15, 53, 200, 205, true, 2),-- Suwałki
                                  (15, 98, 230, 235, true, 1);-- Sokołów Podlaski
 INSERT INTO historia_polaczenia (id_polaczenia, data_od, data_do) VALUES
-    (15, '2023-03-15', NULL);
+    (15, '2023-03-15', '2026-12-31');
 INSERT INTO polaczenia_wagony(id_polaczenia, nr_wagonu, id_wagonu) VALUES
                                                                        (15, 1, 4), (15, 2, 4), (15, 3, 3);
 COMMIT;
@@ -595,7 +595,7 @@ INSERT INTO stacje_posrednie VALUES
                                  (16, 87, 190, 195, true, 1);-- Złotów
 INSERT INTO historia_polaczenia (id_polaczenia, data_od, data_do) VALUES
                                                                       (16, '2023-01-01', '2023-07-31'),
-                                                                      (16, '2023-09-01', NULL);
+                                                                      (16, '2023-09-01', '2026-12-31');
 INSERT INTO polaczenia_wagony(id_polaczenia, nr_wagonu, id_wagonu) VALUES
                                                                        (16, 1, 3), (16, 2, 3), (16, 3, 2);
 COMMIT;
@@ -611,7 +611,7 @@ INSERT INTO stacje_posrednie VALUES
                                  (17, 78, 130, 135, true, 1),-- Dębica
                                  (17, 71, 170, 175, true, 2);-- Starachowice Wschodnie
 INSERT INTO historia_polaczenia (id_polaczenia, data_od, data_do) VALUES
-    (17, '2023-01-01', NULL);
+    (17, '2023-01-01', '2026-12-31');
 INSERT INTO polaczenia_wagony(id_polaczenia, nr_wagonu, id_wagonu) VALUES
                                                                        (17, 1, 4), (17, 2, 4), (17, 3, 3);
 COMMIT;
