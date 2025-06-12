@@ -41,8 +41,8 @@ public class TimeTableViewModel {
 
         selectedStacja.addListener((_, _, _) -> updateList());
 
-        datePicker.setValue(LocalDate.now());
         datePicker.valueProperty().bindBidirectional(selectedDate);
+        datePicker.setValue(LocalDate.now());
 
         selectedDate.addListener((_, _, _) -> updateList());
 

@@ -1,38 +1,3 @@
--- 1_tables.sql
-BEGIN;
-
-DROP TABLE IF EXISTS harmonogramy CASCADE;
-DROP TABLE IF EXISTS pasazerowie CASCADE;
-DROP TABLE IF EXISTS stacje CASCADE;
-DROP TABLE IF EXISTS linie CASCADE;
-DROP TABLE IF EXISTS przewoznicy CASCADE;
-DROP TABLE IF EXISTS historia_cen CASCADE;
-DROP TABLE IF EXISTS polaczenia CASCADE;
-DROP TABLE IF EXISTS stacje_posrednie CASCADE;
-DROP TABLE IF EXISTS historia_polaczenia CASCADE;
-DROP TABLE IF EXISTS bilety CASCADE;
-DROP TABLE IF EXISTS przejazdy CASCADE;
-DROP TABLE IF EXISTS wagony CASCADE;
-DROP TABLE IF EXISTS przedzialy CASCADE;
-DROP TABLE IF EXISTS miejsca CASCADE;
-DROP TABLE IF EXISTS ulgi CASCADE;
-DROP TABLE IF EXISTS bilety_miejsca CASCADE;
-DROP TABLE IF EXISTS polaczenia_wagony CASCADE;
-DROP TABLE IF EXISTS swieta_stale CASCADE;
-DROP TABLE IF EXISTS swieta_ruchome CASCADE;
-DROP TABLE IF EXISTS daty_swiat CASCADE;
-
-COMMIT;
--- 2_triggers.sql
-DROP FUNCTION sprawdz_ceny CASCADE;
-DROP FUNCTION sprawdz_droge CASCADE;
-DROP FUNCTION sprawdz_przystanek CASCADE;
-DROP FUNCTION sprawdz_polaczenie CASCADE;
-DROP FUNCTION sprawdz_zwrot CASCADE;
-DROP FUNCTION sprawdz_przejazd CASCADE;
-DROP FUNCTION sprawdz_miejsce CASCADE;
-DROP FUNCTION sprawdz_date CASCADE;
--- 3_functions.sql
 drop function stacje_na_polaczeniu(integer);
 
 drop function dlugosc_drogi(integer, integer, integer);
@@ -76,4 +41,3 @@ drop function is_poloczenie_active(integer, date);
 drop function get_timetable(integer, date);
 
 drop function get_stacje_by_prefix(text);
-
