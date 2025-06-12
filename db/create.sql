@@ -35,7 +35,7 @@ CREATE TABLE przewoznicy (
 CREATE TABLE historia_cen (
     id_przewoznika INT REFERENCES przewoznicy,
     data_od DATE NOT NULL,
-    data_do DATE CHECK (data_do >= data_od),
+    data_do DATE NOT NULL CHECK (data_do >= data_od),
     cena_za_km_kl1 NUMERIC(10,2) NOT NULL CHECK (cena_za_km_kl1 > 0),
     cena_za_km_kl2 NUMERIC(10,2) NOT NULL CHECK (cena_za_km_kl2 > 0),
     cena_za_rower NUMERIC(10,2) NOT NULL CHECK (cena_za_rower > 0),

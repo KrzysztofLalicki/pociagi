@@ -49,10 +49,19 @@ BEGIN
 
     stacje := ARRAY(SELECT id_stacji
                     FROM stacje_na_polaczeniu(id_polaczenia)
-                    WHERE id_stacji >= id_stacji_start AND id_stacji <= id_stacji_koniec
-                    ORDER BY przyjazd);
+                    WHERE numer >= (
+                        SELECT numer
+                        FROM stacje_na_polaczeniu(id_polaczenia)
+                        WHERE id_stacji = id_stacji_start
+                    )
+                      AND numer <= (
+                        SELECT numer
+                        FROM stacje_na_polaczeniu(id_polaczenia)
+                        WHERE id_stacji = id_stacji_koniec
+                    )
+                    ORDER BY numer);
 
-    FOR i IN 1..array_length(stacje, 1) - 1 LOOP
+    FOR i IN 1..coalesce(array_length(stacje, 1) - 1, 0) LOOP
             SELECT odleglosc
             INTO odleglosc_
             FROM linie
@@ -321,17 +330,17 @@ DECLARE
     BEGIN
     IF czy_dla_rowerow  THEN
         SELECT cena_za_rower INTO koszt_rower FROM polaczenia p JOIN przewoznicy pw ON pw.id_przewoznika = p.id_przewoznika
-        JOIN historia_cen h ON h.id_przewoznika = pw.id_przewoznika WHERE (data BETWEEN h.data_od AND h.data_do) OR
-            (h.data_do IS NULL AND data >= h.data_od);
+        JOIN historia_cen h ON h.id_przewoznika = pw.id_przewoznika WHERE ((data BETWEEN h.data_od AND h.data_do) OR
+            (h.data_do IS NULL AND data >= h.data_od)) AND p.id_polaczenia = id_pol;
     END IF;
     IF klasa = 1 THEN
         SELECT cena_za_km_kl1 INTO koszt_km FROM polaczenia p JOIN przewoznicy pw ON pw.id_przewoznika = p.id_przewoznika
-        JOIN historia_cen h ON h.id_przewoznika = pw.id_przewoznika WHERE (data BETWEEN h.data_od AND h.data_do) OR
-        (h.data_do IS NULL AND data >= h.data_od);
+        JOIN historia_cen h ON h.id_przewoznika = pw.id_przewoznika WHERE ((data BETWEEN h.data_od AND h.data_do) OR
+        (h.data_do IS NULL AND data >= h.data_od)) AND p.id_polaczenia = id_pol;
     ELSE
         SELECT cena_za_km_kl2 INTO koszt_km FROM polaczenia p JOIN przewoznicy pw ON pw.id_przewoznika = p.id_przewoznika
-        JOIN historia_cen h ON h.id_przewoznika = pw.id_przewoznika WHERE (data BETWEEN h.data_od AND h.data_do) OR
-            (h.data_do IS NULL AND data >= h.data_od);
+        JOIN historia_cen h ON h.id_przewoznika = pw.id_przewoznika WHERE ((data BETWEEN h.data_od AND h.data_do) OR
+            (h.data_do IS NULL AND data >= h.data_od)) AND p.id_polaczenia = id_pol;
     end if;
         RETURN liczba_osob * dlugosc_drogi(id_pol,id_stacji_start,id_stacji_koniec) * koszt_km + liczba_osob * koszt_rower;
 
