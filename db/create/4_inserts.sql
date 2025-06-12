@@ -125,7 +125,7 @@ INSERT INTO stacje (nazwa, tory) VALUES
 ('Malbork', 5),
 ('Kwidzyn', 2),
 ('Sztum', 2),
-('Grójec', 1),
+('Grójec', 2),
 ('Garwolin', 2),
 ('Mława', 3),
 ('Ciechanów', 3),
@@ -136,127 +136,98 @@ INSERT INTO stacje (nazwa, tory) VALUES
 ('Łowicz Główny', 3),
 ('Kutno', 5),
 ('Płońsk', 2),
-('Gostynin', 1),
+('Gostynin', 2),
 ('Kozienice', 1),
 ('Szczytno', 2),
-('Mrągowo', 1)
+('Mrągowo', 2)
 ON CONFLICT (nazwa) DO NOTHING;
 
 INSERT INTO linie (stacja1, stacja2, odleglosc) VALUES
-(1, 46, 80),    -- Warszawa Centralna - Skierniewice
-(46, 14, 90),   -- Skierniewice - Radom
-(14, 13, 70),   -- Radom - Częstochowa Osobowa
-(13, 2, 120),   -- Częstochowa Osobowa - Kraków Główny
-(1, 3, 130),    -- Warszawa Centralna - Łódź Fabryczna
-(3, 5, 180),    -- Łódź Fabryczna - Poznań Główny
-(46, 16, 50),   -- Skierniewice - Toruń Główny
-(16, 6, 150),   -- Toruń Główny - Gdańsk Główny
-(3, 4, 220),    -- Łódź Fabryczna - Wrocław Główny
-(10, 2, 80),    -- Katowice - Kraków Główny
-(10, 4, 200),   -- Katowice - Wrocław Główny
-(6, 12, 15),    -- Gdańsk Główny - Gdynia Główna Osobowa
-(5, 7, 200),    -- Poznań Główny - Szczecin Główny
-(4, 5, 180),    -- Wrocław Główny - Poznań Główny
-(2, 18, 160),   -- Kraków Główny - Rzeszów Główny
-(9, 1, 170),    -- Lublin Główny - Warszawa Centralna
-(11, 1, 190),   -- Białystok - Warszawa Centralna
-(10, 16, 300),  -- Katowice - Toruń Główny
-(1, 64, 20),   -- Warszawa Centralna - Otwock
-(1, 66, 25),   -- Warszawa Centralna - Pruszków
-(4, 27, 80),   -- Wrocław Główny - Opole Główne
-(27, 10, 100), -- Opole Główne - Katowice
-(3, 13, 150),  -- Łódź Fabryczna - Częstochowa Osobowa
-(5, 8, 120),   -- Poznań Główny - Bydgoszcz Główna
-(8, 6, 150),   -- Bydgoszcz Główna - Gdańsk Główny
-(2, 45, 100),  -- Kraków Główny - Nowy Sącz
-(45, 85, 70),  -- Nowy Sącz - Zakopane (hipotetyczne)
-(4, 38, 60),   -- Wrocław Główny - Legnica
-(10, 22, 50),  -- Katowice - Bielsko-Biała Główna
-(7, 36, 120),  -- Szczecin Główny - Koszalin
-(36, 41, 60),  -- Koszalin - Słupsk
-(41, 6, 100),  -- Słupsk - Gdańsk Główny
-(5, 29, 100), -- Poznań Główny - Gorzów Wielkopolski
-(9, 18, 150),  -- Lublin Główny - Rzeszów Główny
-(17, 2, 110),  -- Kielce - Kraków Główny
-(14, 9, 120),  -- Radom - Lublin Główny
-(10, 15, 15),   -- Katowice - Sosnowiec Główny
-(10, 19, 20),   -- Katowice - Gliwice
-(19, 20, 10),   -- Gliwice - Zabrze
-(15, 30, 10),   -- Sosnowiec Główny - Dąbrowa Górnicza
-(10, 23, 25),   -- Katowice - Bytom
-(10, 26, 15),   -- Katowice - Ruda Śląska
-(10, 28, 30),   -- Katowice - Tychy
-(10, 57, 15),   -- Katowice - Siemianowice Śląskie
-(10, 63, 35),   -- Katowice - Tarnowskie Góry
-(10, 69, 20),   -- Katowice - Świętochłowice
-(10, 77, 40),   -- Katowice - Żory
-(20, 72, 50),   -- Zabrze - Kędzierzyn-Koźle
-(4, 33, 70),    -- Wrocław Główny - Wałbrzych Główny
-(4, 43, 110),   -- Wrocław Główny - Jelenia Góra
-(4, 56, 80),    -- Wrocław Główny - Głogów
-(4, 85, 90),    -- Wrocław Główny - Kłodzko Główne
-(38, 84, 40),   -- Legnica - Brzeg
-(8, 50, 60),    -- Bydgoszcz Główna - Inowrocław
-(8, 39, 70),    -- Bydgoszcz Główna - Grudziądz
-(6, 74, 40),    -- Gdańsk Główny - Tczew
-(6, 91, 60),    -- Gdańsk Główny - Malbork
-(32, 91, 50),   -- Elbląg - Malbork
-(41, 88, 70),   -- Słupsk - Chojnice
-(41, 89, 50),   -- Słupsk - Kościerzyna
-(36, 76, 80),   -- Koszalin - Kołobrzeg
-(21, 107, 80),  -- Olsztyn Główny - Szczytno
-(21, 108, 90),  -- Olsztyn Główny - Mrągowo
-(21, 62, 120),  -- Olsztyn Główny - Ełk
-(62, 53, 100),  -- Ełk - Suwałki
-(1, 31, 100),   -- Warszawa Centralna - Płock
-(1, 68, 120),   -- Warszawa Centralna - Ostrołęka
-(1, 100, 50),   -- Warszawa Centralna - Żyrardów
-(100, 101, 30), -- Żyrardów - Sochaczew
-(1, 102, 80),   -- Warszawa Centralna - Łowicz Główny
-(102, 103, 40), -- Łowicz Główny - Kutno
-(11, 98, 80),   -- Białystok - Sokołów Podlaski
-(11, 53, 150),  -- Białystok - Suwałki
-(5, 37, 100),   -- Poznań Główny - Kalisz
-(5, 52, 120),   -- Poznań Główny - Ostrów Wielkopolski
-(24, 79, 60),   -- Zielona Góra Główna - Krosno Odrzańskie
-(24, 56, 90),   -- Zielona Góra Główna - Głogów
-(18, 75, 70),   -- Rzeszów Główny - Jarosław
-(18, 65, 90),   -- Rzeszów Główny - Przemyśl Główny
-(65, 75, 50),   -- Przemyśl Główny - Jarosław
-(3, 47, 50),    -- Łódź Fabryczna - Piotrków Trybunalski
-(3, 60, 15),    -- Łódź Fabryczna - Zgierz
-(3, 58, 20),    -- Łódź Fabryczna - Pabianice
-(14, 71, 40),   -- Radom - Starachowice Wschodnie
-(17, 71, 50),   -- Kielce - Starachowice Wschodnie
-(22, 25, 60),   -- Bielsko-Biała Główna - Rybnik
-(25, 77, 30),   -- Rybnik - Żory
-(27, 83, 60),   -- Opole Główne - Nysa
-(27, 81, 70),   -- Opole Główne - Kluczbork
-(81, 80, 20),   -- Kluczbork - Olesno Śląskie
-(81, 82, 30),   -- Kluczbork - Namysłów
-(33, 59, 40),   -- Wałbrzych Główny - Świdnica Miasto
-(33, 85, 70),   -- Wałbrzych Główny - Kłodzko Główne
-(50, 103, 50),  -- Inowrocław - Kutno
-(52, 37, 60),   -- Ostrów Wielkopolski - Kalisz
-(54, 103, 40),  -- Gniezno - Kutno
-(55, 7, 60),    -- Stargard - Szczecin Główny
-(55, 36, 80),   -- Stargard - Koszalin
-(61, 13, 50),   -- Bełchatów - Częstochowa Osobowa
-(70, 13, 40),   -- Zawiercie - Częstochowa Osobowa
-(73, 12, 30),   -- Wejherowo - Gdynia Główna Osobowa
-(74, 91, 80),   -- Tczew - Malbork
-(78, 18, 60),   -- Dębica - Rzeszów Główny
-(86, 88, 70),   -- Wałcz - Chojnice
-(90, 12, 40),   -- Lębork - Gdynia Główna Osobowa
-(92, 91, 50),   -- Kwidzyn - Malbork
-(93, 91, 40),   -- Sztum - Malbork
-(96, 97, 40),   -- Mława - Ciechanów
-(97, 1, 80),    -- Ciechanów - Warszawa Centralna
-(104, 1, 60),   -- Płońsk - Warszawa Centralna
-(105, 31, 30),  -- Gostynin - Płock
-(106, 1, 80),   -- Kozienice - Warszawa Centralna
-(94, 1, 50),    -- Grójec - Warszawa Centralna
-(95, 1, 60);    -- Garwolin - Warszawa Centralna-- Garwolin - Warszawa Centralna
+(1, 46, 110),     -- Warszawa Centralna ↔ Skierniewice
+(46, 14, 120),    -- Skierniewice ↔ Radom
+(14, 13, 70),     -- Radom ↔ Częstochowa Osobowa
+(13, 2, 120),     -- Częstochowa Osobowa ↔ Kraków Główny
+
+(1, 3, 130),      -- Warszawa Centralna ↔ Łódź Fabryczna
+(3, 4, 220),      -- Łódź Fabryczna ↔ Wrocław Główny
+
+(46, 16, 70),     -- Skierniewice ↔ Toruń Główny
+(16, 6, 150),     -- Toruń Główny ↔ Gdańsk Główny
+
+(2, 13, 70),      -- Kraków Główny ↔ Częstochowa Osobowa
+(13, 14, 70),     -- Częstochowa Osobowa ↔ Radom
+(14, 46, 90),     -- Radom ↔ Skierniewice
+
+(46, 3, 70),      -- Skierniewice ↔ Łódź Fabryczna
+
+(10, 15, 10),     -- Katowice ↔ Sosnowiec Główny
+(15, 2, 70),      -- Sosnowiec Główny ↔ Kraków Główny
+
+(1, 102, 40),     -- Warszawa Centralna ↔ Łowicz Główny
+(102, 46, 50),    -- Łowicz Główny ↔ Skierniewice
+
+(6, 74, 15),      -- Gdańsk Główny ↔ Tczew
+(74, 12, 30),     -- Tczew ↔ Gdynia Główna Osobowa
+
+(4, 56, 30),      -- Wrocław Główny ↔ Głogów
+(56, 33, 50),     -- Głogów ↔ Wałbrzych Główny
+
+(10, 23, 15),     -- Katowice ↔ Bytom
+(23, 26, 15),     -- Bytom ↔ Ruda Śląska
+(26, 28, 20),     -- Ruda Śląska ↔ Tychy
+(28, 30, 20),     -- Tychy ↔ Dąbrowa Górnicza
+(30, 35, 20),     -- Dąbrowa Górnicza ↔ Chorzów Batory
+(35, 57, 20),     -- Chorzów Batory ↔ Siemianowice Śląskie
+(57, 63, 20),     -- Siemianowice Śląskie ↔ Tarnowskie Góry
+(63, 69, 20),     -- Tarnowskie Góry ↔ Świętochłowice
+(69, 77, 20),     -- Świętochłowice ↔ Żory
+
+(1, 31, 65),      -- Warszawa Centralna ↔ Płock
+(31, 97, 35),     -- Płock ↔ Ciechanów
+(97, 96, 25),     -- Ciechanów ↔ Mława
+(96, 94, 20),     -- Mława ↔ Grójec
+(94, 95, 20),     -- Grójec ↔ Garwolin
+(95, 101, 20),    -- Garwolin ↔ Sochaczew
+(101, 104, 20),   -- Sochaczew ↔ Płońsk
+(104, 105, 20),   -- Płońsk ↔ Gostynin
+(105, 106, 20),   -- Gostynin ↔ Kozienice
+
+(6, 32, 45),      -- Gdańsk Główny ↔ Elbląg
+(32, 21, 40),     -- Elbląg ↔ Olsztyn Główny
+(21, 62, 40),     -- Olsztyn Główny ↔ Ełk
+(62, 53, 50),     -- Ełk ↔ Suwałki
+(53, 107, 40),    -- Suwałki ↔ Szczytno
+(107, 108, 30),   -- Szczytno ↔ Mrągowo
+
+(4, 43, 60),      -- Wrocław Główny ↔ Jelenia Góra
+(43, 33, 40),     -- Jelenia Góra ↔ Wałbrzych Główny
+(33, 59, 30),     -- Wałbrzych Główny ↔ Świdnica Miasto
+(59, 85, 30),     -- Świdnica Miasto ↔ Kłodzko Główne
+(85, 83, 30),     -- Kłodzko Główne ↔ Nysa
+(83, 84, 20),     -- Nysa ↔ Brzeg
+
+(5, 37, 50),      -- Poznań Główny ↔ Kalisz
+(37, 52, 40),     -- Kalisz ↔ Ostrów Wielkopolski
+(52, 50, 30),     -- Ostrów Wielkopolski ↔ Inowrocław
+(50, 54, 30),     -- Inowrocław ↔ Gniezno
+(54, 103, 30),    -- Gniezno ↔ Kutno
+
+(1, 48, 60),      -- Warszawa Centralna ↔ Siedlce
+(48, 68, 40),     -- Siedlce ↔ Ostrołęka
+(68, 11, 50),     -- Ostrołęka ↔ Białystok
+(11, 53, 50),     -- Białystok ↔ Suwałki
+(53, 98, 30),     -- Suwałki ↔ Sokołów Podlaski
+
+(8, 39, 40),      -- Bydgoszcz Główna ↔ Grudziądz
+(39, 34, 40),     -- Grudziądz ↔ Włocławek
+(34, 50, 40),     -- Włocławek ↔ Inowrocław
+(50, 88, 40),     -- Inowrocław ↔ Chojnice
+(88, 87, 30),     -- Chojnice ↔ Złotów
+
+(18, 65, 50),     -- Rzeszów Główny ↔ Przemyśl Główny
+(65, 75, 40),     -- Przemyśl Główny ↔ Jarosław
+(75, 78, 40),     -- Jarosław ↔ Dębica
+(78, 71, 40);     -- Dębica ↔ Starachowice Wschodnie
 
 INSERT INTO harmonogramy (czy_tydzien, czy_swieta) VALUES
 ('{true,true,true,true,true,true,true}', false),
@@ -342,32 +313,31 @@ BEGIN;
 INSERT INTO polaczenia (godzina_startu, id_harmonogramu, id_przewoznika) VALUES
     ('06:00:00', 1, 1) RETURNING id_polaczenia;
 INSERT INTO stacje_posrednie VALUES
-                                 (1, 1, 0, 5, true, 3),     -- Warszawa Centralna
-                                 (1, 46, 85, 85, false, 2),  -- Skierniewice
+                                 (1, 1, 0, 5, true, 1),     -- Warszawa Centralna
+                                 (1, 46, 85, 85, false, 1),  -- Skierniewice
                                  (1, 14, 175, 177, true, 1), -- Radom
-                                 (1, 13, 245, 247, true, 2), -- Częstochowa Osobowa
-                                 (1, 2, 365, 370, true, 4);  -- Kraków Główny
+                                 (1, 13, 245, 247, true, 1), -- Częstochowa Osobowa
+                                 (1, 2, 365, 370, true, 1);  -- Kraków Główny
+COMMIT;
 INSERT INTO historia_polaczenia (id_polaczenia, data_od, data_do) VALUES
     (1, '2023-01-01', '2026-12-31');
 INSERT INTO polaczenia_wagony(id_polaczenia, nr_wagonu, id_wagonu) VALUES
                                                                        (1, 1, 1), (1, 2, 2), (1, 3, 3);
-COMMIT;
 
 -- 2. IC Warszawa - Wrocław (PKP Intercity)
 BEGIN;
 INSERT INTO polaczenia (godzina_startu, id_harmonogramu, id_przewoznika) VALUES
     ('07:30:00', 1, 1) RETURNING id_polaczenia;
 INSERT INTO stacje_posrednie VALUES
-                                 (2, 1, 0, 5, true, 5),     -- Warszawa Centralna
-                                 (2, 3, 135, 135, false, 2), -- Łódź Fabryczna
-                                 (2, 4, 355, 360, true, 3);  -- Wrocław Główny
+                                 (2, 1, 0, 5, true, 1),     -- Warszawa Centralna
+                                 (2, 3, 135, 135, false, 1), -- Łódź Fabryczna
+                                 (2, 4, 355, 360, true, 1);  -- Wrocław Główny
+COMMIT;
 INSERT INTO historia_polaczenia (id_polaczenia, data_od, data_do) VALUES
                                                                       (2, '2023-01-01', '2023-06-30'),
                                                                       (2, '2023-09-01', '2026-12-31');
 INSERT INTO polaczenia_wagony(id_polaczenia, nr_wagonu, id_wagonu) VALUES
                                                                        (2, 1, 2), (2, 2, 2), (2, 3, 2);
-COMMIT;
-
 -- 3. EIP Warszawa - Gdańsk (PKP Intercity)
 BEGIN;
 INSERT INTO polaczenia (godzina_startu, id_harmonogramu, id_przewoznika) VALUES
@@ -377,11 +347,11 @@ INSERT INTO stacje_posrednie VALUES
                                  (3, 46, 85, 85, false, 1),  -- Skierniewice
                                  (3, 16, 135, 137, true, 3), -- Toruń Główny
                                  (3, 6, 285, 290, true, 5);  -- Gdańsk Główny
+COMMIT;
 INSERT INTO historia_polaczenia (id_polaczenia, data_od, data_do) VALUES
     (3, '2023-03-15', '2026-12-31');
 INSERT INTO polaczenia_wagony(id_polaczenia, nr_wagonu, id_wagonu) VALUES
                                                                        (3, 1, 1), (3, 2, 3), (3, 3, 3);
-COMMIT;
 
 -- 4. TLK Kraków - Warszawa (PKP Intercity)
 BEGIN;
@@ -393,11 +363,11 @@ INSERT INTO stacje_posrednie VALUES
                                  (4, 14, 190, 190, false, 1),-- Radom
                                  (4, 46, 280, 280, false, 2),-- Skierniewice
                                  (4, 1, 365, 370, true, 3);  -- Warszawa Centralna
+COMMIT;
 INSERT INTO historia_polaczenia (id_polaczenia, data_od, data_do) VALUES
     (4, '2022-12-01', '2026-12-31');
 INSERT INTO polaczenia_wagony(id_polaczenia, nr_wagonu, id_wagonu) VALUES
                                                                        (4, 1, 2), (4, 2, 2), (4, 3, 2);
-COMMIT;
 
 -- 5. Warszawa - Łódź (PolRegio)
 BEGIN;
@@ -407,11 +377,13 @@ INSERT INTO stacje_posrednie VALUES
                                  (5, 1, 0, 5, true, 3),     -- Warszawa Centralna
                                  (5, 46, 85, 85, false, 2),  -- Skierniewice
                                  (5, 3, 135, 140, true, 1);  -- Łódź Fabryczna
+COMMIT;
+ROLLBACK;
+
 INSERT INTO historia_polaczenia (id_polaczenia, data_od, data_do) VALUES
     (5, '2023-01-01', '2026-12-31');
 INSERT INTO polaczenia_wagony(id_polaczenia, nr_wagonu, id_wagonu) VALUES
                                                                        (5, 1, 4), (5, 2, 4), (5, 3, 3);
-COMMIT;
 
 -- 6. Katowice - Kraków (PolRegio)
 BEGIN;
@@ -421,11 +393,11 @@ INSERT INTO stacje_posrednie VALUES
                                  (6, 10, 0, 5, true, 4),    -- Katowice
                                  (6, 15, 15, 15, false, 2),  -- Sosnowiec Główny
                                  (6, 2, 85, 90, true, 3);    -- Kraków Główny
+COMMIT;
 INSERT INTO historia_polaczenia (id_polaczenia, data_od, data_do) VALUES
     (6, '2023-01-15', '2026-12-31');
 INSERT INTO polaczenia_wagony(id_polaczenia, nr_wagonu, id_wagonu) VALUES
                                                                        (6, 1, 5), (6, 2, 5), (6, 3, 3);
-COMMIT;
 
 -- 7. Warszawa - Skierniewice (Koleje Mazowieckie)
 BEGIN;
@@ -435,11 +407,11 @@ INSERT INTO stacje_posrednie VALUES
                                  (7, 1, 0, 5, true, 5),     -- Warszawa Centralna
                                  (7, 102, 45, 45, false, 1),-- Łowicz Główny
                                  (7, 46, 85, 90, true, 2);   -- Skierniewice
+COMMIT;
 INSERT INTO historia_polaczenia (id_polaczenia, data_od, data_do) VALUES
     (7, '2023-03-01', '2026-12-31');
 INSERT INTO polaczenia_wagony(id_polaczenia, nr_wagonu, id_wagonu) VALUES
                                                                        (7, 1, 4), (7, 2, 4), (7, 3, 3);
-COMMIT;
 
 -- 8. Gdańsk - Gdynia (SKM Trójmiasto)
 BEGIN;
@@ -449,12 +421,12 @@ INSERT INTO stacje_posrednie VALUES
                                  (8, 6, 0, 5, true, 3),     -- Gdańsk Główny
                                  (8, 74, 15, 15, false, 1),  -- Tczew
                                  (8, 12, 45, 50, true, 2);   -- Gdynia Główna Osobowa
+COMMIT;
 INSERT INTO historia_polaczenia (id_polaczenia, data_od, data_do) VALUES
                                                                       (8, '2023-01-01', '2023-10-31'),
                                                                       (8, '2024-01-01', '2026-12-31');
 INSERT INTO polaczenia_wagony(id_polaczenia, nr_wagonu, id_wagonu) VALUES
                                                                        (8, 1, 5), (8, 2, 5), (8, 3, 2);
-COMMIT;
 
 -- 9. Wrocław - Wałbrzych (Koleje Dolnośląskie)
 BEGIN;
@@ -464,11 +436,11 @@ INSERT INTO stacje_posrednie VALUES
                                  (9, 4, 0, 5, true, 2),     -- Wrocław Główny
                                  (9, 56, 30, 30, false, 1),  -- Głogów
                                  (9, 33, 70, 75, true, 3);   -- Wałbrzych Główny
+COMMIT;
 INSERT INTO historia_polaczenia (id_polaczenia, data_od, data_do) VALUES
     (9, '2023-02-01', '2026-12-31');
 INSERT INTO polaczenia_wagony(id_polaczenia, nr_wagonu, id_wagonu) VALUES
                                                                        (9, 1, 4), (9, 2, 4), (9, 3, 3);
-COMMIT;
 
 -- 10. Katowice - Żory (PolRegio - Śląsk)
 BEGIN;
@@ -485,11 +457,11 @@ INSERT INTO stacje_posrednie VALUES
                                  (10, 63, 135, 140, true, 1), -- Tarnowskie Góry
                                  (10, 69, 155, 160, true, 2), -- Świętochłowice
                                  (10, 77, 175, 180, true, 1); -- Żory
+COMMIT;
 INSERT INTO historia_polaczenia (id_polaczenia, data_od, data_do) VALUES
     (10, '2023-01-01', '2026-12-31');
 INSERT INTO polaczenia_wagony(id_polaczenia, nr_wagonu, id_wagonu) VALUES
                                                                        (10, 1, 5), (10, 2, 4), (10, 3, 2);
-COMMIT;
 
 -- 11. Warszawa - Kozienice (Koleje Mazowieckie)
 BEGIN;
@@ -506,11 +478,11 @@ INSERT INTO stacje_posrednie VALUES
                                  (11, 104, 210, 215, true, 1),-- Płońsk
                                  (11, 105, 230, 235, true, 2),-- Gostynin
                                  (11, 106, 250, 255, true, 1);-- Kozienice
+COMMIT;
 INSERT INTO historia_polaczenia (id_polaczenia, data_od, data_do) VALUES
     (11, '2023-04-01', '2026-12-31');
 INSERT INTO polaczenia_wagony(id_polaczenia, nr_wagonu, id_wagonu) VALUES
                                                                        (11, 1, 4), (11, 2, 5), (11, 3, 2);
-COMMIT;
 
 -- 12. Gdańsk - Mrągowo (PolRegio - Pomorze/Warmia)
 BEGIN;
@@ -524,11 +496,11 @@ INSERT INTO stacje_posrednie VALUES
                                  (12, 53, 180, 185, true, 2),-- Suwałki
                                  (12, 107, 220, 225, true, 1),-- Szczytno
                                  (12, 108, 250, 255, true, 2);-- Mrągowo
+COMMIT;
 INSERT INTO historia_polaczenia (id_polaczenia, data_od, data_do) VALUES
     (12, '2023-01-01', '2026-12-31');
 INSERT INTO polaczenia_wagony(id_polaczenia, nr_wagonu, id_wagonu) VALUES
                                                                        (12, 1, 2), (12, 2, 2), (12, 3, 2);
-COMMIT;
 
 -- 13. Wrocław - Brzeg (Koleje Dolnośląskie)
 BEGIN;
@@ -542,11 +514,11 @@ INSERT INTO stacje_posrednie VALUES
                                  (13, 85, 160, 165, true, 2),-- Kłodzko Główne
                                  (13, 83, 190, 195, true, 1),-- Nysa
                                  (13, 84, 210, 215, true, 2);-- Brzeg
+COMMIT;
 INSERT INTO historia_polaczenia (id_polaczenia, data_od, data_do) VALUES
     (13, '2023-02-10', '2026-12-31');
 INSERT INTO polaczenia_wagony(id_polaczenia, nr_wagonu, id_wagonu) VALUES
                                                                        (13, 1, 5), (13, 2, 4), (13, 3, 2);
-COMMIT;
 
 -- 14. Poznań - Kutno (PolRegio - Wielkopolska)
 BEGIN;
@@ -559,11 +531,11 @@ INSERT INTO stacje_posrednie VALUES
                                  (14, 50, 120, 125, true, 1),-- Inowrocław
                                  (14, 54, 150, 155, true, 2),-- Gniezno
                                  (14, 103, 180, 185, true, 1);-- Kutno
+COMMIT;
 INSERT INTO historia_polaczenia (id_polaczenia, data_od, data_do) VALUES
     (14, '2023-01-01', '2026-12-31');
 INSERT INTO polaczenia_wagony(id_polaczenia, nr_wagonu, id_wagonu) VALUES
                                                                        (14, 1, 5), (14, 2, 5), (14, 3, 3);
-COMMIT;
 
 -- 15. Warszawa - Sokołów Podlaski (PolRegio - Podlasie)
 BEGIN;
@@ -576,11 +548,11 @@ INSERT INTO stacje_posrednie VALUES
                                  (15, 11, 150, 155, true, 1),-- Białystok
                                  (15, 53, 200, 205, true, 2),-- Suwałki
                                  (15, 98, 230, 235, true, 1);-- Sokołów Podlaski
+COMMIT;
 INSERT INTO historia_polaczenia (id_polaczenia, data_od, data_do) VALUES
     (15, '2023-03-15', '2026-12-31');
 INSERT INTO polaczenia_wagony(id_polaczenia, nr_wagonu, id_wagonu) VALUES
                                                                        (15, 1, 4), (15, 2, 4), (15, 3, 3);
-COMMIT;
 
 -- 16. Bydgoszcz - Złotów (PolRegio - Kujawy/Pomorze)
 BEGIN;
@@ -593,12 +565,12 @@ INSERT INTO stacje_posrednie VALUES
                                  (16, 50, 120, 125, true, 1),-- Inowrocław
                                  (16, 88, 160, 165, true, 2),-- Chojnice
                                  (16, 87, 190, 195, true, 1);-- Złotów
+COMMIT;
 INSERT INTO historia_polaczenia (id_polaczenia, data_od, data_do) VALUES
                                                                       (16, '2023-01-01', '2023-07-31'),
                                                                       (16, '2023-09-01', '2026-12-31');
 INSERT INTO polaczenia_wagony(id_polaczenia, nr_wagonu, id_wagonu) VALUES
                                                                        (16, 1, 3), (16, 2, 3), (16, 3, 2);
-COMMIT;
 
 -- 17. Rzeszów - Starachowice (PolRegio - Podkarpacie)
 BEGIN;
@@ -610,11 +582,11 @@ INSERT INTO stacje_posrednie VALUES
                                  (17, 75, 90, 95, true, 2),  -- Jarosław
                                  (17, 78, 130, 135, true, 1),-- Dębica
                                  (17, 71, 170, 175, true, 2);-- Starachowice Wschodnie
+COMMIT;
 INSERT INTO historia_polaczenia (id_polaczenia, data_od, data_do) VALUES
     (17, '2023-01-01', '2026-12-31');
 INSERT INTO polaczenia_wagony(id_polaczenia, nr_wagonu, id_wagonu) VALUES
                                                                        (17, 1, 4), (17, 2, 4), (17, 3, 3);
-COMMIT;
 
 
 insert into pasazerowie (imie, nazwisko, email) values ('Gregg', 'Parkeson', 'gparkeson0@digg.com');

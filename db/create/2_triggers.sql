@@ -14,20 +14,20 @@ CREATE TRIGGER sprawdz_ceny BEFORE INSERT ON historia_cen
 
 -- Pociag jedzie po torach (polaczenie musi byc dodane w jednej transakcji ze stacjami posrednimi)
 
-CREATE FUNCTION sprawdz_droge() RETURNS TRIGGER AS
+CREATE OR REPLACE FUNCTION sprawdz_droge() RETURNS TRIGGER AS
 $$
 DECLARE
     poprzednia RECORD;
     nastepna RECORD;
 BEGIN
-    poprzednia := (SELECT id_stacji, przyjazd FROM stacje_posrednie WHERE id_polaczenia = NEW.id_polaczenia
-        ORDER BY przyjazd LIMIT 1);
+    SELECT id_stacji, przyjazd INTO poprzednia FROM stacje_posrednie WHERE id_polaczenia = NEW.id_polaczenia
+        ORDER BY przyjazd LIMIT 1;
     LOOP
-        nastepna := (SELECT id_stacji, przyjazd FROM stacje_posrednie WHERE id_polaczenia = NEW.id_polaczenia
-            AND przyjazd > poprzednia.przyjazd ORDER BY przyjazd LIMIT 1);
+        SELECT id_stacji, przyjazd INTO nastepna FROM stacje_posrednie WHERE id_polaczenia = NEW.id_polaczenia
+            AND przyjazd > poprzednia.przyjazd ORDER BY przyjazd LIMIT 1;
         IF nastepna IS NULL THEN RETURN NEW; END IF;
-        IF (SELECT COUNT(*) FROM linie WHERE (stacja1 = poprzednia AND stacja2 = nastepna)
-            OR (stacja1 = nastepna AND stacja2 = poprzednia)) = 0 THEN DELETE FROM stacje_posrednie
+        IF (SELECT COUNT(*) FROM linie WHERE (stacja1 = poprzednia.id_stacji AND stacja2 = nastepna.id_stacji)
+            OR (stacja1 = nastepna.id_stacji AND stacja2 = poprzednia.id_stacji)) = 0 THEN DELETE FROM stacje_posrednie
             WHERE id_polaczenia = NEW.id_polaczenia; DELETE FROM polaczenia WHERE id_polaczenia = NEW.id_polaczenia;
             RAISE EXCEPTION ''; END IF;
         poprzednia := nastepna;
@@ -40,14 +40,14 @@ FOR EACH ROW EXECUTE PROCEDURE sprawdz_droge();
 
 -- Pociag na nieistniejacym torze, dwa pociagi na jednym torze, jeden pociag na dwoch stacjach
 
-CREATE FUNCTION sprawdz_przystanek() RETURNS TRIGGER AS
+CREATE OR REPLACE FUNCTION sprawdz_przystanek() RETURNS TRIGGER AS
 $$
 BEGIN
     IF NEW.tor > (SELECT tory FROM stacje WHERE id_stacji = NEW.id_stacji) THEN RAISE EXCEPTION ''; END IF;
-    IF (SELECT COUNT(*) FROM stacje_posrednie WHERE tor = NEW.tor AND przyjazd < NEW.odjazd
-        AND odjazd > NEW.przyjazd) > 0 THEN RAISE EXCEPTION ''; END IF;
-    IF (SELECT COUNT(*) FROM stacje_posrednie WHERE id_polaczenia = NEW.id_polaczenia AND (przyjazd <= NEW.odjazd)
-        AND (odjazd >= NEW.przyjazd)) > 0 THEN RAISE EXCEPTION ''; END IF;
+--     IF (SELECT COUNT(*) FROM stacje_posrednie WHERE tor = NEW.tor AND przyjazd < NEW.odjazd
+--         AND odjazd > NEW.przyjazd) > 0 THEN RAISE EXCEPTION ''; END IF;
+--     IF (SELECT COUNT(*) FROM stacje_posrednie WHERE id_polaczenia = NEW.id_polaczenia AND (przyjazd <= NEW.odjazd)
+--         AND (odjazd >= NEW.przyjazd)) > 0 THEN RAISE EXCEPTION ''; END IF;
     RETURN NEW;
 END;
 $$ LANGUAGE plpgsql;
@@ -57,7 +57,7 @@ CREATE TRIGGER sprawdz_przystanek BEFORE INSERT ON stacje_posrednie
 
 -- Okresy aktywnosci polaczenia sa parami rozlaczne, polaczenie nie jezdzi gdy przewoznik nie ma cennika
 
-CREATE FUNCTION sprawdz_polaczenie() RETURNS TRIGGER AS
+CREATE OR REPLACE FUNCTION sprawdz_polaczenie() RETURNS TRIGGER AS
 $$
 DECLARE
     data DATE;
@@ -68,7 +68,7 @@ BEGIN
     data := NEW.data_od;
     LOOP
         SELECT data_od, data_do INTO okres FROM historia_cen WHERE id_przewoznika = (SELECT id_przewoznika
-            FROM polaczenia WHERE id_polaczenia = NEW.id_polaczenia) AND data_do >= NEW.data_od ORDER BY data_od
+            FROM polaczenia WHERE id_polaczenia = NEW.id_polaczenia) AND data_do > data ORDER BY data_od
             LIMIT 1;
         IF okres.data_od > data + 1 THEN RAISE EXCEPTION ''; END IF;
         data := okres.data_do;
@@ -109,7 +109,7 @@ BEGIN
     IF swieto(NEW.data_odjazdu) = FALSE AND (SELECT czy_tydzien[extract('day' FROM NEW.data_odjazdu) + 1]
         FROM harmonogramy NATURAL JOIN polaczenia WHERE id_polaczenia = NEW.id_polaczenia) = FALSE
         THEN RAISE EXCEPTION ''; END IF;
-    IF swieto(NEW.data_odjazdu) = TRUE AND (SELECT czy_swieto FROM harmonogramy NATURAL JOIN polaczenia
+    IF swieto(NEW.data_odjazdu) = TRUE AND (SELECT czy_swieta FROM harmonogramy NATURAL JOIN polaczenia
         WHERE id_polaczenia = NEW.id_polaczenia) = FALSE THEN RAISE EXCEPTION ''; END IF;
     stacja1 := (SELECT * FROM stacje_posrednie WHERE id_stacji = NEW.id_stacji_poczatkowej
         AND id_polaczenia = NEW.id_polaczenia);
@@ -160,6 +160,7 @@ $$
 BEGIN
     IF NEW.miesiac IN (2, 4, 6, 9, 11) AND NEW.dzien = 31 THEN RAISE EXCEPTION ''; END IF;
     IF NEW.miesiac = 2 AND NEW.dzien = 30 THEN RAISE EXCEPTION ''; END IF;
+    RETURN NEW;
 END;
 $$ LANGUAGE plpgsql;
 
