@@ -10,7 +10,7 @@ db.username=your_user
 db.password=your_password
 ```
 From the `/app` directory, run `./gradlew run`.
-### Clearing the database.
+### Clearing the database
 To reset the database, run: `/db/clear.sql` in PostgreSQL.
 
 `psql -U your_user -d your_db -f clear.sql`.
