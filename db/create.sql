@@ -1083,91 +1083,91 @@ INSERT INTO stacje (nazwa, tory) VALUES
 ON CONFLICT (nazwa) DO NOTHING;
 
 INSERT INTO linie (stacja1, stacja2, odleglosc) VALUES
-(1, 46, 110),     -- Warszawa Centralna ↔ Skierniewice
-(46, 14, 120),    -- Skierniewice ↔ Radom
-(14, 13, 70),     -- Radom ↔ Częstochowa Osobowa
-(13, 2, 120),     -- Częstochowa Osobowa ↔ Kraków Główny
+(1, 46, 110),     -- Warszawa Centralna <-> Skierniewice
+(46, 14, 120),    -- Skierniewice <-> Radom
+(14, 13, 70),     -- Radom <-> Częstochowa Osobowa
+(13, 2, 120),     -- Częstochowa Osobowa <-> Kraków Główny
 
-(1, 3, 130),      -- Warszawa Centralna ↔ Łódź Fabryczna
-(3, 4, 220),      -- Łódź Fabryczna ↔ Wrocław Główny
+(1, 3, 130),      -- Warszawa Centralna <-> Łódź Fabryczna
+(3, 4, 220),      -- Łódź Fabryczna <-> Wrocław Główny
 
-(46, 16, 70),     -- Skierniewice ↔ Toruń Główny
-(16, 6, 150),     -- Toruń Główny ↔ Gdańsk Główny
+(46, 16, 70),     -- Skierniewice <-> Toruń Główny
+(16, 6, 150),     -- Toruń Główny <-> Gdańsk Główny
 
-(2, 13, 70),      -- Kraków Główny ↔ Częstochowa Osobowa
-(13, 14, 70),     -- Częstochowa Osobowa ↔ Radom
-(14, 46, 90),     -- Radom ↔ Skierniewice
+(2, 13, 70),      -- Kraków Główny <-> Częstochowa Osobowa
+(13, 14, 70),     -- Częstochowa Osobowa <-> Radom
+(14, 46, 90),     -- Radom <-> Skierniewice
 
-(46, 3, 70),      -- Skierniewice ↔ Łódź Fabryczna
+(46, 3, 70),      -- Skierniewice <-> Łódź Fabryczna
 
-(10, 15, 10),     -- Katowice ↔ Sosnowiec Główny
-(15, 2, 70),      -- Sosnowiec Główny ↔ Kraków Główny
+(10, 15, 10),     -- Katowice <-> Sosnowiec Główny
+(15, 2, 70),      -- Sosnowiec Główny <-> Kraków Główny
 
-(1, 102, 40),     -- Warszawa Centralna ↔ Łowicz Główny
-(102, 46, 50),    -- Łowicz Główny ↔ Skierniewice
+(1, 102, 40),     -- Warszawa Centralna <-> Łowicz Główny
+(102, 46, 50),    -- Łowicz Główny <-> Skierniewice
 
-(6, 74, 15),      -- Gdańsk Główny ↔ Tczew
-(74, 12, 30),     -- Tczew ↔ Gdynia Główna Osobowa
+(6, 74, 15),      -- Gdańsk Główny <-> Tczew
+(74, 12, 30),     -- Tczew <-> Gdynia Główna Osobowa
 
-(4, 56, 30),      -- Wrocław Główny ↔ Głogów
-(56, 33, 50),     -- Głogów ↔ Wałbrzych Główny
+(4, 56, 30),      -- Wrocław Główny <-> Głogów
+(56, 33, 50),     -- Głogów <-> Wałbrzych Główny
 
-(10, 23, 15),     -- Katowice ↔ Bytom
-(23, 26, 15),     -- Bytom ↔ Ruda Śląska
-(26, 28, 20),     -- Ruda Śląska ↔ Tychy
-(28, 30, 20),     -- Tychy ↔ Dąbrowa Górnicza
-(30, 35, 20),     -- Dąbrowa Górnicza ↔ Chorzów Batory
-(35, 57, 20),     -- Chorzów Batory ↔ Siemianowice Śląskie
-(57, 63, 20),     -- Siemianowice Śląskie ↔ Tarnowskie Góry
-(63, 69, 20),     -- Tarnowskie Góry ↔ Świętochłowice
-(69, 77, 20),     -- Świętochłowice ↔ Żory
+(10, 23, 15),     -- Katowice <-> Bytom
+(23, 26, 15),     -- Bytom <-> Ruda Śląska
+(26, 28, 20),     -- Ruda Śląska <-> Tychy
+(28, 30, 20),     -- Tychy <-> Dąbrowa Górnicza
+(30, 35, 20),     -- Dąbrowa Górnicza <-> Chorzów Batory
+(35, 57, 20),     -- Chorzów Batory <-> Siemianowice Śląskie
+(57, 63, 20),     -- Siemianowice Śląskie <-> Tarnowskie Góry
+(63, 69, 20),     -- Tarnowskie Góry <-> Świętochłowice
+(69, 77, 20),     -- Świętochłowice <-> Żory
 
-(1, 31, 65),      -- Warszawa Centralna ↔ Płock
-(31, 97, 35),     -- Płock ↔ Ciechanów
-(97, 96, 25),     -- Ciechanów ↔ Mława
-(96, 94, 20),     -- Mława ↔ Grójec
-(94, 95, 20),     -- Grójec ↔ Garwolin
-(95, 101, 20),    -- Garwolin ↔ Sochaczew
-(101, 104, 20),   -- Sochaczew ↔ Płońsk
-(104, 105, 20),   -- Płońsk ↔ Gostynin
-(105, 106, 20),   -- Gostynin ↔ Kozienice
+(1, 31, 65),      -- Warszawa Centralna <-> Płock
+(31, 97, 35),     -- Płock <-> Ciechanów
+(97, 96, 25),     -- Ciechanów <-> Mława
+(96, 94, 20),     -- Mława <-> Grójec
+(94, 95, 20),     -- Grójec <-> Garwolin
+(95, 101, 20),    -- Garwolin <-> Sochaczew
+(101, 104, 20),   -- Sochaczew <-> Płońsk
+(104, 105, 20),   -- Płońsk <-> Gostynin
+(105, 106, 20),   -- Gostynin <-> Kozienice
 
-(6, 32, 45),      -- Gdańsk Główny ↔ Elbląg
-(32, 21, 40),     -- Elbląg ↔ Olsztyn Główny
-(21, 62, 40),     -- Olsztyn Główny ↔ Ełk
-(62, 53, 50),     -- Ełk ↔ Suwałki
-(53, 107, 40),    -- Suwałki ↔ Szczytno
-(107, 108, 30),   -- Szczytno ↔ Mrągowo
+(6, 32, 45),      -- Gdańsk Główny <-> Elbląg
+(32, 21, 40),     -- Elbląg <-> Olsztyn Główny
+(21, 62, 40),     -- Olsztyn Główny <-> Ełk
+(62, 53, 50),     -- Ełk <-> Suwałki
+(53, 107, 40),    -- Suwałki <-> Szczytno
+(107, 108, 30),   -- Szczytno <-> Mrągowo
 
-(4, 43, 60),      -- Wrocław Główny ↔ Jelenia Góra
-(43, 33, 40),     -- Jelenia Góra ↔ Wałbrzych Główny
-(33, 59, 30),     -- Wałbrzych Główny ↔ Świdnica Miasto
-(59, 85, 30),     -- Świdnica Miasto ↔ Kłodzko Główne
-(85, 83, 30),     -- Kłodzko Główne ↔ Nysa
-(83, 84, 20),     -- Nysa ↔ Brzeg
+(4, 43, 60),      -- Wrocław Główny <-> Jelenia Góra
+(43, 33, 40),     -- Jelenia Góra <-> Wałbrzych Główny
+(33, 59, 30),     -- Wałbrzych Główny <-> Świdnica Miasto
+(59, 85, 30),     -- Świdnica Miasto <-> Kłodzko Główne
+(85, 83, 30),     -- Kłodzko Główne <-> Nysa
+(83, 84, 20),     -- Nysa <-> Brzeg
 
-(5, 37, 50),      -- Poznań Główny ↔ Kalisz
-(37, 52, 40),     -- Kalisz ↔ Ostrów Wielkopolski
-(52, 50, 30),     -- Ostrów Wielkopolski ↔ Inowrocław
-(50, 54, 30),     -- Inowrocław ↔ Gniezno
-(54, 103, 30),    -- Gniezno ↔ Kutno
+(5, 37, 50),      -- Poznań Główny <-> Kalisz
+(37, 52, 40),     -- Kalisz <-> Ostrów Wielkopolski
+(52, 50, 30),     -- Ostrów Wielkopolski <-> Inowrocław
+(50, 54, 30),     -- Inowrocław <-> Gniezno
+(54, 103, 30),    -- Gniezno <-> Kutno
 
-(1, 48, 60),      -- Warszawa Centralna ↔ Siedlce
-(48, 68, 40),     -- Siedlce ↔ Ostrołęka
-(68, 11, 50),     -- Ostrołęka ↔ Białystok
-(11, 53, 50),     -- Białystok ↔ Suwałki
-(53, 98, 30),     -- Suwałki ↔ Sokołów Podlaski
+(1, 48, 60),      -- Warszawa Centralna <-> Siedlce
+(48, 68, 40),     -- Siedlce <-> Ostrołęka
+(68, 11, 50),     -- Ostrołęka <-> Białystok
+(11, 53, 50),     -- Białystok <-> Suwałki
+(53, 98, 30),     -- Suwałki <-> Sokołów Podlaski
 
-(8, 39, 40),      -- Bydgoszcz Główna ↔ Grudziądz
-(39, 34, 40),     -- Grudziądz ↔ Włocławek
-(34, 50, 40),     -- Włocławek ↔ Inowrocław
-(50, 88, 40),     -- Inowrocław ↔ Chojnice
-(88, 87, 30),     -- Chojnice ↔ Złotów
+(8, 39, 40),      -- Bydgoszcz Główna <-> Grudziądz
+(39, 34, 40),     -- Grudziądz <-> Włocławek
+(34, 50, 40),     -- Włocławek <-> Inowrocław
+(50, 88, 40),     -- Inowrocław <-> Chojnice
+(88, 87, 30),     -- Chojnice <-> Złotów
 
-(18, 65, 50),     -- Rzeszów Główny ↔ Przemyśl Główny
-(65, 75, 40),     -- Przemyśl Główny ↔ Jarosław
-(75, 78, 40),     -- Jarosław ↔ Dębica
-(78, 71, 40);     -- Dębica ↔ Starachowice Wschodnie
+(18, 65, 50),     -- Rzeszów Główny <-> Przemyśl Główny
+(65, 75, 40),     -- Przemyśl Główny <-> Jarosław
+(75, 78, 40),     -- Jarosław <-> Dębica
+(78, 71, 40);     -- Dębica <-> Starachowice Wschodnie
 
 INSERT INTO harmonogramy (czy_tydzien, czy_swieta) VALUES
 ('{true,true,true,true,true,true,true}', false),
