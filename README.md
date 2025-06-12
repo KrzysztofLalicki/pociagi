@@ -1,6 +1,7 @@
 ### Initializing the database
 Run `/db/create.sql` in PostgreSQL to create the necessary objects.
-`psql -U your_user -d your_database -f create.sql`.
+
+`psql -U your_user -d your_db -f create.sql`.
 ### Building and running application
 Edit `/app/db.properties` and set the following:
 ```
@@ -10,5 +11,6 @@ db.password=your_password
 ```
 From the `/app` directory, run `./gradlew run`.
 ### Clearing the database.
-To reset the database, run: `db/clear.sql` in PostgreSQL.
-``psql -U your_user -d your_db -f clear.sql``.
+To reset the database, run: `/db/clear.sql` in PostgreSQL.
+
+`psql -U your_user -d your_db -f clear.sql`.
