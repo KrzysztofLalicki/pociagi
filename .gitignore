@@ -1,4 +1,2 @@
 app/db.properties
-/db/create.sql
-/db/clear.sql
 .idea
