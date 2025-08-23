@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+
+<VBox prefHeight="400.0" prefWidth="790.0" xmlns="http://javafx.com/javafx/24.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="pociagi.app.viewmodel.TicketListOfConnectionViewModel">
+   <children>
+      <HBox alignment="CENTER" prefHeight="67.0" prefWidth="600.0">
+         <children>
+            <VBox alignment="CENTER" prefHeight="67.0" prefWidth="180.0">
+               <children>
+                  <Label prefHeight="18.0" prefWidth="145.0" text="Liczba miejsc w klasie 1 :" textAlignment="CENTER" />
+                  <Label fx:id="labelOne" text="Label" />
+               </children>
+            </VBox>
+            <VBox alignment="CENTER" prefHeight="67.0" prefWidth="149.0">
+               <children>
+                  <Label text="Liczba miejsc w klasie 2 :" />
+                  <Label fx:id="labelTwo" text="Label" />
+               </children>
+            </VBox>
+            <VBox alignment="CENTER" prefHeight="200.0" prefWidth="100.0">
+               <children>
+                  <Label text="Data :" />
+                  <Label fx:id="labelTri" text="Label" />
+               </children>
+            </VBox>
+            <VBox alignment="CENTER" prefHeight="200.0" prefWidth="100.0">
+               <children>
+                  <Label text="Godzina :" />
+                  <Label fx:id="labelQut" text="Label" />
+               </children>
+            </VBox>
+            <VBox alignment="CENTER" prefHeight="67.0" prefWidth="140.0">
+               <children>
+                  <Label prefHeight="18.0" prefWidth="106.0" text="Stacja początkowa :" />
+                  <Label fx:id="labelFive" text="Label" />
+               </children>
+            </VBox>
+            <VBox alignment="CENTER" prefHeight="67.0" prefWidth="119.0">
+               <children>
+                  <Label text="Stacja końcowa :" />
+                  <Label fx:id="labelSix" text="Label" />
+               </children>
+            </VBox>
+         </children>
+      </HBox>
+      <HBox alignment="CENTER" prefHeight="100.0" prefWidth="200.0">
+         <children>
+            <TableView fx:id="tableView" prefHeight="100.0" prefWidth="758.0">
+              <columns>
+                <TableColumn fx:id="skadCol" minWidth="150.0" prefWidth="150.0" text="Stacja początkowa" />
+                <TableColumn fx:id="dokadCol" minWidth="150.0" prefWidth="150.0" text="Stacja końcowa" />
+                  <TableColumn fx:id="odjazdCol" minWidth="150.0" prefWidth="150.0" text="Odjazd" />
+                  <TableColumn fx:id="czasCol" minWidth="150.0" prefWidth="150.0" text="Czas przejazdu" />
+                  <TableColumn fx:id="kosztCol" minWidth="150.0" prefWidth="150.0" text="Koszt" />
+              </columns>
+            </TableView>
+         </children>
+      </HBox>
+   </children>
+</VBox>

@@ -8,4 +8,7 @@ public class DaoFactory {
 
     private static final TimetableDao timetableDao = new TimetableDao();
     public static TimetableDao getTimetableDao() { return timetableDao; }
+
+    private static final TicketConnectionDao ticketConnectionDao = new TicketConnectionDao();
+    public static TicketConnectionDao getTicketConnectionDao() { return ticketConnectionDao; }
 }
