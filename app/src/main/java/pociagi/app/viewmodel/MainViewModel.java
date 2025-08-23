@@ -10,14 +10,14 @@ public class MainViewModel {
     @FXML private Tab wyszukiwarkaPolaczen;
     @FXML private Tab bilet;
 
-    @FXML private TicketViewModel TicketViewController;
+    @FXML private LoggingViewModel loggingViewModelController;
 
 
 
     @FXML
     public void initialize() {
-        if (TicketViewController != null && bilet != null) {
-            TicketViewController.setTab(bilet);
+        if (loggingViewModelController != null && bilet != null) {
+            loggingViewModelController.setTab(bilet);
             System.out.println("Wyszukiwarka polaczen");
         }
 //        tabPane.getSelectionModel().selectedItemProperty().addListener((obs, oldTab, newTab) -> {

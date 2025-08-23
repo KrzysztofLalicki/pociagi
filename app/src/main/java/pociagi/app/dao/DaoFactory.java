@@ -11,4 +11,7 @@ public class DaoFactory {
 
     private static final TicketConnectionDao ticketConnectionDao = new TicketConnectionDao();
     public static TicketConnectionDao getTicketConnectionDao() { return ticketConnectionDao; }
+
+    private static final UlgiDao ulgiDao = new UlgiDao();
+    public static UlgiDao getUlgiDao() { return ulgiDao; }
 }

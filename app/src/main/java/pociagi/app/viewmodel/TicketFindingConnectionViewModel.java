@@ -1,16 +1,13 @@
 package pociagi.app.viewmodel;
 
-import javafx.application.Platform;
-import javafx.beans.property.ObjectProperty;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
-import javafx.scene.Node;
 import javafx.scene.control.Label;
 import javafx.scene.control.Tab;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.VBox;
 import pociagi.app.model.Stacja;
-import pociagi.app.service.TicketFinding;
+import pociagi.app.service.Przejazd;
 
 import java.io.IOException;
 
@@ -28,10 +25,10 @@ public class TicketFindingConnectionViewModel {
 
     private Tab tab;
 
-    private TicketFinding ticketFinding;
+    private Przejazd przejazd;
 
-    public void setTicket(TicketFinding ticket) {
-        this.ticketFinding = ticket;
+    public void setTicket(Przejazd ticket) {
+        this.przejazd = ticket;
     }
 
 
@@ -62,14 +59,14 @@ public class TicketFindingConnectionViewModel {
         VBox newView = loader.load();
 
         TicketListOfConnectionViewModel controller = loader.getController();
-        controller.setTicketFinding(ticketFinding);
+        controller.setPrzejazd(przejazd);
         controller.setTab(tab);
 
         Stacja startStacja = startStationController.getStacjaProperty().get();
         Stacja endStacja   = endStationController.getStacjaProperty().get();
 
-        ticketFinding.setStartStation(startStacja);
-        ticketFinding.setEndStation(endStacja);
+        przejazd.setStartStation(startStacja);
+        przejazd.setEndStation(endStacja);
 
         controller.setLabels();
         tab.setContent(newView);

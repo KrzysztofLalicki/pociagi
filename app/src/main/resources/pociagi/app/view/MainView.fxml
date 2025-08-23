@@ -18,7 +18,7 @@
     </Tab>
       <Tab fx:id="bilet" text="Bilet" >
         <content>
-          <fx:include fx:id="TicketView" source="Ticket.fxml" />
+          <fx:include fx:id="loggingViewModel" source="Logging.fxml" />
         </content>
       </Tab>
   </tabs>

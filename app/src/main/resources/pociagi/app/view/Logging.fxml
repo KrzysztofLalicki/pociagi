@@ -5,7 +5,7 @@
 <?import javafx.scene.control.TextField?>
 <?import javafx.scene.layout.VBox?>
 
-<VBox fx:id="rootVBoxTicket" alignment="CENTER" prefHeight="400.0" prefWidth="600.0" spacing="10.0" xmlns="http://javafx.com/javafx/24.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="pociagi.app.viewmodel.TicketViewModel">
+<VBox fx:id="rootVBoxTicket" alignment="CENTER" prefHeight="400.0" prefWidth="600.0" spacing="10.0" xmlns="http://javafx.com/javafx/24.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="pociagi.app.viewmodel.LoggingViewModel">
    <children>
       <Label prefHeight="24.0" prefWidth="71.0" text="Podaj mail'a:" />
       <TextField alignment="CENTER" maxHeight="30.0" maxWidth="250.0" minHeight="30.0" minWidth="200.0" prefHeight="30.0" prefWidth="200.0" />

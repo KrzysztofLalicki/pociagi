@@ -3,24 +3,26 @@ package pociagi.app.viewmodel;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
 import javafx.scene.control.Label;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.layout.VBox;
 import pociagi.app.dao.DaoFactory;
 import pociagi.app.model.ConnectionsTableEntry;
-import pociagi.app.model.Stacja;
-import pociagi.app.model.TimetableEntry;
-import pociagi.app.service.TicketFinding;
-import pociagi.app.service.TicketFinding.*;
+import pociagi.app.service.Przejazd;
+import pociagi.app.service.Przejazd.*;
+import pociagi.app.service.TicketFactory;
 
+import java.io.IOException;
 import java.math.BigDecimal;
 
 public class TicketListOfConnectionViewModel {
     private Tab tab;
 
-    private TicketFinding ticketFinding;
+    private Przejazd przejazd;
 
     @FXML private Label labelOne;
     @FXML private Label labelTwo;
@@ -40,17 +42,17 @@ public class TicketListOfConnectionViewModel {
 
     private final ObservableList<ConnectionsTableEntry> stationList = FXCollections.observableArrayList();
 
-    public void setTicketFinding(TicketFinding ticketFinding) {
-        this.ticketFinding = ticketFinding;
+    public void setPrzejazd(Przejazd przejazd) {
+        this.przejazd = przejazd;
     }
 
     public void setLabels(){
-        labelOne.setText(String.valueOf(ticketFinding.getNumberOfPlacesOne()));
-        labelTwo.setText(String.valueOf(ticketFinding.getNumberOfPlacesTwo()));
-        labelTri.setText(String.valueOf(ticketFinding.getDepartureDate()));
-        labelQut.setText(String.valueOf(ticketFinding.getDepartureTime()));
-        labelFive.setText(String.valueOf(ticketFinding.getStartStation().getNazwa()));
-        labelSix.setText(String.valueOf(ticketFinding.getEndStation().getNazwa()));
+        labelOne.setText(String.valueOf(przejazd.getNumberOfPlacesOne()));
+        labelTwo.setText(String.valueOf(przejazd.getNumberOfPlacesTwo()));
+        labelTri.setText(String.valueOf(przejazd.getDepartureDate()));
+        labelQut.setText(String.valueOf(przejazd.getDepartureTime()));
+        labelFive.setText(String.valueOf(przejazd.getStartStation().getNazwa()));
+        labelSix.setText(String.valueOf(przejazd.getEndStation().getNazwa()));
     }
 
     public void setTab(Tab tab) {
@@ -58,9 +60,9 @@ public class TicketListOfConnectionViewModel {
     }
 
     public void setData() {
-        stationList.setAll(DaoFactory.getTicketConnectionDao().getConnections(ticketFinding.getStartStation(),
-                ticketFinding.getEndStation(),ticketFinding.getNumberOfPlacesOne(), ticketFinding.getNumberOfPlacesTwo(),
-                ticketFinding.getDepartureDate(), ticketFinding.getDepartureTime()));
+        stationList.setAll(DaoFactory.getTicketConnectionDao().getConnections(przejazd.getStartStation(),
+                przejazd.getEndStation(),przejazd.getNumberOfPlacesOne(), przejazd.getNumberOfPlacesTwo(),
+                przejazd.getDepartureDate(), przejazd.getDepartureTime()));
 
         tableView.setItems(stationList);
     }
@@ -72,6 +74,25 @@ public class TicketListOfConnectionViewModel {
         czasCol.setCellValueFactory(new PropertyValueFactory<>("czas"));
         kosztCol.setCellValueFactory(new PropertyValueFactory<>("koszt"));
         idCol.setCellValueFactory(new PropertyValueFactory<>("id"));
+
+        tableView.getSelectionModel().selectedItemProperty().addListener((obs, oldSel, newSel) -> {
+            if (newSel != null) {
+                int id = newSel.getId();
+                przejazd.setId_polaczenia(id);
+                System.out.println("Wybrano połączenie o ID: " + id);
+            }
+        });
+    }
+
+    @FXML public void HandleButton() throws IOException {
+        TicketFactory.list.add(przejazd);
+        FXMLLoader loader = new FXMLLoader(getClass().getResource("/pociagi/app/view/TicketSummaryView.fxml"));
+        VBox newView = loader.load();
+
+        TicketSummaryViewModel ticketSummaryViewModel = loader.getController();
+        ticketSummaryViewModel.setTab(tab);
+        tab.setContent(newView);
+
     }
 
 
