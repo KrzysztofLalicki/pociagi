@@ -31,11 +31,12 @@ public class TicketListOfConnectionViewModel {
 
     @FXML private TableView<ConnectionsTableEntry> tableView;
 
-    @FXML private TableColumn<TimetableEntry, String> skadCol;
-    @FXML private TableColumn<TimetableEntry, String> dokadCol;
-    @FXML private TableColumn<TimetableEntry, Object> odjazdCol;
-    @FXML private TableColumn<TimetableEntry, Object> czasCol;
-    @FXML private TableColumn<TimetableEntry, BigDecimal> kosztCol;
+    @FXML private TableColumn<ConnectionsTableEntry, Integer> idCol;
+    @FXML private TableColumn<ConnectionsTableEntry, String> skadCol;
+    @FXML private TableColumn<ConnectionsTableEntry, String> dokadCol;
+    @FXML private TableColumn<ConnectionsTableEntry, Object> odjazdCol;
+    @FXML private TableColumn<ConnectionsTableEntry, Object> czasCol;
+    @FXML private TableColumn<ConnectionsTableEntry, BigDecimal> kosztCol;
 
     private final ObservableList<ConnectionsTableEntry> stationList = FXCollections.observableArrayList();
 
@@ -70,6 +71,7 @@ public class TicketListOfConnectionViewModel {
         odjazdCol.setCellValueFactory(new PropertyValueFactory<>("odjazd"));
         czasCol.setCellValueFactory(new PropertyValueFactory<>("czas"));
         kosztCol.setCellValueFactory(new PropertyValueFactory<>("koszt"));
+        idCol.setCellValueFactory(new PropertyValueFactory<>("id"));
     }
 
 

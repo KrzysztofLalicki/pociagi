@@ -4,6 +4,7 @@ import java.math.BigDecimal;
 import java.time.LocalTime;
 
 public record ConnectionsTableEntry(
+        Integer id,
         String skad,
         String dokad,
         LocalTime odjazd,
@@ -15,4 +16,5 @@ public record ConnectionsTableEntry(
     public LocalTime getOdjazd() { return odjazd;}
     public LocalTime getCzas() { return czas; }
     public BigDecimal getKoszt() { return koszt; }
+    public Integer getId() { return id; }
 }

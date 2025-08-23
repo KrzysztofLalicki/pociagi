@@ -36,6 +36,7 @@ public class TicketConnectionDao {
 
             while (rs.next()) {
                 ConnectionsTableEntry entry = new ConnectionsTableEntry(
+                        rs.getInt("id_polaczenia"),
                         rs.getString("stacja_start"),
                         rs.getString("stacja_koniec"),
                         rs.getTime("godzina_odjazdu") == null ? null : rs.getTime("godzina_odjazdu").toLocalTime(),

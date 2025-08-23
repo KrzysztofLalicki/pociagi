@@ -357,7 +357,7 @@ CREATE OR REPLACE FUNCTION szukaj_polaczenia(
     godzina TIME,
     czy_dla_niepelnosprawnych boolean,
     czy_dla_rowerow boolean
-) RETURNS TABLE (stacja_start VARCHAR, stacja_koniec VARCHAR, godzina_odjazdu TIME, czas_trasy TIME,koszt_przejazdu NUMERIC(8,2)) AS $$
+) RETURNS TABLE (id_polaczenia INTEGER, stacja_start VARCHAR, stacja_koniec VARCHAR, godzina_odjazdu TIME, czas_trasy TIME,koszt_przejazdu NUMERIC(8,2)) AS $$
 DECLARE
     id_stacji_start INTEGER;
     id_stacji_koniec INTEGER;
@@ -367,6 +367,7 @@ BEGIN
     IF(godzina < '18:00:00') THEN
     RETURN QUERY
         SELECT
+            p.id_polaczenia,
             start.nazwa AS stacja_start,
             koniec.nazwa AS stacja_koniec,
             p.godzina_startu,
@@ -393,6 +394,7 @@ BEGIN
     ELSE
         RETURN QUERY
             (SELECT
+                 p.id_polaczenia,
                 start.nazwa AS stacja_start,
                 koniec.nazwa AS stacja_koniec,
                 p.godzina_startu,
@@ -418,6 +420,7 @@ BEGIN
             ORDER BY p.godzina_startu)
         UNION
             (SELECT
+                 p.id_polaczenia,
                 start.nazwa AS stacja_start,
                 koniec.nazwa AS stacja_koniec,
                 p.godzina_startu,
