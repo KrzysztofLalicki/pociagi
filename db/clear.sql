@@ -1,6 +1,5 @@
 -- 1_tables.sql
-BEGIN;
-
+--BEGIN;
 DROP TABLE IF EXISTS harmonogramy CASCADE;
 DROP TABLE IF EXISTS pasazerowie CASCADE;
 DROP TABLE IF EXISTS stacje CASCADE;
@@ -22,7 +21,6 @@ DROP TABLE IF EXISTS swieta_stale CASCADE;
 DROP TABLE IF EXISTS swieta_ruchome CASCADE;
 DROP TABLE IF EXISTS daty_swiat CASCADE;
 
-COMMIT;
 -- 2_triggers.sql
 DROP FUNCTION sprawdz_ceny CASCADE;
 DROP FUNCTION sprawdz_droge CASCADE;
@@ -77,3 +75,4 @@ drop function get_timetable(integer, date);
 
 drop function get_stacje_by_prefix(text);
 
+--COMMIT;

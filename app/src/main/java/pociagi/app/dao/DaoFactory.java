@@ -14,4 +14,10 @@ public class DaoFactory {
 
     private static final UlgiDao ulgiDao = new UlgiDao();
     public static UlgiDao getUlgiDao() { return ulgiDao; }
+
+    private static final AddingTicketDao addingTicketDao = new AddingTicketDao();
+    public static AddingTicketDao getAddingTicketDao() { return addingTicketDao; }
+
+    private static final AddingPrzejazdDao addingPrzejazdDao = new AddingPrzejazdDao();
+    public static AddingPrzejazdDao getAddingPrzejazdDao() { return addingPrzejazdDao; }
 }

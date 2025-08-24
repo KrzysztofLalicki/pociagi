@@ -8,6 +8,7 @@ import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.VBox;
 import pociagi.app.model.Stacja;
 import pociagi.app.service.Przejazd;
+import pociagi.app.service.TicketFactory;
 
 import java.io.IOException;
 
@@ -24,13 +25,6 @@ public class TicketFindingConnectionViewModel {
     @FXML Label labelTwo;
 
     private Tab tab;
-
-    private Przejazd przejazd;
-
-    public void setTicket(Przejazd ticket) {
-        this.przejazd = ticket;
-    }
-
 
     private Integer numberOfPlaces;
     private Integer Class;
@@ -59,14 +53,13 @@ public class TicketFindingConnectionViewModel {
         VBox newView = loader.load();
 
         TicketListOfConnectionViewModel controller = loader.getController();
-        controller.setPrzejazd(przejazd);
         controller.setTab(tab);
 
         Stacja startStacja = startStationController.getStacjaProperty().get();
         Stacja endStacja   = endStationController.getStacjaProperty().get();
 
-        przejazd.setStartStation(startStacja);
-        przejazd.setEndStation(endStacja);
+        TicketFactory.getActualPrzeazd().setStartStation(startStacja);
+        TicketFactory.getActualPrzeazd().setEndStation(endStacja);
 
         controller.setLabels();
         tab.setContent(newView);

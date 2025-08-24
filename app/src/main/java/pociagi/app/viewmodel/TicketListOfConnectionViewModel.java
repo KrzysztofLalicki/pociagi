@@ -22,7 +22,6 @@ import java.math.BigDecimal;
 public class TicketListOfConnectionViewModel {
     private Tab tab;
 
-    private Przejazd przejazd;
 
     @FXML private Label labelOne;
     @FXML private Label labelTwo;
@@ -42,17 +41,14 @@ public class TicketListOfConnectionViewModel {
 
     private final ObservableList<ConnectionsTableEntry> stationList = FXCollections.observableArrayList();
 
-    public void setPrzejazd(Przejazd przejazd) {
-        this.przejazd = przejazd;
-    }
 
     public void setLabels(){
-        labelOne.setText(String.valueOf(przejazd.getNumberOfPlacesOne()));
-        labelTwo.setText(String.valueOf(przejazd.getNumberOfPlacesTwo()));
-        labelTri.setText(String.valueOf(przejazd.getDepartureDate()));
-        labelQut.setText(String.valueOf(przejazd.getDepartureTime()));
-        labelFive.setText(String.valueOf(przejazd.getStartStation().getNazwa()));
-        labelSix.setText(String.valueOf(przejazd.getEndStation().getNazwa()));
+        labelOne.setText(String.valueOf(TicketFactory.getActualPrzeazd().getNumberOfPlacesOne()));
+        labelTwo.setText(String.valueOf(TicketFactory.getActualPrzeazd().getNumberOfPlacesTwo()));
+        labelTri.setText(String.valueOf(TicketFactory.getActualPrzeazd().getDepartureDate()));
+        labelQut.setText(String.valueOf(TicketFactory.getActualPrzeazd().getDepartureTime()));
+        labelFive.setText(String.valueOf(TicketFactory.getActualPrzeazd().getStartStation().getNazwa()));
+        labelSix.setText(String.valueOf(TicketFactory.getActualPrzeazd().getEndStation().getNazwa()));
     }
 
     public void setTab(Tab tab) {
@@ -60,9 +56,10 @@ public class TicketListOfConnectionViewModel {
     }
 
     public void setData() {
-        stationList.setAll(DaoFactory.getTicketConnectionDao().getConnections(przejazd.getStartStation(),
-                przejazd.getEndStation(),przejazd.getNumberOfPlacesOne(), przejazd.getNumberOfPlacesTwo(),
-                przejazd.getDepartureDate(), przejazd.getDepartureTime()));
+        stationList.setAll(DaoFactory.getTicketConnectionDao().getConnections(TicketFactory.getActualPrzeazd().getStartStation(),
+                TicketFactory.getActualPrzeazd().getEndStation(),TicketFactory.getActualPrzeazd().getNumberOfPlacesOne(),
+                TicketFactory.getActualPrzeazd().getNumberOfPlacesTwo(), TicketFactory.getActualPrzeazd().getDepartureDate(),
+                TicketFactory.getActualPrzeazd().getDepartureTime()));
 
         tableView.setItems(stationList);
     }
@@ -78,14 +75,14 @@ public class TicketListOfConnectionViewModel {
         tableView.getSelectionModel().selectedItemProperty().addListener((obs, oldSel, newSel) -> {
             if (newSel != null) {
                 int id = newSel.getId();
-                przejazd.setId_polaczenia(id);
+                TicketFactory.getActualPrzeazd().setId_polaczenia(id);
                 System.out.println("Wybrano połączenie o ID: " + id);
             }
         });
     }
 
     @FXML public void HandleButton() throws IOException {
-        TicketFactory.list.add(przejazd);
+        TicketFactory.addingActualToList();
         FXMLLoader loader = new FXMLLoader(getClass().getResource("/pociagi/app/view/TicketSummaryView.fxml"));
         VBox newView = loader.load();
 

@@ -7,6 +7,7 @@ import javafx.scene.layout.VBox;
 import pociagi.app.dao.DaoFactory;
 import pociagi.app.model.UlgiTableEntry;
 import pociagi.app.service.Przejazd;
+import pociagi.app.service.TicketFactory;
 
 import java.io.IOException;
 import java.time.LocalDate;
@@ -27,11 +28,6 @@ public class TicketPlacesViewModel {
 
     private Tab tab;
 
-    private Przejazd przejazd = new Przejazd();
-
-    public void setTicket(Przejazd ticket) {
-        this.przejazd = ticket;
-    }
 
     public void setTab(Tab tab) {
         this.tab = tab;
@@ -65,8 +61,6 @@ public class TicketPlacesViewModel {
 
         TicketFindingConnectionViewModel controller = loader.getController();
         controller.setTab(tab);
-        //controller.setInfo(choiceBoxPlaces.getValue(),choiceBoxClass.getValue());
-        controller.setTicket(przejazd);
         LocalDate selectedDate = datePicker.getValue();
         LocalTime selectedTime = LocalTime.of(
                 hourSpinner.getValue(),
@@ -74,9 +68,9 @@ public class TicketPlacesViewModel {
         );
 
         // Ustaw datę i czas w obiekcie Przejazd
-        przejazd.setDepartureDate(selectedDate);
-        przejazd.setDepartureTime(selectedTime);
-        przejazd.setNumberOfPlaces(comboBoxPlacesOne.getValue(),comboBoxPlacesTwo.getValue());
+        TicketFactory.getActualPrzeazd().setDepartureDate(selectedDate);
+        TicketFactory.getActualPrzeazd().setDepartureTime(selectedTime);
+        TicketFactory.getActualPrzeazd().setNumberOfPlaces(comboBoxPlacesOne.getValue(),comboBoxPlacesTwo.getValue());
         tab.setContent(newView);
     }
 
