@@ -20,4 +20,13 @@ public class DaoFactory {
 
     private static final AddingPrzejazdDao addingPrzejazdDao = new AddingPrzejazdDao();
     public static AddingPrzejazdDao getAddingPrzejazdDao() { return addingPrzejazdDao; }
+
+    private static final DeletingPrzejazdDao deletingPrzejazdDao = new DeletingPrzejazdDao();
+    public static DeletingPrzejazdDao getDeletingPrzejazdDao() { return deletingPrzejazdDao; }
+
+    private static final DeletingTicketDao deletingTicketDao = new DeletingTicketDao();
+    public static DeletingTicketDao getDeletingTicketDao() { return deletingTicketDao; }
+
+    private static final TicketFreePlacesDao ticketFreePlacesDao = new TicketFreePlacesDao();
+    public static TicketFreePlacesDao getTicketFreePlacesDao() { return ticketFreePlacesDao; }
 }

@@ -9,6 +9,7 @@ import javafx.scene.control.Tab;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import pociagi.app.dao.DaoFactory;
 import pociagi.app.model.ConnectionsTableEntry;
@@ -18,6 +19,7 @@ import pociagi.app.service.TicketFactory;
 
 import java.io.IOException;
 import java.math.BigDecimal;
+import java.time.LocalTime;
 
 public class TicketListOfConnectionViewModel {
     private Tab tab;
@@ -75,20 +77,27 @@ public class TicketListOfConnectionViewModel {
         tableView.getSelectionModel().selectedItemProperty().addListener((obs, oldSel, newSel) -> {
             if (newSel != null) {
                 int id = newSel.getId();
+                LocalTime czas = newSel.getCzas();
+                LocalTime odjazd = newSel.getOdjazd();
+
                 TicketFactory.getActualPrzeazd().setId_polaczenia(id);
+                TicketFactory.getActualPrzeazd().setDepartureTime(odjazd);
+                TicketFactory.getActualPrzeazd().setCzas(czas);
                 System.out.println("Wybrano połączenie o ID: " + id);
             }
         });
     }
 
     @FXML public void HandleButton() throws IOException {
-        TicketFactory.addingActualToList();
-        FXMLLoader loader = new FXMLLoader(getClass().getResource("/pociagi/app/view/TicketSummaryView.fxml"));
-        VBox newView = loader.load();
+        if(TicketFactory.getActualPrzeazd().getId_polaczenia() != null) {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/pociagi/app/view/TicketPlacesChoice.fxml"));
+            HBox newView = loader.load();
 
-        TicketSummaryViewModel ticketSummaryViewModel = loader.getController();
-        ticketSummaryViewModel.setTab(tab);
-        tab.setContent(newView);
+            TicketPlacesChoiceViewModel ticketPlacesChoiceViewModel = loader.getController();
+            ticketPlacesChoiceViewModel.setTab(tab);
+            ticketPlacesChoiceViewModel.setData();
+            tab.setContent(newView);
+        }
 
     }
 

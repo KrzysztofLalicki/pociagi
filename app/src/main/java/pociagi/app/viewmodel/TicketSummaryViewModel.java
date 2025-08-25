@@ -1,14 +1,18 @@
 package pociagi.app.viewmodel;
 
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
 import javafx.geometry.Pos;
+import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.Tab;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
+import pociagi.app.dao.DaoFactory;
 import pociagi.app.service.Przejazd;
 import pociagi.app.service.TicketFactory;
 
+import java.io.IOException;
 import java.util.List;
 
 public class TicketSummaryViewModel {
@@ -54,23 +58,65 @@ public class TicketSummaryViewModel {
             vbox2.getChildren().add(new Label(przejazd.getEndStation().getNazwa()));
             hbox.getChildren().add(vbox2);
             VBox vbox3 = new VBox();
-            vbox3.setMinWidth(140);
+            vbox3.setMinWidth(70);
             vbox3.setAlignment(Pos.CENTER);
-            vbox3.getChildren().add(new Label("Liczba miejsc w klasie I :"));
+            vbox3.getChildren().add(new Label("Klasa I :"));
             vbox3.getChildren().add(new Label(String.valueOf(przejazd.getNumberOfPlacesOne())));
             hbox.getChildren().add(vbox3);
             VBox vbox4 = new VBox();
-            vbox4.setMinWidth(140);
+            vbox4.setMinWidth(70);
             vbox4.setAlignment(Pos.CENTER);
-            vbox4.getChildren().add(new Label("Liczba miejsc w klasie II :"));
+            vbox4.getChildren().add(new Label("Klasa II :"));
             vbox4.getChildren().add(new Label(String.valueOf(przejazd.getNumberOfPlacesTwo())));
             hbox.getChildren().add(vbox4);
+            VBox vbox5 = new VBox();
+            vbox5.setMinWidth(70);
+            vbox5.setAlignment(Pos.CENTER);
+            vbox5.getChildren().add(new Label("Data :"));
+            vbox5.getChildren().add(new Label(String.valueOf(przejazd.getDepartureDate())));
+            hbox.getChildren().add(vbox5);
+            VBox vbox6 = new VBox();
+            vbox6.setMinWidth(70);
+            vbox6.setAlignment(Pos.CENTER);
+            vbox6.getChildren().add(new Label("Godzina :"));
+            vbox6.getChildren().add(new Label(String.valueOf(przejazd.getDepartureTime())));
+            hbox.getChildren().add(vbox6);
+            VBox vbox8 = new VBox();
+            vbox8.setMinWidth(70);
+            vbox8.setAlignment(Pos.CENTER);
+            vbox8.getChildren().add(new Label("Czas :"));
+            vbox8.getChildren().add(new Label(String.valueOf(przejazd.getCzas())));
+            hbox.getChildren().add(vbox8);
+            VBox vbox7 = new VBox();
+            vbox7.setMinWidth(70);
+            vbox7.setAlignment(Pos.CENTER);
+            vbox7.getChildren().add(new Label("Numer :"));
+            vbox7.getChildren().add(new Label(String.valueOf(przejazd.getId_polaczenia())));
+            hbox.getChildren().add(vbox7);
 
-
+            VBox vbox9 = new VBox();
+            Button button = new Button("Usuń");
+            button.setOnAction(event -> {
+                DaoFactory.getDeletingPrzejazdDao().delete(przejazd);
+                TicketFactory.list.remove(przejazd);
+                createHBoxes();
+            });
+            vbox9.getChildren().add(button);
+            hbox.getChildren().add(vbox9);
             container.getChildren().add(hbox);
         }
         container.getChildren().add(lastHBox);
     }
+
+    @FXML public void HandleButton() throws IOException {
+        FXMLLoader loader = new FXMLLoader(getClass().getResource("/pociagi/app/view/TicketPlaces.fxml"));
+        HBox newView = loader.load();
+        TicketPlacesViewModel controller = loader.getController();
+        controller.setTab(tab);
+        tab.setContent(newView);
+
+    }
+
 
 
 }

@@ -615,7 +615,7 @@ INSERT INTO linie VALUES
     (17,2,150);
 
 INSERT INTO polaczenia (godzina_startu, id_harmonogramu, id_przewoznika)
-VALUES ('10:00:00', 1, 1);
+VALUES ('10:00:00', 1, 3);
 INSERT INTO stacje_posrednie VALUES
                                  (19, 1,   0,   5, true, 1),   -- Warszawa Centralna
                                  (19, 14, 60,  65, true, 1),   -- Radom

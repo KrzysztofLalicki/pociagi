@@ -111,10 +111,10 @@ BEGIN
         THEN RAISE EXCEPTION ''; END IF;
     IF swieto(NEW.data_odjazdu) = TRUE AND (SELECT czy_swieta FROM harmonogramy NATURAL JOIN polaczenia
         WHERE id_polaczenia = NEW.id_polaczenia) = FALSE THEN RAISE EXCEPTION ''; END IF;
-    (SELECT * INTO stacja1 FROM stacje_posrednie WHERE id_stacji = NEW.id_stacji_poczatkowej
-        AND id_polaczenia = NEW.id_polaczenia);
-    (SELECT * INTO stacja2 FROM stacje_posrednie WHERE id_stacji = NEW.id_stacji_koncowej
-        AND id_polaczenia = NEW.id_polaczenia);
+    SELECT * INTO stacja1 FROM stacje_posrednie WHERE id_stacji = NEW.id_stacji_poczatkowej
+        AND id_polaczenia = NEW.id_polaczenia;
+     SELECT * INTO stacja2 FROM stacje_posrednie WHERE id_stacji = NEW.id_stacji_koncowej
+        AND id_polaczenia = NEW.id_polaczenia;
     IF stacja1 IS NULL OR stacja2 IS NULL THEN RAISE EXCEPTION ''; END IF;
     IF stacja1.odjazd >= stacja2.przyjazd THEN RAISE EXCEPTION ''; END IF;
     RETURN NEW;

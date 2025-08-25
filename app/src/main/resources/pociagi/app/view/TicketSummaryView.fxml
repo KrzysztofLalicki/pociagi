@@ -10,7 +10,7 @@
       <HBox fx:id="lastHBox" alignment="CENTER" prefHeight="100.0" prefWidth="200.0" spacing="50.0">
          <children>
             <Button minWidth="150.0" mnemonicParsing="false" text="Zakup bilet" />
-            <Button minWidth="150.0" mnemonicParsing="false" text="Dodaj nowy przejazd" />
+            <Button minWidth="150.0" mnemonicParsing="false" text="Dodaj nowy przejazd" onAction="#HandleButton" />
          </children>
       </HBox>
    </children>
