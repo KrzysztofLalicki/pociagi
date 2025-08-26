@@ -178,9 +178,24 @@ public class TicketPlacesChoiceViewModel {
         FXMLLoader load = new FXMLLoader(getClass().getResource("/pociagi/app/view/TicketChosingUlgiView.fxml"));
         VBox newView = load.load();
         TicketChosingUlgiViewModel viewModel = load.getController();
+        TicketFactory.getActualPrzeazd().setNumberOfPlaces(TicketFactory.getActualPrzeazd().getPlacesOne().size(),
+                TicketFactory.getActualPrzeazd().getPlacesTwo().size());
         viewModel.setTab(tab);
         viewModel.setData();
         tab.setContent(newView);
+    }
+
+    @FXML public void CofnijButton() throws IOException {
+        FXMLLoader loader = new FXMLLoader(getClass().getResource("/pociagi/app/view/TicketListOfConnection.fxml"));
+        VBox newView = loader.load();
+        TicketFactory.getActualPrzeazd().resetData2();
+        TicketListOfConnectionViewModel controller = loader.getController();
+        TicketFactory.getActualPrzeazd().setDepartureTime(TicketFactory.getActualPrzeazd().lookingHour);
+        TicketFactory.getActualPrzeazd().setDepartureDate(TicketFactory.getActualPrzeazd().lookingDay);
+        controller.setLabels();
+        tab.setContent(newView);
+        controller.setData();
+        controller.setTab(tab);
     }
 
 }

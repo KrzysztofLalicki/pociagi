@@ -16,7 +16,7 @@ public class TicketConnectionDao {
                                                       Integer numberOfPlacesClassTwo, LocalDate date, LocalTime time)
     {
         List<ConnectionsTableEntry> result = new ArrayList<>();
-        String sql = "SELECT * FROM szukaj_polaczenia(?, ?, ?, ?, ?, ?, ?, ?)";
+        String sql = "SELECT * FROM szukaj_polaczenia(?, ?, ?, ?, ?, ?)";
 
         try (Connection conn = DBManager.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
@@ -28,9 +28,6 @@ public class TicketConnectionDao {
             stmt.setDate(5, Date.valueOf(date));
             stmt.setTime(6, Time.valueOf(time));
 
-            // Dwa ostatnie argumenty zawsze ustawione na false
-            stmt.setBoolean(7, false);
-            stmt.setBoolean(8, false);
 
             ResultSet rs = stmt.executeQuery();
 
@@ -39,6 +36,7 @@ public class TicketConnectionDao {
                         rs.getInt("id_polaczenia"),
                         rs.getString("stacja_start"),
                         rs.getString("stacja_koniec"),
+                        rs.getDate(4).toLocalDate(),
                         rs.getTime("godzina_odjazdu") == null ? null : rs.getTime("godzina_odjazdu").toLocalTime(),
                         rs.getTime("czas_trasy") == null ? null : rs.getTime("czas_trasy").toLocalTime(),
                         rs.getBigDecimal("koszt_przejazdu")

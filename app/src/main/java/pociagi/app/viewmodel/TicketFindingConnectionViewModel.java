@@ -101,6 +101,8 @@ public class TicketFindingConnectionViewModel {
             // Ustaw datę i czas w obiekcie Przejazd
             TicketFactory.getActualPrzeazd().setDepartureDate(selectedDate);
             TicketFactory.getActualPrzeazd().setDepartureTime(selectedTime);
+            TicketFactory.getActualPrzeazd().lookingHour = selectedTime;
+            TicketFactory.getActualPrzeazd().lookingDay = selectedDate;
             TicketFactory.getActualPrzeazd().setNumberOfPlaces(comboBoxPlacesOne.getValue(), comboBoxPlacesTwo.getValue());
 
             controller.setLabels();

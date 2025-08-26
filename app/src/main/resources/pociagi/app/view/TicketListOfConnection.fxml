@@ -7,7 +7,7 @@
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
 
-<VBox prefHeight="532.0" prefWidth="859.0" xmlns="http://javafx.com/javafx/24.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="pociagi.app.viewmodel.TicketListOfConnectionViewModel">
+<VBox alignment="CENTER" prefHeight="532.0" prefWidth="903.0" xmlns="http://javafx.com/javafx/24.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="pociagi.app.viewmodel.TicketListOfConnectionViewModel">
    <children>
       <HBox alignment="CENTER" prefHeight="67.0" prefWidth="600.0">
          <children>
@@ -49,23 +49,33 @@
             </VBox>
          </children>
       </HBox>
-      <HBox alignment="CENTER" prefHeight="100.0" prefWidth="200.0">
+      <HBox alignment="CENTER" prefHeight="100.0" prefWidth="860.0">
          <children>
-            <TableView fx:id="tableView" maxHeight="400.0" maxWidth="811.0" minHeight="400.0" prefHeight="400.0" prefWidth="824.0">
+            <TableView fx:id="tableView" maxHeight="400.0" maxWidth="906.0" minHeight="400.0" prefHeight="400.0" prefWidth="896.0">
               <columns>
                  <TableColumn fx:id="idCol" minWidth="50.0" prefWidth="50.0" text="Id" />
                 <TableColumn fx:id="skadCol" minWidth="150.0" prefWidth="150.0" text="Stacja początkowa" />
                 <TableColumn fx:id="dokadCol" minWidth="150.0" prefWidth="150.0" text="Stacja końcowa" />
-                  <TableColumn fx:id="odjazdCol" minWidth="150.0" prefWidth="150.0" text="Odjazd" />
+                 <TableColumn fx:id="dateCol" prefWidth="94.39996337890625" text="Data" />
+                  <TableColumn fx:id="odjazdCol" minWidth="136.00006103515625" prefWidth="136.00006103515625" text="Odjazd" />
                   <TableColumn fx:id="czasCol" minWidth="150.0" prefWidth="150.0" text="Czas przejazdu" />
                   <TableColumn fx:id="kosztCol" minWidth="150.0" prefWidth="150.0" text="Koszt" />
               </columns>
             </TableView>
          </children>
       </HBox>
-      <HBox alignment="CENTER_RIGHT" maxWidth="835.0" prefHeight="100.0" prefWidth="824.0">
+      <HBox alignment="CENTER" maxWidth="835.0" prefHeight="100.0" prefWidth="824.0">
          <children>
-            <Button minWidth="70.0" mnemonicParsing="false" text="Dalej" onAction="#HandleButton" />
+            <VBox alignment="CENTER_LEFT" prefHeight="82.0" prefWidth="410.0">
+               <children>
+                  <Button minWidth="70.0" mnemonicParsing="false" onAction="#CofnijButton" text="Cofnij" />
+               </children>
+            </VBox>
+            <VBox alignment="CENTER_RIGHT" prefHeight="82.0" prefWidth="410.0">
+               <children>
+                  <Button minWidth="70.0" mnemonicParsing="false" onAction="#HandleButton" text="Dalej" />
+               </children>
+            </VBox>
          </children>
       </HBox>
    </children>

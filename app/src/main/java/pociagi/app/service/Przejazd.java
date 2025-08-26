@@ -2,6 +2,7 @@ package pociagi.app.service;
 
 import pociagi.app.model.Stacja;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.ArrayList;
@@ -21,9 +22,29 @@ public class Przejazd {
     private Integer id_przejazdu;
     private LocalTime czas;
     public boolean IsAfter18 = false;
+    public LocalTime lookingHour;
+    public LocalDate lookingDay;
+    public BigDecimal cena;
+
+    public void resetData(){
+        this.startStation = null;
+        this.endStation = null;
+        this.departureDate = null;
+        this.departureTime = null;
+        this.id_polaczenia = null;
+        this.numberOfPlacesOne = null;
+        this.numberOfPlacesTwo = null;
+    }
+
+    public void resetData2(){
+        placesOne.clear();
+        placesTwo.clear();
+    }
 
     public Przejazd(Integer id_biletu) { this.id_biletu = id_biletu;  }
     public Przejazd() {}
+    public void setCena(BigDecimal cena) { this.cena = cena; }
+    public BigDecimal getCena() { return cena; }
 
     public void setStartStation(Stacja startStation) {this.startStation = startStation;    }
     public void setEndStation(Stacja endStation) {        this.endStation = endStation;    }

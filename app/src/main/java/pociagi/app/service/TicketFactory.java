@@ -22,7 +22,12 @@ public class TicketFactory {
     public static  Integer getId() { return id; }
     public static LocalDate getData_zakupu() { return data_zakupu; }
     public static void setData_zakupu(LocalDate data_zakupu) { TicketFactory.data_zakupu = data_zakupu; }
-    public static void makeTicket() {DaoFactory.getAddingTicketDao().addTicket(); actualPrzeazd.setId_biletu(id); isCreated = true; }
+    public static void makeTicket() {
+        DaoFactory.getAddingTicketDao().addTicket();
+        list.clear();
+        actualPrzeazd = new Przejazd();
+        actualPrzeazd.setId_biletu(id);
+        isCreated = true; }
     public static Przejazd getActualPrzeazd() { return actualPrzeazd; }
     public static void setActualPrzeazd(Przejazd actualPrzeazd) { TicketFactory.actualPrzeazd = actualPrzeazd; }
 

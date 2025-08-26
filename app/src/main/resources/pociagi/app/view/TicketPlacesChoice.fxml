@@ -39,7 +39,16 @@
       </HBox>
       <HBox alignment="CENTER" prefHeight="100.0" prefWidth="200.0">
          <children>
-            <Button minHeight="40.0" minWidth="70.0" mnemonicParsing="false" text="Dalej" onAction="#HandleButton"/>
+            <VBox alignment="CENTER_LEFT" minWidth="300.0" prefHeight="200.0" prefWidth="100.0">
+               <children>
+                  <Button minHeight="40.0" minWidth="70.0" mnemonicParsing="false" text="Cofnij" onAction="#CofnijButton" />
+               </children>
+            </VBox>
+            <VBox alignment="TOP_RIGHT" minWidth="300.0" prefHeight="200.0" prefWidth="100.0">
+               <children>
+                  <Button minHeight="40.0" minWidth="70.0" mnemonicParsing="false" onAction="#HandleButton" text="Dalej" />
+               </children>
+            </VBox>
          </children>
       </HBox>
    </children>

@@ -37,6 +37,7 @@ public class TicketListOfConnectionViewModel {
     @FXML private TableColumn<ConnectionsTableEntry, Integer> idCol;
     @FXML private TableColumn<ConnectionsTableEntry, String> skadCol;
     @FXML private TableColumn<ConnectionsTableEntry, String> dokadCol;
+    @FXML private TableColumn<ConnectionsTableEntry, LocalTime> dateCol;
     @FXML private TableColumn<ConnectionsTableEntry, Object> odjazdCol;
     @FXML private TableColumn<ConnectionsTableEntry, Object> czasCol;
     @FXML private TableColumn<ConnectionsTableEntry, BigDecimal> kosztCol;
@@ -70,6 +71,7 @@ public class TicketListOfConnectionViewModel {
         skadCol.setCellValueFactory(new PropertyValueFactory<>("skad"));
         dokadCol.setCellValueFactory(new PropertyValueFactory<>("dokad"));
         odjazdCol.setCellValueFactory(new PropertyValueFactory<>("odjazd"));
+        dateCol.setCellValueFactory(new PropertyValueFactory<>("date"));
         czasCol.setCellValueFactory(new PropertyValueFactory<>("czas"));
         kosztCol.setCellValueFactory(new PropertyValueFactory<>("koszt"));
         idCol.setCellValueFactory(new PropertyValueFactory<>("id"));
@@ -103,6 +105,15 @@ public class TicketListOfConnectionViewModel {
             tab.setContent(newView);
         }
 
+    }
+
+    @FXML public void CofnijButton() throws IOException {
+        FXMLLoader loader = new FXMLLoader(getClass().getResource("/pociagi/app/view/TicketFindingConnection.fxml"));
+        VBox newView = loader.load();
+        TicketFindingConnectionViewModel controller = loader.getController();
+        controller.setTab(tab);
+        TicketFactory.getActualPrzeazd().resetData();
+        tab.setContent(newView);
     }
 
 
