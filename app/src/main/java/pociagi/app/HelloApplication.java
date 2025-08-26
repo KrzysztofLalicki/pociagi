@@ -14,7 +14,9 @@ public class HelloApplication extends Application {
     static {
         Runtime.getRuntime().addShutdownHook(new Thread(() -> {
             System.out.println("Zamykanie aplikacji...");
-            DaoFactory.getDeletingTicketDao().delete();
+            if(TicketFactory.isCreated()) {
+                DaoFactory.getDeletingTicketDao().delete();
+            }
         }));
     }
 

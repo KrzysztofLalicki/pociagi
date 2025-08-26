@@ -4,6 +4,7 @@ import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.control.Tab;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.VBox;
 import pociagi.app.service.TicketFactory;
 
 import java.io.IOException;
@@ -17,10 +18,10 @@ public class AccountViewModel {
     }
 
     @FXML public void handleNewBilet() throws IOException {
-        FXMLLoader loader = new FXMLLoader(getClass().getResource("/pociagi/app/view/TicketPlaces.fxml"));
-        HBox newView = loader.load();
+        FXMLLoader loader = new FXMLLoader(getClass().getResource("/pociagi/app/view/TicketFindingConnection.fxml"));
+        VBox newView = loader.load();
         TicketFactory.makeTicket();
-        TicketPlacesViewModel controller = loader.getController();
+        TicketFindingConnectionViewModel controller = loader.getController();
         controller.setTab(tab);
 
         tab.setContent(newView);

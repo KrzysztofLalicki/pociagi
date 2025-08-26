@@ -20,6 +20,7 @@ public class Przejazd {
     private Integer id_biletu;
     private Integer id_przejazdu;
     private LocalTime czas;
+    public boolean IsAfter18 = false;
 
     public Przejazd(Integer id_biletu) { this.id_biletu = id_biletu;  }
     public Przejazd() {}

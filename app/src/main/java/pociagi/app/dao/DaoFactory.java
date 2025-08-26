@@ -29,4 +29,10 @@ public class DaoFactory {
 
     private static final TicketFreePlacesDao ticketFreePlacesDao = new TicketFreePlacesDao();
     public static TicketFreePlacesDao getTicketFreePlacesDao() { return ticketFreePlacesDao; }
+
+    private static final AddingTicketPlacesDao addingTicketPlacesDao = new AddingTicketPlacesDao();
+    public static AddingTicketPlacesDao getAddingTicketPlacesDao() { return addingTicketPlacesDao; }
+
+    private static final DeletingFromTicketPlacesDao deletingFromTicketPlacesDao = new DeletingFromTicketPlacesDao();
+    public static DeletingFromTicketPlacesDao getDeletingFromTicketPlacesDao() { return deletingFromTicketPlacesDao; }
 }

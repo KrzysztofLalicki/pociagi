@@ -10,7 +10,8 @@ import java.sql.SQLException;
 
 public class DeletingPrzejazdDao {
     public void delete(Przejazd przejazd) {
-        String sql = "DELETE FROM przejazdy WHERE id_przejazdu=?";
+        String sql = "DELETE FROM przejazdy WHERE id_przejazdu=?;";
+        DaoFactory.getDeletingFromTicketPlacesDao().deleteFromTicketPlaces(przejazd.getId_przejazdu());
 
 
         try (Connection conn = DBManager.getConnection();

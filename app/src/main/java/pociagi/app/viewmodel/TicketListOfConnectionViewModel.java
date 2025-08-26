@@ -89,6 +89,10 @@ public class TicketListOfConnectionViewModel {
     }
 
     @FXML public void HandleButton() throws IOException {
+        if(TicketFactory.getActualPrzeazd().IsAfter18 && TicketFactory.getActualPrzeazd().getDepartureTime().isBefore(LocalTime.of(18, 0)))
+        {
+            TicketFactory.getActualPrzeazd().setDepartureDate(TicketFactory.getActualPrzeazd().getDepartureDate().plusDays(1));
+        }
         if(TicketFactory.getActualPrzeazd().getId_polaczenia() != null) {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/pociagi/app/view/TicketPlacesChoice.fxml"));
             VBox newView = loader.load();

@@ -109,12 +109,21 @@ public class TicketSummaryViewModel {
     }
 
     @FXML public void HandleButton() throws IOException {
-        FXMLLoader loader = new FXMLLoader(getClass().getResource("/pociagi/app/view/TicketPlaces.fxml"));
-        HBox newView = loader.load();
-        TicketPlacesViewModel controller = loader.getController();
+        FXMLLoader loader = new FXMLLoader(getClass().getResource("/pociagi/app/view/TicketFindingConnection.fxml"));
+        VBox newView = loader.load();
+        TicketFindingConnectionViewModel controller = loader.getController();
         controller.setTab(tab);
         tab.setContent(newView);
 
+    }
+
+    @FXML public void BuyTicket() throws IOException {
+        FXMLLoader loader = new FXMLLoader(getClass().getResource("/pociagi/app/view/AccountView.fxml"));
+        HBox newView = loader.load();
+        TicketFactory.setIsCreated(false);
+        AccountViewModel controller = loader.getController();
+        controller.setTab(tab);
+        tab.setContent(newView);
     }
 
 

@@ -123,6 +123,7 @@ public class TicketChosingUlgiViewModel {
         VBox newView = loader.load();
 
         TicketSummaryViewModel viewmodel= loader.getController();
+        TicketFactory.addingActualToList();
         viewmodel.setTab(tab);
         tab.setContent(newView);
     }

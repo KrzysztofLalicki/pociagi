@@ -18,7 +18,7 @@ public class DeletingTicketDao {
             {
                 DaoFactory.getDeletingPrzejazdDao().delete(przejazd);
             }
-            String sql = "DELETE FROM bilety WHERE id_biletu=?";
+            String sql = "DELETE FROM bilety WHERE id_biletu=?;";
 
 
             try (Connection conn = DBManager.getConnection();
