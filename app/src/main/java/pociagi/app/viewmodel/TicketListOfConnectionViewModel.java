@@ -91,7 +91,7 @@ public class TicketListOfConnectionViewModel {
     @FXML public void HandleButton() throws IOException {
         if(TicketFactory.getActualPrzeazd().getId_polaczenia() != null) {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/pociagi/app/view/TicketPlacesChoice.fxml"));
-            HBox newView = loader.load();
+            VBox newView = loader.load();
 
             TicketPlacesChoiceViewModel ticketPlacesChoiceViewModel = loader.getController();
             ticketPlacesChoiceViewModel.setTab(tab);

@@ -1,7 +1,6 @@
 package pociagi.app.dao;
 
-import pociagi.app.model.ConnectionsTableEntry;
-import pociagi.app.model.Place;
+import pociagi.app.model.PlaceRecord;
 import pociagi.app.service.TicketFactory;
 
 import java.sql.*;
@@ -9,8 +8,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class TicketFreePlacesDao {
-    public List<Place> getFreePlaces(Integer klasa) {
-        List<Place> result = new ArrayList<Place>();
+    public List<PlaceRecord> getFreePlaces(Integer klasa) {
+        List<PlaceRecord> result = new ArrayList<PlaceRecord>();
         String sql = "SELECT nr_wagonu, nr_miejsca, nr_przedzialu FROM wszystkie_wolne_dla_polaczenia_dla_klasy(?, ?, ?, ?, ?, ?, ?)";
 
         try (Connection conn = DBManager.getConnection();
@@ -28,7 +27,7 @@ public class TicketFreePlacesDao {
             ResultSet rs = stmt.executeQuery();
 
             while (rs.next()) {
-                Place entry = new Place(
+                PlaceRecord entry = new PlaceRecord(
                         rs.getInt("nr_wagonu"),
                         rs.getInt("nr_miejsca"),
                         rs.getInt("nr_przedzialu")

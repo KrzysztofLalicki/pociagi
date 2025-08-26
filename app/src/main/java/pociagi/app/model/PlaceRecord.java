@@ -1,6 +1,6 @@
 package pociagi.app.model;
 
-public record Place(
+public record PlaceRecord(
         Integer nr_wagonu,
         Integer nr_miejsca,
         Integer nr_przedzialu)

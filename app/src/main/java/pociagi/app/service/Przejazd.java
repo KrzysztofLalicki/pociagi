@@ -15,7 +15,8 @@ public class Przejazd {
     private LocalDate departureDate;
     private LocalTime departureTime;
     private Integer id_polaczenia;
-    private List<Place> places = new ArrayList<>();
+    private List<Place> placesOne = new ArrayList<>();
+    private List<Place> placesTwo = new ArrayList<>();
     private Integer id_biletu;
     private Integer id_przejazdu;
     private LocalTime czas;
@@ -32,10 +33,11 @@ public class Przejazd {
     public void setDepartureDate(LocalDate departureDate) { this.departureDate = departureDate;    }
     public void setDepartureTime(LocalTime departureTime) { this.departureTime = departureTime;   }
     public void setId_polaczenia(Integer id_polaczenia) {  this.id_polaczenia = id_polaczenia;  }
-    public void addPlace(Place place) { places.add(place); }
     public void setId_biletu(Integer id_biletu) { this.id_biletu = id_biletu;    }
     public void setCzas(LocalTime czas) { this.czas = czas; }
     public void setId_przejazdu(Integer id) { this.id_przejazdu = id;    }
+    public List<Place> getPlacesOne() { return placesOne; }
+    public List<Place> getPlacesTwo() { return placesTwo; }
     public Integer getId_przejazdu() { return id_przejazdu; }
     public Integer getId_biletu() { return id_biletu; }
     public Integer getNumberOfPlacesOne() {   return numberOfPlacesOne;  }
