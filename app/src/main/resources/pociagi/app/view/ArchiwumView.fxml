@@ -10,19 +10,20 @@
    <children>
       <HBox alignment="CENTER" prefHeight="373.0" prefWidth="600.0">
          <children>
-            <TableView fx:id="tableView" prefHeight="362.0" prefWidth="355.0">
+            <TableView fx:id="tableView" prefHeight="337.0" prefWidth="493.0">
               <columns>
-                  <TableColumn fx:id="idCol" prefWidth="94.40002137422562" text="Column X" />
-                <TableColumn fx:id="data_zakupuCol" prefWidth="85.5999755859375" text="C1" />
-                <TableColumn fx:id="data_zwrotuCol" prefWidth="81.59999084472656" text="C2" />
-                  <TableColumn fx:id="akcjaCol" prefWidth="72.0" />
+                  <TableColumn fx:id="idCol" prefWidth="94.40002137422562" text="Numer" />
+                <TableColumn fx:id="data_odjazduCol" prefWidth="85.5999755859375" text="Data odjazdu" />
+                  <TableColumn fx:id="godzina_odjazduCol" prefWidth="110.4000244140625" text="Godzina odjazdu" />
+                <TableColumn fx:id="data_zwrotuCol" prefWidth="104.00006103515625" text="Data zwrotu" />
+                  <TableColumn fx:id="akcjaCol" prefWidth="78.39999389648438" />
               </columns>
             </TableView>
          </children>
       </HBox>
       <HBox alignment="CENTER" prefHeight="100.0" prefWidth="200.0">
          <children>
-            <Button minHeight="40.0" minWidth="70.0" mnemonicParsing="false" text="Cofnij" onAction="#CofnijButton" />
+            <Button minHeight="40.0" minWidth="70.0" mnemonicParsing="false" onAction="#CofnijButton" text="Cofnij" />
          </children>
       </HBox>
    </children>

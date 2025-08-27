@@ -24,8 +24,9 @@ public class AccountTickets {
                 TicketsTableEntry entry = new TicketsTableEntry(
                         rs.getInt(1),
                         rs.getDate(2).toLocalDate() ,
-                        rs.getDate(3) == null ? null : rs.getDate(3).toLocalDate(),
-                        rs.getBoolean(4)
+                        rs.getTime(3).toLocalTime(),
+                        rs.getDate(4) == null ? null : rs.getDate(4).toLocalDate(),
+                        rs.getBoolean(5)
                 );
                 result.add(entry);
             }

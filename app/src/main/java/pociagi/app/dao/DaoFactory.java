@@ -38,4 +38,7 @@ public class DaoFactory {
 
     private static final AccountTickets accountTicketsDao = new AccountTickets();
     public static AccountTickets getAccountTicketsDao() { return accountTicketsDao; }
+
+    private static final ReturningTicketDao returningTicketDao = new ReturningTicketDao();
+    public static ReturningTicketDao getReturningTicketDao() { return returningTicketDao; }
 }

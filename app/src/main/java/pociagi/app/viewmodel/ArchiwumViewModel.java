@@ -12,6 +12,7 @@ import pociagi.app.model.ConnectionsTableEntry;
 import pociagi.app.model.TicketsTableEntry;
 
 import java.io.IOException;
+import java.sql.Time;
 import java.util.Date;
 
 public class ArchiwumViewModel {
@@ -23,9 +24,10 @@ public class ArchiwumViewModel {
 
     @FXML
     TableColumn<TicketsTableEntry, Integer> idCol;
-    @FXML TableColumn<TicketsTableEntry, Date> data_zakupuCol;
+    @FXML TableColumn<TicketsTableEntry, Date> data_odjazduCol;
     @FXML TableColumn<TicketsTableEntry, Date> data_zwrotuCol;
     @FXML TableColumn<TicketsTableEntry, Void> akcjaCol;
+    @FXML TableColumn<TicketsTableEntry, Time> godzina_odjazduCol;
 
     private final ObservableList<TicketsTableEntry> ticketsList = FXCollections.observableArrayList();
 
@@ -38,8 +40,9 @@ public class ArchiwumViewModel {
     @FXML
     public void initialize() {
         idCol.setCellValueFactory(new PropertyValueFactory<>("id_biletu"));
-        data_zakupuCol.setCellValueFactory(new PropertyValueFactory<>("data_zakupu"));
+        data_odjazduCol.setCellValueFactory(new PropertyValueFactory<>("data_odjazdu"));
         data_zwrotuCol.setCellValueFactory(new PropertyValueFactory<>("data_zwrotu"));
+        godzina_odjazduCol.setCellValueFactory(new PropertyValueFactory<>("godzina_odjazdu"));
 
         // Dodanie przycisku w kolumnie
         akcjaCol.setCellFactory(col -> new TableCell<>() {
@@ -48,15 +51,10 @@ public class ArchiwumViewModel {
             {
                 btn.setOnAction(event -> {
                     TicketsTableEntry ticket = getTableView().getItems().get(getIndex());
-
-                    if (ticket.getCzy_mozna_zwrocic()) {
-                        // TODO: wywołaj DAO do zwrotu biletu
-                        System.out.println("Zwracam bilet: " + ticket.getId_biletu());
-                    } else {
-                        // np. alert, że nie można zwrócić
-                        Alert alert = new Alert(Alert.AlertType.WARNING, "Tego biletu nie można zwrócić!");
-                        alert.showAndWait();
-                    }
+                    DaoFactory.getReturningTicketDao().returnTicket(ticket.id_biletu());
+                    ticketsList.clear();
+                    ticketsList.addAll(DaoFactory.getAccountTicketsDao().getTicketsTableEntry(1));
+                    System.out.println("Zwracam bilet: " + ticket.getId_biletu());
                 });
             }
 
@@ -67,11 +65,16 @@ public class ArchiwumViewModel {
                     setGraphic(null);
                 } else {
                     TicketsTableEntry ticket = getTableView().getItems().get(getIndex());
-                    btn.setDisable(!ticket.getCzy_mozna_zwrocic()); // przycisk aktywny tylko gdy można zwrócić
-                    setGraphic(btn);
+
+                    if (ticket.getCzy_mozna_zwrocic()) {
+                        setGraphic(btn);   // pokaż przycisk tylko gdy można zwrócić
+                    } else {
+                        setGraphic(null);  // brak przycisku
+                    }
                 }
             }
         });
+
     }
 
 

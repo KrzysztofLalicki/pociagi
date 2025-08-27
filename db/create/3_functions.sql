@@ -447,13 +447,15 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
-create or replace function wszystkie_bilety(
-    user_id INTEGER
-)
-RETURNS TABLE (id_biletu INTEGER, data_zakupu DATE, data_zwrotu DATE, czy_mozna_zwrocic BOOLEAN) AS $$
+create or replace function godzina_odjazdu(id integer, id_s integer)
+RETURNS TIME AS $$
+    DECLARE
+        MINUTY INTEGER;
+        poczatek TIME;
     BEGIN
-        RETURN QUERY
-        SELECT b.id_biletu, b.data_zakupu , b.data_zwrotu, czy_do_zwrotu(b.id_biletu) FROM bilety b WHERE b.id_pasazera = user_id;
+        SELECT odjazd INTO minuty FROM stacje_posrednie WHERE id_polaczenia = id AND id_stacji = id_s;
+        SELECT godzina_startu INTO poczatek FROM polaczenia where id_polaczenia = id;
+        RETURN poczatek + (minuty * INTERVAL '1 minute');
     end;
 $$ LANGUAGE plpgsql;
 
@@ -462,7 +464,10 @@ create or replace function czy_do_zwrotu(bilet integer)
 $$
 declare
     przejazd_count int;
+    data_zwrotu DATE;
 begin
+    select bilety.data_zwrotu into data_zwrotu FROM bilety WHERE bilety.id_biletu = bilet;
+    if data_zwrotu IS NOT NULL THEN RETURN false;end if;
     select count(*) into przejazd_count
     from przejazdy p
              join polaczenia pol on p.id_polaczenia = pol.id_polaczenia
@@ -481,6 +486,18 @@ end;
 $$ language plpgsql;
 
 
+create or replace function wszystkie_bilety(
+    user_id INTEGER
+)
+RETURNS TABLE (id_biletu INTEGER, data_odjazdu DATE, godzina_odjazdu TIME, data_zwrotu DATE, czy_mozna_zwrocic BOOLEAN) AS $$
+    BEGIN
+        RETURN QUERY
+        SELECT b.id_biletu, p.data_odjazdu, godzina_odjazdu(p.id_polaczenia,p.id_stacji_poczatkowej), b.data_zwrotu, czy_do_zwrotu(b.id_biletu) FROM bilety b JOIN przejazdy p ON b.id_biletu = p.id_biletu
+            Join polaczenia p2 ON p.id_polaczenia = p2.id_polaczenia WHERE p.id_przejazdu = (SELECT k.id_przejazdu FROM przejazdy k JOIN polaczenia k2 ON k.id_polaczenia = k2.id_polaczenia
+            WHERE k.id_biletu = b.id_biletu ORDER BY k.data_odjazdu, godzina_odjazdu(k.id_polaczenia,k.id_stacji_poczatkowej) LIMIT 1)
+            AND b.id_pasazera = user_id ORDER BY 2 DESC,3 DESC;
+    end;
+$$ LANGUAGE plpgsql;
 
 
 
