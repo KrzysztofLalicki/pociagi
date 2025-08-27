@@ -447,6 +447,42 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
+create or replace function wszystkie_bilety(
+    user_id INTEGER
+)
+RETURNS TABLE (id_biletu INTEGER, data_zakupu DATE, data_zwrotu DATE, czy_mozna_zwrocic BOOLEAN) AS $$
+    BEGIN
+        RETURN QUERY
+        SELECT b.id_biletu, b.data_zakupu , b.data_zwrotu, czy_do_zwrotu(b.id_biletu) FROM bilety b WHERE b.id_pasazera = user_id;
+    end;
+$$ LANGUAGE plpgsql;
+
+create or replace function czy_do_zwrotu(bilet integer)
+    returns boolean as
+$$
+declare
+    przejazd_count int;
+begin
+    select count(*) into przejazd_count
+    from przejazdy p
+             join polaczenia pol on p.id_polaczenia = pol.id_polaczenia
+    where p.id_biletu = bilet
+      and (
+        p.data_odjazdu < current_date
+            or (p.data_odjazdu = current_date and pol.godzina_startu <= current_time)
+        );
+
+    if przejazd_count > 0 then
+        return false;
+    else
+        return true;
+    end if;
+end;
+$$ language plpgsql;
+
+
+
+
 
 
 

@@ -14,11 +14,12 @@
             <VBox fx:id="vbox1" alignment="CENTER" prefHeight="200.0" prefWidth="300.0" spacing="20.0">
                <children>
                   <Label text="Miejsca klasa I :" />
-                  <TableView fx:id="tableView" maxHeight="600.0" maxWidth="258.0" minHeight="400.0" prefHeight="400.0" prefWidth="258.0">
+                  <TableView fx:id="tableView" maxHeight="600.0" maxWidth="278.0" minHeight="400.0" prefHeight="400.0" prefWidth="278.0">
                      <columns>
                         <TableColumn fx:id="nr_wagonuCol" prefWidth="75.0" text="nr. miejsca" />
                         <TableColumn fx:id="nr_miejscaCol" prefWidth="75.0" text="nr. wagonu" />
                         <TableColumn fx:id="nr_przedzialuCol" prefWidth="83.99993896484375" text="nr. przedziału" />
+                        <TableColumn fx:id="cechyCol" />
                      </columns>
                   </TableView>
                </children>
@@ -26,11 +27,12 @@
             <VBox fx:id="vbox2" alignment="CENTER" prefHeight="200.0" prefWidth="300.0" spacing="20.0">
                <children>
                   <Label text="Miejsca klasa II :" />
-                  <TableView fx:id="tableView2" maxHeight="600.0" maxWidth="258.0" minHeight="400.0" prefHeight="400.0" prefWidth="258.0">
+                  <TableView fx:id="tableView2" maxHeight="600.0" maxWidth="278.0" minHeight="400.0" prefHeight="400.0" prefWidth="278.0">
                      <columns>
                         <TableColumn fx:id="nr_wagonuCol2" prefWidth="75.0" text="nr. miejsca" />
                         <TableColumn fx:id="nr_miejscaCol2" prefWidth="75.0" text="nr. wagonu" />
                         <TableColumn fx:id="nr_przedzialuCol2" prefWidth="84.800048828125" text="nr. przedziału" />
+                        <TableColumn fx:id="cechyCol2" />
                      </columns>
                   </TableView>
                </children>
@@ -41,10 +43,10 @@
          <children>
             <VBox alignment="CENTER_LEFT" minWidth="300.0" prefHeight="200.0" prefWidth="100.0">
                <children>
-                  <Button minHeight="40.0" minWidth="70.0" mnemonicParsing="false" text="Cofnij" onAction="#CofnijButton" />
+                  <Button minHeight="40.0" minWidth="70.0" mnemonicParsing="false" onAction="#CofnijButton" text="Cofnij" />
                </children>
             </VBox>
-            <VBox alignment="TOP_RIGHT" minWidth="300.0" prefHeight="200.0" prefWidth="100.0">
+            <VBox alignment="CENTER_RIGHT" minWidth="300.0" prefHeight="200.0" prefWidth="100.0">
                <children>
                   <Button minHeight="40.0" minWidth="70.0" mnemonicParsing="false" onAction="#HandleButton" text="Dalej" />
                </children>

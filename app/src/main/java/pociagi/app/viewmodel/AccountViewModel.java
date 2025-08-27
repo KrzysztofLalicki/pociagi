@@ -27,4 +27,12 @@ public class AccountViewModel {
         tab.setContent(newView);
     }
 
+    @FXML public void ArchiwumButton() throws IOException {
+        FXMLLoader loader = new FXMLLoader(getClass().getResource("/pociagi/app/view/ArchiwumView.fxml"));
+        VBox newView = loader.load();
+        ArchiwumViewModel controller = loader.getController();
+        controller.setData(tab);
+        tab.setContent(newView);
+    }
+
 }

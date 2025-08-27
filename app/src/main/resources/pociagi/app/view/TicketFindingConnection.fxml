@@ -83,9 +83,18 @@
                 </VBox>
             </children>
         </HBox>
-    <HBox alignment="CENTER_RIGHT" spacing="10.0" VBox.vgrow="NEVER">
+    <HBox alignment="CENTER" spacing="10.0" VBox.vgrow="NEVER">
         <children>
-            <Button fx:id="dalejButton" mnemonicParsing="false" onAction="#HandleButton" text="Dalej" />
+            <VBox alignment="CENTER_LEFT" prefHeight="62.0" prefWidth="300.0">
+               <children>
+                  <Button mnemonicParsing="false" text="Cofnij" onAction="#CofnijButton" />
+               </children>
+            </VBox>
+            <VBox alignment="CENTER_RIGHT" prefHeight="26.0" prefWidth="300.0">
+               <children>
+                  <Button fx:id="dalejButton" mnemonicParsing="false" onAction="#HandleButton" text="Dalej" />
+               </children>
+            </VBox>
         </children>
     </HBox>
 </children>

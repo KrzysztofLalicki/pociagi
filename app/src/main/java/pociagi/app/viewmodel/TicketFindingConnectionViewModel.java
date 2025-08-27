@@ -4,7 +4,9 @@ import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.control.*;
 import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
+import pociagi.app.dao.DaoFactory;
 import pociagi.app.model.Stacja;
 import pociagi.app.service.Przejazd;
 import pociagi.app.service.TicketFactory;
@@ -120,5 +122,17 @@ public class TicketFindingConnectionViewModel {
             e.printStackTrace();
 
         }
+    }
+
+    @FXML public void CofnijButton() throws IOException
+    {
+        DaoFactory.getDeletingTicketDao().delete();
+        FXMLLoader loader = new FXMLLoader(getClass().getResource("/pociagi/app/view/AccountView.fxml"));
+        HBox newView = loader.load();
+
+        AccountViewModel controller = loader.getController();
+        controller.setTab(tab);
+
+        tab.setContent(newView);
     }
 }

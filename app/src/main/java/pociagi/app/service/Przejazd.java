@@ -41,6 +41,7 @@ public class Przejazd {
         placesTwo.clear();
     }
 
+
     public Przejazd(Integer id_biletu) { this.id_biletu = id_biletu;  }
     public Przejazd() {}
     public void setCena(BigDecimal cena) { this.cena = cena; }

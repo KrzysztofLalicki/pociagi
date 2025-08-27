@@ -1,5 +1,6 @@
 package pociagi.app.viewmodel;
 
+import javafx.beans.property.ReadOnlyStringWrapper;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
@@ -34,6 +35,8 @@ public class TicketPlacesChoiceViewModel {
     @FXML
     TableColumn<PlaceRecord, Integer> nr_przedzialuCol;
 
+    @FXML TableColumn<PlaceRecord, String> cechyCol;
+
     @FXML
     public TableView<PlaceRecord> tableView2;
 
@@ -46,6 +49,8 @@ public class TicketPlacesChoiceViewModel {
     TableColumn<PlaceRecord, Integer> nr_wagonuCol2;
     @FXML
     TableColumn<PlaceRecord, Integer> nr_przedzialuCol2;
+
+    @FXML TableColumn<PlaceRecord, String> cechyCol2;
 
     private final ObservableList<PlaceRecord> places = FXCollections.observableArrayList();
 
@@ -77,6 +82,24 @@ public class TicketPlacesChoiceViewModel {
         nr_miejscaCol.setCellValueFactory(new PropertyValueFactory<>("nr_miejsca"));
         nr_wagonuCol.setCellValueFactory(new PropertyValueFactory<>("nr_wagonu"));
         nr_przedzialuCol.setCellValueFactory(new PropertyValueFactory<>("nr_przedzialu"));
+        cechyCol.setCellValueFactory(cellData -> {
+            PlaceRecord place = cellData.getValue();
+            StringBuilder cechy = new StringBuilder();
+
+            if (place.getCzy_dla_niepelnosprawnych()) {
+                cechy.append("♿ "); // ikona albo napis
+            }
+            if (place.getCzy_dla_rowerow()) {
+                cechy.append("🚲 ");
+            }
+
+            // jeśli brak cech, możesz wpisać np. "-"
+            if (cechy.length() == 0) {
+                cechy.append("");
+            }
+
+            return new ReadOnlyStringWrapper(cechy.toString().trim());
+        });
 
         // RowFactory z toggle zaznaczenia i podświetleniem
         tableView.setRowFactory(tv -> {
@@ -130,6 +153,24 @@ public class TicketPlacesChoiceViewModel {
         nr_miejscaCol2.setCellValueFactory(new PropertyValueFactory<>("nr_miejsca"));
         nr_wagonuCol2.setCellValueFactory(new PropertyValueFactory<>("nr_wagonu"));
         nr_przedzialuCol2.setCellValueFactory(new PropertyValueFactory<>("nr_przedzialu"));
+        cechyCol2.setCellValueFactory(cellData -> {
+            PlaceRecord place = cellData.getValue();
+            StringBuilder cechy = new StringBuilder();
+
+            if (place.getCzy_dla_niepelnosprawnych()) {
+                cechy.append("♿ "); // ikona albo napis
+            }
+            if (place.getCzy_dla_rowerow()) {
+                cechy.append("🚲 ");
+            }
+
+            // jeśli brak cech, możesz wpisać np. "-"
+            if (cechy.length() == 0) {
+                cechy.append("");
+            }
+
+            return new ReadOnlyStringWrapper(cechy.toString().trim());
+        });
 
     // RowFactory z toggle zaznaczenia i podświetleniem
         tableView2.setRowFactory(tv -> {

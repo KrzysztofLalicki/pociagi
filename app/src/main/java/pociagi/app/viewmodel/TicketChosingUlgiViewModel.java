@@ -2,10 +2,7 @@ package pociagi.app.viewmodel;
 
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
-import javafx.scene.control.ComboBox;
-import javafx.scene.control.Label;
-import javafx.scene.control.ListCell;
-import javafx.scene.control.Tab;
+import javafx.scene.control.*;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import pociagi.app.dao.DaoFactory;
@@ -26,11 +23,11 @@ public class TicketChosingUlgiViewModel {
     HBox mainHBox;
     @FXML VBox vbox1, vbox2, vbox11, vbox12, vbox13, vbox14, vbox21, vbox22, vbox23, vbox24;
 
+    @FXML
+    ScrollPane vbox1scroll, vbox2scroll;
+
     public void setData(){
-        vbox1.setVisible(false);
-        vbox1.setManaged(false);
-        vbox2.setVisible(false);
-        vbox2.setManaged(false);
+        mainHBox.getChildren().clear();
         if( TicketFactory.getActualPrzeazd().getNumberOfPlacesOne() > 0) {
             for (Place place : TicketFactory.getActualPrzeazd().getPlacesOne()) {
                 vbox11.getChildren().add(new Label( String.valueOf(place.getNr_miejsca())));
@@ -72,8 +69,7 @@ public class TicketChosingUlgiViewModel {
                 vbox14.getChildren().add(cb);
             }
             System.out.println("Set data in ulgi One");
-            vbox1.setVisible(true);
-            vbox1.setManaged(true);
+            mainHBox.getChildren().add(vbox1scroll);
         }
         if( TicketFactory.getActualPrzeazd().getNumberOfPlacesTwo() > 0) {
             for (Place place : TicketFactory.getActualPrzeazd().getPlacesTwo()) {
@@ -113,8 +109,7 @@ public class TicketChosingUlgiViewModel {
                 cb.getSelectionModel().selectFirst();
                 vbox24.getChildren().add(cb);
             }
-            vbox2.setVisible(true);
-            vbox2.setManaged(true);
+            mainHBox.getChildren().add(vbox2scroll);
         }
     }
 
@@ -128,6 +123,15 @@ public class TicketChosingUlgiViewModel {
         tab.setContent(newView);
     }
 
+    @FXML public void CofnijButton() throws IOException {
+        FXMLLoader loader = new FXMLLoader(getClass().getResource("/pociagi/app/view/TicketPlacesChoice.fxml"));
+        VBox newView = loader.load();
+        TicketFactory.getActualPrzeazd().resetData2();
+        TicketPlacesChoiceViewModel ticketPlacesChoiceViewModel = loader.getController();
+        ticketPlacesChoiceViewModel.setTab(tab);
+        ticketPlacesChoiceViewModel.setData();
+        tab.setContent(newView);
+    }
 
 
 }

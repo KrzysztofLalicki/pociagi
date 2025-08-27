@@ -35,4 +35,7 @@ public class DaoFactory {
 
     private static final DeletingFromTicketPlacesDao deletingFromTicketPlacesDao = new DeletingFromTicketPlacesDao();
     public static DeletingFromTicketPlacesDao getDeletingFromTicketPlacesDao() { return deletingFromTicketPlacesDao; }
+
+    private static final AccountTickets accountTicketsDao = new AccountTickets();
+    public static AccountTickets getAccountTicketsDao() { return accountTicketsDao; }
 }
