@@ -574,7 +574,7 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
-CREATE OR REPLACE FUNCTION is_poloczenie_active(id INTEGER, data DATE)
+CREATE OR REPLACE FUNCTION is_polaczenie_active(id INTEGER, data DATE)
     RETURNS BOOLEAN AS $$
 DECLARE
     id_harmonogram INTEGER := (SELECT id_harmonogramu FROM polaczenia WHERE id_polaczenia = id);
@@ -599,7 +599,7 @@ BEGIN
                             WHEN id_stac = id_stac_koniec THEN NULL
                             ELSE oblicz_godzine_odjazdu(id_stac,id_pol)
                             END
-                 FROM polaczenia_wraz_z_dana_stacja(id_stac) WHERE is_poloczenie_active(id_pol,data);
+                 FROM polaczenia_wraz_z_dana_stacja(id_stac) WHERE is_polaczenie_active(id_pol,data);
 
 END;
 $$ LANGUAGE plpgsql;
@@ -618,3 +618,32 @@ BEGIN
         ORDER BY s.tory DESC, s.nazwa;
 END;
 $$ LANGUAGE plpgsql;
+
+create or replace function get_edges(station_id integer, search_start timestamp)
+    returns table(next_station_id integer, departure_time timestamp, arrival_time timestamp, next_id_polaczenia integer) as $$
+declare
+    MAX_CZAS_PRZESIADKI interval = '24 hours';
+    _polaczenie record;
+begin
+    for _polaczenie in
+        select p.id_polaczenia, search_start::date + p.godzina_startu as czas_startu_polaczenia, search_start::date + p.godzina_startu + s_p.odjazd * '1 minute'::interval as czas_odjazdu
+        from stacje_posrednie s_p
+        join polaczenia p on s_p.id_polaczenia = p.id_polaczenia
+        where s_p.id_stacji = station_id  and is_polaczenie_active(p.id_polaczenia, search_start::date) and s_p.zatrzymanie
+          and search_start::date + p.godzina_startu + s_p.odjazd * '1 minute'::interval between search_start and search_start + MAX_CZAS_PRZESIADKI
+    loop
+        raise notice '%', _polaczenie;
+        select id_stacji, _polaczenie.czas_odjazdu, _polaczenie.czas_startu_polaczenia + odjazd * '1 minute'::interval, _polaczenie.id_polaczenia
+        into next_station_id, departure_time, arrival_time, next_id_polaczenia
+        from stacje_posrednie
+        where id_polaczenia = _polaczenie.id_polaczenia and zatrzymanie
+            and _polaczenie.czas_odjazdu < _polaczenie.czas_startu_polaczenia + przyjazd * '1 minute'::interval
+        order by przyjazd limit 1;
+        if found then
+            return next;
+        end if;
+    end loop;
+
+    return;
+end;
+$$ language plpgsql;
