@@ -78,38 +78,48 @@ public class TicketFindingConnectionViewModel {
             if(comboBoxPlacesOne.getSelectionModel().getSelectedIndex() == 0 && comboBoxPlacesTwo.getSelectionModel().getSelectedIndex() == 0) {
                 throw new Exception();
             }
-            if(hourSpinner.getValue() > 18)
-            {
-                TicketFactory.getActualPrzeazd().IsAfter18 = true;
+            if(datePicker.getValue().isBefore(LocalDate.now()) ||
+                    (datePicker.getValue().isEqual(LocalDate.now()) && hourSpinner.getValue() < LocalTime.now().getHour() )) {
+                Alert alert = new Alert(Alert.AlertType.ERROR);
+                alert.setTitle("Błąd");
+                alert.setHeaderText(null);
+                alert.setContentText("Raczej nie potrafisz podróżować w czasie!");
+                alert.showAndWait();
+
             }
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/pociagi/app/view/TicketListOfConnection.fxml"));
-            VBox newView = loader.load();
+            else {
+                if (hourSpinner.getValue() > 18) {
+                    TicketFactory.getActualPrzeazd().IsAfter18 = true;
+                }
+                FXMLLoader loader = new FXMLLoader(getClass().getResource("/pociagi/app/view/TicketListOfConnection.fxml"));
+                VBox newView = loader.load();
 
-            TicketListOfConnectionViewModel controller = loader.getController();
-            controller.setTab(tab);
+                TicketListOfConnectionViewModel controller = loader.getController();
+                controller.setTab(tab);
 
-            Stacja startStacja = startStationController.getStacjaProperty().get();
-            Stacja endStacja = endStationController.getStacjaProperty().get();
+                Stacja startStacja = startStationController.getStacjaProperty().get();
+                Stacja endStacja = endStationController.getStacjaProperty().get();
 
-            TicketFactory.getActualPrzeazd().setStartStation(startStacja);
-            TicketFactory.getActualPrzeazd().setEndStation(endStacja);
+                TicketFactory.getActualPrzeazd().setStartStation(startStacja);
+                TicketFactory.getActualPrzeazd().setEndStation(endStacja);
 
-            LocalDate selectedDate = datePicker.getValue();
-            LocalTime selectedTime = LocalTime.of(
-                    hourSpinner.getValue(),
-                    minuteSpinner.getValue()
-            );
+                LocalDate selectedDate = datePicker.getValue();
+                LocalTime selectedTime = LocalTime.of(
+                        hourSpinner.getValue(),
+                        minuteSpinner.getValue()
+                );
 
-            // Ustaw datę i czas w obiekcie Przejazd
-            TicketFactory.getActualPrzeazd().setDepartureDate(selectedDate);
-            TicketFactory.getActualPrzeazd().setDepartureTime(selectedTime);
-            TicketFactory.getActualPrzeazd().lookingHour = selectedTime;
-            TicketFactory.getActualPrzeazd().lookingDay = selectedDate;
-            TicketFactory.getActualPrzeazd().setNumberOfPlaces(comboBoxPlacesOne.getValue(), comboBoxPlacesTwo.getValue());
+                // Ustaw datę i czas w obiekcie Przejazd
+                TicketFactory.getActualPrzeazd().setDepartureDate(selectedDate);
+                TicketFactory.getActualPrzeazd().setDepartureTime(selectedTime);
+                TicketFactory.getActualPrzeazd().lookingHour = selectedTime;
+                TicketFactory.getActualPrzeazd().lookingDay = selectedDate;
+                TicketFactory.getActualPrzeazd().setNumberOfPlaces(comboBoxPlacesOne.getValue(), comboBoxPlacesTwo.getValue());
 
-            controller.setLabels();
-            tab.setContent(newView);
-            controller.setData();
+                controller.setLabels();
+                tab.setContent(newView);
+                controller.setData();
+            }
         }
         catch(Exception e )
         {
@@ -127,6 +137,7 @@ public class TicketFindingConnectionViewModel {
     @FXML public void CofnijButton() throws IOException
     {
         DaoFactory.getDeletingTicketDao().delete();
+        TicketFactory.setIsCreated(Boolean.FALSE);
         FXMLLoader loader = new FXMLLoader(getClass().getResource("/pociagi/app/view/AccountView.fxml"));
         HBox newView = loader.load();
 

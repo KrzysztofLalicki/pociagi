@@ -2,20 +2,21 @@ package pociagi.app.dao;
 
 import pociagi.app.model.ConnectionsTableEntry;
 import pociagi.app.model.TicketsTableEntry;
+import pociagi.app.service.LoggedAccount;
 
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
 public class AccountTickets {
-    public List<TicketsTableEntry> getTicketsTableEntry(int user_id) {
+    public List<TicketsTableEntry> getTicketsTableEntry() {
         List<TicketsTableEntry> result = new ArrayList<>();
         String sql = "SELECT * FROM wszystkie_bilety(?);";
 
         try (Connection conn = DBManager.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
 
-            stmt.setInt(1, user_id);
+            stmt.setInt(1, LoggedAccount.getUser_id());
 
 
             ResultSet rs = stmt.executeQuery();

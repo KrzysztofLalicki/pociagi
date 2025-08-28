@@ -41,4 +41,13 @@ public class DaoFactory {
 
     private static final ReturningTicketDao returningTicketDao = new ReturningTicketDao();
     public static ReturningTicketDao getReturningTicketDao() { return returningTicketDao; }
+
+    private static final PrizeOfPrzejazd prizeOfPrzejazdDao = new PrizeOfPrzejazd();
+    public static PrizeOfPrzejazd getPrizeOfPrzejazdDao () { return prizeOfPrzejazdDao; }
+
+    private static final AddingPassengerDao addingPassengerDao = new AddingPassengerDao();
+    public static AddingPassengerDao getAddingPassengerDao() { return addingPassengerDao; }
+
+    private static final LoggingClassDao loggingClassDao = new LoggingClassDao();
+    public static LoggingClassDao getLoggingClassDao() { return loggingClassDao; }
 }

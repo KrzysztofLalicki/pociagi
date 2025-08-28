@@ -645,6 +645,22 @@ INSERT INTO polaczenia_wagony (id_polaczenia, nr_wagonu, id_wagonu) VALUES
                                                                         (20, 3, 2),
                                                                         (20, 4, 3);
 
+INSERT INTO polaczenia (godzina_startu, id_harmonogramu, id_przewoznika)
+VALUES ('22:00:00', 1, 2);
+INSERT INTO stacje_posrednie VALUES
+                                 (21, 1,   0,   5, true, 1),   -- Warszawa Centralna
+                                 (21, 14, 60,  65, true, 1),   -- Radom
+                                 (21, 17,120, 125, true, 1),   -- Kielce
+                                 (21, 2, 180, 185, true, 1);   -- Kraków Główny
+
+INSERT INTO historia_polaczenia (id_polaczenia, data_od, data_do) VALUES
+    (21, '2023-01-01', '2026-12-31');
+INSERT INTO polaczenia_wagony (id_polaczenia, nr_wagonu, id_wagonu) VALUES
+                                                                        (21, 1, 1),
+                                                                        (21, 2, 1),
+                                                                        (21, 3, 2),
+                                                                        (21, 4, 3);
+
 
 
 

@@ -675,3 +675,28 @@ BEGIN
         ORDER BY s.tory DESC, s.nazwa;
 END;
 $$ LANGUAGE plpgsql;
+
+create or replace function cena_przejazdu(
+    id_pol integer,
+    dzien DATE,
+    id_start INTEGER,
+    id_koniec INTEGER,
+    number_of_one INTEGER,
+    number_of_two INTEGER,
+    number_of_bikes INTEGER
+) RETURNS NUMERIC(10,2) AS $$
+DECLARE id_ INTEGER;
+        cena_one NUMERIC(10,2);
+        cena_two NUMERIC(10,2);
+        cena_bike NUMERIC(10,2);
+        droga INTEGER;
+BEGIN
+    SELECT id_przewoznika INTO id_ FROM polaczenia WHERE id_polaczenia = id_pol;
+    SELECT cena_za_km_kl1 INTO cena_one FROM historia_cen WHERE id_przewoznika = id_ AND dzien BETWEEN data_od AND data_do;
+    SELECT cena_za_km_kl2 INTO cena_two FROM historia_cen WHERE id_przewoznika = id_ AND dzien BETWEEN data_od AND data_do;
+    SELECT cena_za_rower INTO cena_bike FROM historia_cen WHERE id_przewoznika = id_ AND dzien BETWEEN data_od AND data_do;
+    SELECT dlugosc_drogi(id_pol,id_start,id_koniec) INTO droga;
+    RETURN number_of_one * droga * cena_one + number_of_two * droga * cena_two + number_of_bikes * cena_bike;
+
+END;
+$$ LANGUAGE plpgsql;

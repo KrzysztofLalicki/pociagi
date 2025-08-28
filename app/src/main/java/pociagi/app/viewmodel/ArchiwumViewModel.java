@@ -33,7 +33,7 @@ public class ArchiwumViewModel {
 
     public void setData(Tab tab){
         this.tab = tab;
-        ticketsList.addAll(DaoFactory.getAccountTicketsDao().getTicketsTableEntry(1));
+        ticketsList.addAll(DaoFactory.getAccountTicketsDao().getTicketsTableEntry());
         tableView.setItems(ticketsList);
     }
 
@@ -53,7 +53,7 @@ public class ArchiwumViewModel {
                     TicketsTableEntry ticket = getTableView().getItems().get(getIndex());
                     DaoFactory.getReturningTicketDao().returnTicket(ticket.id_biletu());
                     ticketsList.clear();
-                    ticketsList.addAll(DaoFactory.getAccountTicketsDao().getTicketsTableEntry(1));
+                    ticketsList.addAll(DaoFactory.getAccountTicketsDao().getTicketsTableEntry());
                     System.out.println("Zwracam bilet: " + ticket.getId_biletu());
                 });
             }

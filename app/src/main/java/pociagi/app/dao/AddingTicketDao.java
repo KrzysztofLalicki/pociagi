@@ -1,6 +1,7 @@
 package pociagi.app.dao;
 
 import pociagi.app.model.UlgiTableEntry;
+import pociagi.app.service.LoggedAccount;
 import pociagi.app.service.TicketFactory;
 
 import java.sql.Connection;
@@ -15,7 +16,7 @@ public class AddingTicketDao {
 
         try (Connection conn = DBManager.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
-            stmt.setInt(1, 1);
+            stmt.setInt(1, LoggedAccount.getUser_id());
             try (ResultSet rs = stmt.executeQuery()) {
                 if (rs.next()) {
                     int generatedId = rs.getInt("id_biletu");
@@ -26,7 +27,7 @@ public class AddingTicketDao {
                 }
             }
         } catch (SQLException e) {
-            e.printStackTrace();
+            throw new RuntimeException(e);
         }
 
 

@@ -21,5 +21,10 @@
           <fx:include fx:id="loggingViewModel" source="Logging.fxml" />
         </content>
       </Tab>
+    <Tab fx:id="registration" text="Rejestracja" >
+      <content>
+        <fx:include fx:id="registrationViewModel" source="RegistrationView.fxml" />
+      </content>
+    </Tab>
   </tabs>
 </TabPane>

@@ -93,6 +93,12 @@ public class TicketSummaryViewModel {
             vbox7.getChildren().add(new Label("Numer :"));
             vbox7.getChildren().add(new Label(String.valueOf(przejazd.getId_polaczenia())));
             hbox.getChildren().add(vbox7);
+            VBox vbox10 = new VBox();
+            vbox10.setMinWidth(70);
+            vbox10.setAlignment(Pos.CENTER);
+            vbox10.getChildren().add(new Label("Cena :"));
+            vbox10.getChildren().add(new Label(String.valueOf(DaoFactory.getPrizeOfPrzejazdDao().Prize(przejazd))));
+            hbox.getChildren().add(vbox10);
 
             VBox vbox9 = new VBox();
             Button button = new Button("Usuń");
@@ -121,6 +127,16 @@ public class TicketSummaryViewModel {
         FXMLLoader loader = new FXMLLoader(getClass().getResource("/pociagi/app/view/AccountView.fxml"));
         HBox newView = loader.load();
         TicketFactory.setIsCreated(false);
+        AccountViewModel controller = loader.getController();
+        controller.setTab(tab);
+        tab.setContent(newView);
+    }
+
+    @FXML public void AnulujButton() throws IOException {
+        FXMLLoader loader = new FXMLLoader(getClass().getResource("/pociagi/app/view/AccountView.fxml"));
+        HBox newView = loader.load();
+        DaoFactory.getDeletingTicketDao().delete();
+        TicketFactory.setIsCreated(Boolean.FALSE);
         AccountViewModel controller = loader.getController();
         controller.setTab(tab);
         tab.setContent(newView);

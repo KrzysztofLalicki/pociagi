@@ -38,12 +38,13 @@ public class AddingTicketPlacesDao {
             conn.commit(); // zatwierdź całość
             System.out.println("Dodano wszystkie miejsca w jednej transakcji.");
         } catch (SQLException e) {
-            e.printStackTrace();
+
             try {
                 DBManager.getConnection().rollback(); // wycofaj w razie błędu
                 System.out.println("Wycofano transakcję!");
+                throw new RuntimeException(e);
             } catch (SQLException ex) {
-                ex.printStackTrace();
+                throw new RuntimeException(ex);
             }
         }
     }

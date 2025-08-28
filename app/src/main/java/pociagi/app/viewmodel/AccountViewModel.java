@@ -35,4 +35,12 @@ public class AccountViewModel {
         tab.setContent(newView);
     }
 
+    @FXML public void logOut() throws IOException {
+        FXMLLoader loader = new FXMLLoader(getClass().getResource("/pociagi/app/view/Logging.fxml"));
+        VBox newView = loader.load();
+        LoggingViewModel controller = loader.getController();
+        controller.setTab(tab);
+        tab.setContent(newView);
+    }
+
 }

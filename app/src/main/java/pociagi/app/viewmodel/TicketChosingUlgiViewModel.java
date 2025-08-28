@@ -116,7 +116,6 @@ public class TicketChosingUlgiViewModel {
     @FXML public void HandleButton() throws IOException {
         FXMLLoader loader = new FXMLLoader(getClass().getResource("/pociagi/app/view/TicketSummaryView.fxml"));
         VBox newView = loader.load();
-
         TicketSummaryViewModel viewmodel= loader.getController();
         TicketFactory.addingActualToList();
         viewmodel.setTab(tab);

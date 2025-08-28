@@ -53,6 +53,7 @@ public class TicketPlacesChoiceViewModel {
     @FXML TableColumn<PlaceRecord, String> cechyCol2;
 
     private final ObservableList<PlaceRecord> places = FXCollections.observableArrayList();
+    private final ObservableList<PlaceRecord> places2 = FXCollections.observableArrayList();
 
     private Tab tab;
 
@@ -131,7 +132,7 @@ public class TicketPlacesChoiceViewModel {
                         System.out.println(TicketFactory.getActualPrzeazd().getPlacesTwo().size());
                     } else {
                         sm.select(index);
-                        TicketFactory.getActualPrzeazd().getPlacesOne().add(new Place(place.getNr_miejsca(),place.nr_wagonu(),place.getNr_przedzialu(),TicketFactory.getActualPrzeazd().getId_przejazdu()));
+                        TicketFactory.getActualPrzeazd().getPlacesOne().add(new Place(place.getNr_miejsca(),place.nr_wagonu(),place.getNr_przedzialu(),TicketFactory.getActualPrzeazd().getId_przejazdu(),place.czy_dla_rowerow()));
                         System.out.println("Dodanie miejsca");
                     }
                     event.consume();
@@ -146,8 +147,8 @@ public class TicketPlacesChoiceViewModel {
         tableView2.getSelectionModel().setCellSelectionEnabled(false);
 
     // Pobranie miejsc z DAO
-        places.setAll(DaoFactory.getTicketFreePlacesDao().getFreePlaces(2));
-        tableView2.setItems(places);
+        places2.setAll(DaoFactory.getTicketFreePlacesDao().getFreePlaces(2));
+        tableView2.setItems(places2);
 
     // Kolumny danych
         nr_miejscaCol2.setCellValueFactory(new PropertyValueFactory<>("nr_miejsca"));
@@ -202,7 +203,7 @@ public class TicketPlacesChoiceViewModel {
                     System.out.println(TicketFactory.getActualPrzeazd().getPlacesOne().size());
                 } else {
                     sm.select(index);
-                    TicketFactory.getActualPrzeazd().getPlacesTwo().add(new Place(place.getNr_miejsca(),place.nr_wagonu(),place.getNr_przedzialu(), TicketFactory.getActualPrzeazd().getId_przejazdu()));
+                    TicketFactory.getActualPrzeazd().getPlacesTwo().add(new Place(place.getNr_miejsca(),place.nr_wagonu(),place.getNr_przedzialu(), TicketFactory.getActualPrzeazd().getId_przejazdu(),place.czy_dla_rowerow()));
                     System.out.println("Dodanie miejsca");
                 }
                 event.consume();
@@ -216,14 +217,25 @@ public class TicketPlacesChoiceViewModel {
 
 
     @FXML public void HandleButton() throws IOException {
-        FXMLLoader load = new FXMLLoader(getClass().getResource("/pociagi/app/view/TicketChosingUlgiView.fxml"));
-        VBox newView = load.load();
-        TicketChosingUlgiViewModel viewModel = load.getController();
-        TicketFactory.getActualPrzeazd().setNumberOfPlaces(TicketFactory.getActualPrzeazd().getPlacesOne().size(),
-                TicketFactory.getActualPrzeazd().getPlacesTwo().size());
-        viewModel.setTab(tab);
-        viewModel.setData();
-        tab.setContent(newView);
+        if(TicketFactory.getActualPrzeazd().getPlacesOne().isEmpty() && TicketFactory.getActualPrzeazd().getPlacesTwo().isEmpty()){
+            Alert alert = new Alert(Alert.AlertType.ERROR);
+            alert.setTitle("Błąd");
+            alert.setHeaderText(null);
+            alert.setContentText("Nieprawidłowe dane!");
+            alert.showAndWait();
+
+        }
+        else {
+            TicketFactory.getActualPrzeazd().setNumberOfPlaces(
+                    TicketFactory.getActualPrzeazd().getPlacesOne().size(),
+                    TicketFactory.getActualPrzeazd().getPlacesTwo().size());
+            FXMLLoader load = new FXMLLoader(getClass().getResource("/pociagi/app/view/TicketChosingUlgiView.fxml"));
+            VBox newView = load.load();
+            TicketChosingUlgiViewModel viewModel = load.getController();
+            viewModel.setTab(tab);
+            viewModel.setData();
+            tab.setContent(newView);
+        }
     }
 
     @FXML public void CofnijButton() throws IOException {

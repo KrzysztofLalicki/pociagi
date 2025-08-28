@@ -37,4 +37,6 @@ public class TicketFactory {
         DaoFactory.getAddingTicketPlacesDao().addToTicketPlaces();
         actualPrzeazd = new Przejazd(id);
     }
+
+
 }
