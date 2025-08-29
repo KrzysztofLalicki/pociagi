@@ -57,7 +57,7 @@ drop function if exists wszystkie_miejsca_polaczenie(integer);
 
 drop function if exists czy_miejsce_wolne(integer, date, integer, integer, integer, integer);
 
-drop function if exists wszystkie_wolne_dla_polaczenia_dla_klasy(integer, date, integer, integer, integer, boolean, boolean);
+drop function if exists wszystkie_wolne_dla_polaczenia_dla_klasy(integer, date, integer, integer, integer);
 
 drop function if exists czas_trasy(integer, integer, integer);
 
@@ -80,6 +80,16 @@ drop function if exists is_polaczenie_active(integer, date);
 drop function if exists get_timetable(integer, date);
 
 drop function if exists get_stacje_by_prefix(text);
+
+drop function if exists szukaj_polaczenia(varchar, varchar, integer, integer, date, time);
+
+drop function if exists godzina_odjazdu(integer, integer);
+
+drop function if exists czy_do_zwrotu(integer);
+
+drop function if exists wszystkie_bilety(integer);
+
+drop function if exists cena_przejazdu(integer, integer, date, integer, integer, integer, integer, integer);
 
 drop function if exists get_edges(integer, timestamp);
 
