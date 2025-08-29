@@ -1,0 +1,98 @@
+package pociagi.app.viewmodel;
+
+import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.control.*;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.VBox;
+import pociagi.app.dao.DaoFactory;
+import pociagi.app.model.UlgiTableEntry;
+import pociagi.app.service.Place;
+import pociagi.app.service.TicketFactory;
+
+import java.io.IOException;
+
+public class TicketChosingUlgiViewModel {
+
+    private Tab tab;
+    public void setTab(Tab tab) {
+        this.tab = tab;
+    }
+
+    @FXML
+    HBox mainHBox;
+    @FXML VBox vbox1, vbox2, vbox11, vbox12, vbox13, vbox14, vbox21, vbox22, vbox23, vbox24;
+
+    @FXML
+    ScrollPane vbox1scroll, vbox2scroll;
+
+    public void setData(){
+        mainHBox.getChildren().clear();
+        if( TicketFactory.getActualPrzeazd().getNumberOfPlacesTwo() > 0) {
+            for (Place place : TicketFactory.getActualPrzeazd().getPlacesTwo()) {
+                System.out.println("Set data in ulgi Two");
+                vbox21.getChildren().add(new Label( String.valueOf(place.getNr_miejsca())));
+                vbox22.getChildren().add(new Label( String.valueOf(place.getNr_wagonu())));
+                vbox23.getChildren().add(new Label( String.valueOf(place.getNr_przedzialu())));
+                ComboBox<UlgiTableEntry> cb = new ComboBox<>();
+                cb.setCellFactory(param -> new ListCell<UlgiTableEntry>() {
+                    @Override
+                    protected void updateItem(UlgiTableEntry item, boolean empty) {
+                        super.updateItem(item, empty);
+                        if (empty || item == null) {
+                            setText(null);
+                        } else {
+                            setText(item.getNazwa()); // Tylko nazwa
+                        }
+                    }
+                });
+                cb.setButtonCell(new ListCell<UlgiTableEntry>() {
+                    @Override
+                    protected void updateItem(UlgiTableEntry item, boolean empty) {
+                        super.updateItem(item, empty);
+                        if (empty || item == null) {
+                            setText("Wybierz ulgę");
+                            setStyle("");
+                        } else {
+                            setText(item.getNazwa());
+                            setStyle("-fx-font-weight: bold;");
+                        }
+                    }
+                });
+                cb.setPrefWidth(120);
+                cb.setMinWidth(120);
+                cb.setMaxWidth(120);
+                cb.getItems().addAll(DaoFactory.getUlgiDao().getUlgiTable());
+                cb.getSelectionModel().selectFirst();
+
+                cb.getSelectionModel().selectedItemProperty().addListener((obs, oldVal, newVal) -> {
+                    place.setId_ulgi(newVal.getId_ulgi());
+                });
+
+                vbox24.getChildren().add(cb);
+            }
+            mainHBox.getChildren().add(vbox2scroll);
+        }
+    }
+
+    @FXML public void HandleButton() throws IOException {
+        FXMLLoader loader = new FXMLLoader(getClass().getResource("/pociagi/app/view/TicketSummaryView.fxml"));
+        VBox newView = loader.load();
+        TicketSummaryViewModel viewmodel= loader.getController();
+        TicketFactory.addingActualToList();
+        viewmodel.setTab(tab);
+        tab.setContent(newView);
+    }
+
+    @FXML public void CofnijButton() throws IOException {
+        FXMLLoader loader = new FXMLLoader(getClass().getResource("/pociagi/app/view/TicketPlacesChoice.fxml"));
+        VBox newView = loader.load();
+        TicketFactory.getActualPrzeazd().resetData2();
+        TicketPlacesChoiceViewModel ticketPlacesChoiceViewModel = loader.getController();
+        ticketPlacesChoiceViewModel.setTab(tab);
+        ticketPlacesChoiceViewModel.setData();
+        tab.setContent(newView);
+    }
+
+
+}

@@ -4,10 +4,22 @@ import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
+import pociagi.app.dao.DaoFactory;
+import pociagi.app.service.TicketFactory;
 
 import java.io.IOException;
 
 public class HelloApplication extends Application {
+
+    static {
+        Runtime.getRuntime().addShutdownHook(new Thread(() -> {
+            System.out.println("Zamykanie aplikacji...");
+            if(TicketFactory.isCreated()) {
+                DaoFactory.getDeletingTicketDao().delete();
+            }
+        }));
+    }
+
     @Override
     public void start(Stage stage) throws IOException {
         FXMLLoader fxmlLoader = new FXMLLoader(HelloApplication.class.getResource("view/MainView.fxml"));
