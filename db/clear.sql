@@ -22,6 +22,10 @@ DROP TABLE IF EXISTS swieta_stale CASCADE;
 DROP TABLE IF EXISTS swieta_ruchome CASCADE;
 DROP TABLE IF EXISTS daty_swiat CASCADE;
 
+drop table if exists p_q;
+drop table if exists d;
+drop table if exists prev;
+
 COMMIT;
 -- 2_triggers.sql
 DROP FUNCTION sprawdz_ceny CASCADE;
