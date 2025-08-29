@@ -93,5 +93,7 @@ drop function if exists cena_przejazdu(integer, integer, date, integer, integer,
 
 drop function if exists get_edges(integer, timestamp);
 
-drop function if exists dijkstra(integer, integer, timestamp)
+drop function if exists search_routes_with_transfers(integer, integer, timestamp);
+
+
 

@@ -1033,7 +1033,7 @@ $$ LANGUAGE plpgsql;
 create or replace function get_edges(station_id integer, search_start timestamp)
     returns table(next_station_id integer, departure_time timestamp, arrival_time timestamp, next_id_polaczenia integer) as $$
 declare
-    MAX_CZAS_PRZESIADKI interval = '24 hours';
+    MAX_CZAS_PRZESIADKI interval = '8 hours';
     _polaczenie record;
 begin
     for _polaczenie in
@@ -1058,8 +1058,9 @@ begin
 end;
 $$ language plpgsql;
 
-create or replace function dijkstra(stacja_startowa integer, stacja_koncowa integer, czas timestamp)
-    returns table(_prev_stacja integer, _next_stacja integer, _odjazd_prev timestamp, _przyjazd_curr timestamp, _id_polaczenia integer) as $$
+create or replace function search_routes_with_transfers(stacja_startowa integer, stacja_koncowa integer, czas timestamp)
+    returns table(id_polaczenia integer, stacja1 varchar, data_odjazdu date, czas_odjazdu time,
+                  stacja2 varchar, data_przyjazdu date, czas_przyjazdu time) as $$
     declare
         DEBUG boolean := true;
         call_id uuid := gen_random_uuid();
@@ -1103,13 +1104,15 @@ create or replace function dijkstra(stacja_startowa integer, stacja_koncowa inte
 
         return query
         with recursive route as(
-            select prev_stacja, next_stacja, odjazd_prev, przyjazd_curr, id_polaczenia
-            from prev where function_call_id = call_id and next_stacja = stacja_koncowa
+            select prev_stacja, next_stacja, odjazd_prev, przyjazd_curr, p.id_polaczenia
+            from prev p where function_call_id = call_id and next_stacja = stacja_koncowa
             union all
             select p.prev_stacja, r.prev_stacja as next_stacja, p.odjazd_prev, p.przyjazd_curr, p.id_polaczenia
             from prev p join route r on p.next_stacja = r.prev_stacja
             where p.function_call_id = call_id
-        ) select * from route order by _odjazd_prev;
+        ) select r.id_polaczenia, get_nazwa_stacji(prev_stacja) as stacja1, odjazd_prev::date as data_odjazdu, odjazd_prev::time as czas_odjazdu,
+                get_nazwa_stacji(next_stacja) as stacja2, przyjazd_curr::date as data_przyjazdu, przyjazd_curr::time as czas_przyjazdu
+        from route r order by odjazd_prev asc;
 
         delete from p_q where function_call_id = call_id;
         delete from d where function_call_id = call_id;
