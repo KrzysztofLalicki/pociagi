@@ -1,50 +1,52 @@
 package pociagi.app.viewmodel;
 
-import javafx.application.Platform;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.scene.Node;
-import javafx.scene.Parent;
-import javafx.scene.control.Button;
-import javafx.scene.control.DatePicker;
-import javafx.scene.control.Spinner;
-import javafx.scene.control.SpinnerValueFactory;
+import javafx.scene.control.*;
+import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.util.StringConverter;
+import pociagi.app.dao.DaoFactory;
+import pociagi.app.model.PathSegmentEntry;
 import pociagi.app.model.Stacja;
-
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
+import java.util.List;
+import java.sql.Timestamp;
 
 public class SelectStartAndEndStationViewController {
     @FXML private Node startStationView;
     @FXML private Node endStationView;
-    @FXML private Button dalejButton;
     @FXML private DatePicker datePicker;
     @FXML private Spinner<LocalTime> timeSpinner;
 
+    @FXML private TableView<PathSegmentEntry> tableView;
+    @FXML private TableColumn<PathSegmentEntry, Integer> id_polaczenia;
+    @FXML private TableColumn<PathSegmentEntry, String> stacja1;
+    @FXML private TableColumn<PathSegmentEntry, LocalDate> data_odjazdu;
+    @FXML private TableColumn<PathSegmentEntry, LocalTime> czas_odjazdu;
+    @FXML private TableColumn<PathSegmentEntry, String> stacja2;
+    @FXML private TableColumn<PathSegmentEntry, LocalDate> data_przyjazdu;
+    @FXML private TableColumn<PathSegmentEntry, LocalTime> czas_przyjazdu;
+
+
     private ObjectProperty<Stacja> startStation;
     private ObjectProperty<Stacja> endStation;
+    private ObjectProperty<LocalDate> selectedDate = new SimpleObjectProperty<>();
+    private ObjectProperty<LocalTime> selectedTime = new SimpleObjectProperty<>();
+    private final ObservableList<PathSegmentEntry> routeList = FXCollections.observableArrayList();
 
     @FXML
     public void initialize() {
-        startStation = ((SelectStationViewModel)startStationView.getUserData()).getStacjaProperty();
-        endStation = ((SelectStationViewModel)endStationView.getUserData()).getStacjaProperty();
-
-        dalejButton.setOnAction(event -> {
-            if(startStation.get() != null && endStation.get() != null)
-                Platform.exit();
-        });
-
-        datePicker.setValue(java.time.LocalDate.now());
         timeSpinner.setValueFactory(new SpinnerValueFactory<LocalTime>() {
             private DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm");
 
             {
-                setValue(java.time.LocalTime.now());
-
                 setConverter(new StringConverter<>() {
                     @Override
                     public String toString(LocalTime time) {
@@ -84,5 +86,39 @@ public class SelectStartAndEndStationViewController {
             }
         });
 
+        startStation = ((SelectStationViewModel)startStationView.getUserData()).getStacjaProperty();
+        endStation = ((SelectStationViewModel)endStationView.getUserData()).getStacjaProperty();
+        selectedDate.bind(datePicker.valueProperty());
+        selectedTime.bind(timeSpinner.valueProperty());
+
+        datePicker.setValue(java.time.LocalDate.now());
+        timeSpinner.getValueFactory().setValue(LocalTime.now());
+
+        startStation.addListener((obs, oldStacja, newStacja) -> updateTable());
+        endStation.addListener((obs, oldStacja, newStacja) -> updateTable());
+        selectedDate.addListener((obs, oldDate, newDate) -> updateTable());
+        selectedTime.addListener((obs, oldTime, newTime) -> updateTable());
+
+        tableView.setItems(routeList);
+
+        id_polaczenia.setCellValueFactory(new PropertyValueFactory<>("connectionId"));
+        stacja1.setCellValueFactory(new PropertyValueFactory<>("startStation"));
+        data_odjazdu.setCellValueFactory(new PropertyValueFactory<>("departureDate"));
+        czas_odjazdu.setCellValueFactory(new PropertyValueFactory<>("departureTime"));
+        stacja2.setCellValueFactory(new PropertyValueFactory<>("endStation"));
+        data_przyjazdu.setCellValueFactory(new PropertyValueFactory<>("arrivalDate"));
+        czas_przyjazdu.setCellValueFactory(new PropertyValueFactory<>("arrivalTime"));
+    }
+
+    private void updateTable() {
+        if (startStation.get() != null && endStation.get() != null && selectedDate.get() != null && selectedTime.get() != null) {
+            Timestamp timestamp = Timestamp.valueOf(selectedDate.get().atTime(selectedTime.get()));
+            List<PathSegmentEntry> results = DaoFactory.getRouteDao().searchRoutesWithTransfers(
+                    startStation.get().getIdStacji(),
+                    endStation.get().getIdStacji(),
+                    timestamp
+            );
+            routeList.setAll(results);
+        }
     }
 }

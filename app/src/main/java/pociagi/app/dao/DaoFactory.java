@@ -50,4 +50,7 @@ public class DaoFactory {
 
     private static final LoggingClassDao loggingClassDao = new LoggingClassDao();
     public static LoggingClassDao getLoggingClassDao() { return loggingClassDao; }
+
+    private static final RouteDao routeDao = new RouteDao();
+    public static RouteDao getRouteDao() { return routeDao; }
 }
