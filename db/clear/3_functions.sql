@@ -41,3 +41,7 @@ drop function is_poloczenie_active(integer, date);
 drop function get_timetable(integer, date);
 
 drop function get_stacje_by_prefix(text);
+
+drop function get_edges(integer, timestamp);
+
+drop function dijkstra(integer, integer, timestamp)
