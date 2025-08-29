@@ -49,7 +49,7 @@
                      </children>
                   </HBox>
             <VBox spacing="10.0" VBox.vgrow="ALWAYS" style="-fx-border-color: derive(-fx-base, -20%); -fx-border-width: 1; -fx-padding: 5;">
-               <Label text="Trasa:">
+               <Label text="Najszybsza trasa:">
                   <font>
                      <Font name="System Bold" size="13.0" />
                   </font>
@@ -60,10 +60,10 @@
                      <Label text="Brak trasy do wyświetlenia" />
                   </placeholder>
                   <columns>
-                     <TableColumn fx:id="id_polaczenia" prefWidth="100" text="Id połączenia" />
+                     <TableColumn fx:id="id_polaczenia" prefWidth="100" text="Id połączenia" style="-fx-border-color: transparent derive(-fx-base, -20%) transparent transparent" />
                      <TableColumn fx:id="stacja1" prefWidth="150" text="Stacja 1" />
                      <TableColumn fx:id="data_odjazdu" prefWidth="150" text="Data odjazdu" />
-                     <TableColumn fx:id="czas_odjazdu" prefWidth="100" text="Godzina odjazdu" />
+                     <TableColumn fx:id="czas_odjazdu" prefWidth="100" text="Godzina odjazdu" style="-fx-border-color: transparent derive(-fx-base, -20%) transparent transparent"/>
                      <TableColumn fx:id="stacja2" prefWidth="100" text="Stacja 2" />
                      <TableColumn fx:id="data_przyjazdu" prefWidth="100" text="Data przyjazdu" />
                      <TableColumn fx:id="czas_przyjazdu" prefWidth="100" text="Godzina przyjazdu" />

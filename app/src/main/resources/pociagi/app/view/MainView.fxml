@@ -13,7 +13,7 @@
     </Tab>
     <Tab fx:id="wyszukiwarkaPolaczen" text="Wyszukiwarka połączeń">
       <content>
-          <fx:include fx:id="selectStartAndEndStationView" source="SelectStartAndEndStationView.fxml" />
+          <fx:include fx:id="selectStartAndEndStationView" source="PathSearchView.fxml" />
       </content>
     </Tab>
       <Tab fx:id="bilet" text="Bilet" >
