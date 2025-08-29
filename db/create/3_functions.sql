@@ -713,7 +713,7 @@ $$ LANGUAGE plpgsql;
 create or replace function get_edges(station_id integer, search_start timestamp)
     returns table(next_station_id integer, departure_time timestamp, arrival_time timestamp, next_id_polaczenia integer) as $$
 declare
-    MAX_CZAS_PRZESIADKI interval = '8 hours';
+    MAX_CZAS_PRZESIADKI interval = '24 hours';
     _polaczenie record;
 begin
     for _polaczenie in
@@ -722,6 +722,12 @@ begin
         join polaczenia p on s_p.id_polaczenia = p.id_polaczenia
         where s_p.id_stacji = station_id  and is_polaczenie_active(p.id_polaczenia, search_start::date) and s_p.zatrzymanie
           and search_start::date + p.godzina_startu + s_p.odjazd * '1 minute'::interval between search_start and search_start + MAX_CZAS_PRZESIADKI
+        union
+        select p.id_polaczenia, search_start::date + interval '1 day' + p.godzina_startu as czas_startu_polaczenia, search_start::date + interval '1 day'+ p.godzina_startu + s_p.odjazd * '1 minute'::interval as czas_odjazdu
+        from stacje_posrednie s_p
+                 join polaczenia p on s_p.id_polaczenia = p.id_polaczenia
+        where s_p.id_stacji = station_id  and is_polaczenie_active(p.id_polaczenia, (search_start::date + interval '1 day')::date) and s_p.zatrzymanie
+          and search_start::date + interval '1 day' + p.godzina_startu + s_p.odjazd * '1 minute'::interval between search_start and search_start + MAX_CZAS_PRZESIADKI
     loop
         select id_stacji, _polaczenie.czas_odjazdu, _polaczenie.czas_startu_polaczenia + odjazd * '1 minute'::interval, _polaczenie.id_polaczenia
         into next_station_id, departure_time, arrival_time, next_id_polaczenia
@@ -769,6 +775,7 @@ create or replace function search_routes_with_transfers(stacja_startowa integer,
                 if e.arrival_time < temp then
                     insert into p_q values (call_id, e.next_station_id, e.arrival_time);
                     insert into d values (call_id, e.next_station_id, e.arrival_time);
+                    delete from prev where function_call_id = call_id and next_stacja = e.next_station_id;
                     insert into prev values (call_id, curr.stacja_id, e.next_station_id, e.departure_time, e.arrival_time, e.next_id_polaczenia);
                 end if;
             end loop;
