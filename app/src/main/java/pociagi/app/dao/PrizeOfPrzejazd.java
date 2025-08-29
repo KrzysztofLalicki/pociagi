@@ -10,7 +10,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 public class PrizeOfPrzejazd {
     public BigDecimal Prize(Przejazd przejazd) {
-        String sql = "SELECT cena_przejazdu(?,?,?,?,?,?,?)";
+        String sql = "SELECT cena_przejazdu(?,?,?,?,?,?,?,?)";
 
         int numbers_of_bikes = 0;
         for (Place place : przejazd.getPlacesOne()) {
@@ -23,16 +23,17 @@ public class PrizeOfPrzejazd {
         try (Connection conn = DBManager.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
 
-            stmt.setInt(1, przejazd.getId_polaczenia());
+            stmt.setInt(1, przejazd.getId_przejazdu());
+            stmt.setInt(2, przejazd.getId_polaczenia());
 
             // LocalDate -> java.sql.Date
-            stmt.setDate(2, java.sql.Date.valueOf(przejazd.getDepartureDate()));
+            stmt.setDate(3, java.sql.Date.valueOf(przejazd.getDepartureDate()));
 
-            stmt.setInt(3, przejazd.getStartStation().getIdStacji());
-            stmt.setInt(4, przejazd.getEndStation().getIdStacji());
-            stmt.setInt(5, przejazd.getNumberOfPlacesOne());
-            stmt.setInt(6, przejazd.getNumberOfPlacesTwo());
-            stmt.setInt(7, numbers_of_bikes);
+            stmt.setInt(4, przejazd.getStartStation().getIdStacji());
+            stmt.setInt(5, przejazd.getEndStation().getIdStacji());
+            stmt.setInt(6, przejazd.getNumberOfPlacesOne());
+            stmt.setInt(7, przejazd.getNumberOfPlacesTwo());
+            stmt.setInt(8, numbers_of_bikes);
 
             try (ResultSet rs = stmt.executeQuery()) {
                 if (rs.next()) {

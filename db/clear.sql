@@ -28,7 +28,7 @@ DROP FUNCTION sprawdz_przystanek CASCADE;
 DROP FUNCTION sprawdz_polaczenie CASCADE;
 DROP FUNCTION sprawdz_zwrot CASCADE;
 DROP FUNCTION sprawdz_przejazd CASCADE;
-DROP FUNCTION sprawdz_miejsce CASCADE;
+DROP FUNCTION  IF EXISTS sprawdz_miejsce CASCADE;
 DROP FUNCTION sprawdz_date CASCADE;
 -- 3_functions.sql
 drop function stacje_na_polaczeniu(integer);
@@ -51,13 +51,13 @@ drop function wszystkie_miejsca_polaczenie(integer);
 
 drop function czy_miejsce_wolne(integer, date, integer, integer, integer, integer);
 
-drop function wszystkie_wolne_dla_polaczenia_dla_klasy(integer, date, integer, integer, integer, boolean, boolean);
+drop function wszystkie_wolne_dla_polaczenia_dla_klasy(integer, date, integer, integer, integer);
 
 drop function czas_trasy(integer, integer, integer);
 
 drop function koszt_przejazdu(integer, boolean, integer, integer, integer, integer, date);
 
-drop function szukaj_polaczenia(varchar, varchar, integer, integer, date, time, boolean, boolean);
+drop function szukaj_polaczenia(varchar, varchar, integer, integer, date, time);
 
 drop function losuj_data_odjazdu_dla_polaczenia(integer, date, date);
 
@@ -74,5 +74,14 @@ drop function is_poloczenie_active(integer, date);
 drop function get_timetable(integer, date);
 
 drop function get_stacje_by_prefix(text);
+
+drop function cena_przejazdu(integer,id_pol integer, dzien date, id_start integer, id_koniec integer, number_of_one integer, number_of_two integer, number_of_bikes integer);
+
+drop function czy_do_zwrotu(bilet integer);
+
+
+drop function godzina_odjazdu(id integer, id_s integer);
+
+drop function wszystkie_bilety(user_id integer);
 
 --COMMIT;

@@ -11,7 +11,7 @@ import java.util.List;
 public class AccountTickets {
     public List<TicketsTableEntry> getTicketsTableEntry() {
         List<TicketsTableEntry> result = new ArrayList<>();
-        String sql = "SELECT * FROM wszystkie_bilety(?);";
+        String sql = "SELECT * FROM wszystkie_bilety(?) WHERE data_zwrotu IS NULL;";
 
         try (Connection conn = DBManager.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {

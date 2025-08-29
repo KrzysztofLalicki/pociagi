@@ -15,7 +15,7 @@ public class AddingTicketPlacesDao {
                 "VALUES (?, ?, ?, ?)";
 
         try (Connection conn = DBManager.getConnection()) {
-            conn.setAutoCommit(false); // start transakcji
+            conn.setAutoCommit(false);
 
             try (PreparedStatement stmt = conn.prepareStatement(sql)) {
                 for (Place place : TicketFactory.getActualPrzeazd().getPlacesOne()) {
@@ -23,24 +23,24 @@ public class AddingTicketPlacesDao {
                     stmt.setInt(2, place.getNr_wagonu());
                     stmt.setInt(3, place.getNr_miejsca());
                     stmt.setInt(4, place.getId_ulgi());
-                    stmt.addBatch(); // dodaj do batcha
+                    stmt.addBatch();
                 }
                 for (Place place : TicketFactory.getActualPrzeazd().getPlacesTwo()) {
                     stmt.setInt(1, TicketFactory.getActualPrzeazd().getId_przejazdu());
                     stmt.setInt(2, place.getNr_wagonu());
                     stmt.setInt(3, place.getNr_miejsca());
                     stmt.setInt(4, place.getId_ulgi());
-                    stmt.addBatch(); // dodaj do batcha
+                    stmt.addBatch();
                 }
-                stmt.executeBatch(); // wykonaj wszystko naraz
+                stmt.executeBatch();
             }
 
-            conn.commit(); // zatwierdź całość
+            conn.commit();
             System.out.println("Dodano wszystkie miejsca w jednej transakcji.");
         } catch (SQLException e) {
 
             try {
-                DBManager.getConnection().rollback(); // wycofaj w razie błędu
+                DBManager.getConnection().rollback();
                 System.out.println("Wycofano transakcję!");
                 throw new RuntimeException(e);
             } catch (SQLException ex) {

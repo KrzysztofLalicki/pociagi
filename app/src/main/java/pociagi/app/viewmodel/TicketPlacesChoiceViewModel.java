@@ -229,12 +229,22 @@ public class TicketPlacesChoiceViewModel {
             TicketFactory.getActualPrzeazd().setNumberOfPlaces(
                     TicketFactory.getActualPrzeazd().getPlacesOne().size(),
                     TicketFactory.getActualPrzeazd().getPlacesTwo().size());
-            FXMLLoader load = new FXMLLoader(getClass().getResource("/pociagi/app/view/TicketChosingUlgiView.fxml"));
-            VBox newView = load.load();
-            TicketChosingUlgiViewModel viewModel = load.getController();
-            viewModel.setTab(tab);
-            viewModel.setData();
-            tab.setContent(newView);
+            if(!TicketFactory.getActualPrzeazd().getPlacesTwo().isEmpty()) {
+                FXMLLoader load = new FXMLLoader(getClass().getResource("/pociagi/app/view/TicketChosingUlgiView.fxml"));
+                VBox newView = load.load();
+                TicketChosingUlgiViewModel viewModel = load.getController();
+                viewModel.setTab(tab);
+                viewModel.setData();
+                tab.setContent(newView);
+            }
+            else{
+                FXMLLoader loader = new FXMLLoader(getClass().getResource("/pociagi/app/view/TicketSummaryView.fxml"));
+                VBox newView = loader.load();
+                TicketSummaryViewModel viewmodel= loader.getController();
+                TicketFactory.addingActualToList();
+                viewmodel.setTab(tab);
+                tab.setContent(newView);
+            }
         }
     }
 

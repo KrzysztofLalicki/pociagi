@@ -16,8 +16,8 @@
                   <Label text="Miejsca klasa I :" />
                   <TableView fx:id="tableView" maxHeight="600.0" maxWidth="278.0" minHeight="400.0" prefHeight="400.0" prefWidth="278.0">
                      <columns>
-                        <TableColumn fx:id="nr_wagonuCol" prefWidth="75.0" text="nr. miejsca" />
-                        <TableColumn fx:id="nr_miejscaCol" prefWidth="75.0" text="nr. wagonu" />
+                        <TableColumn fx:id="nr_wagonuCol" prefWidth="75.0" text="nr. wagonu" />
+                        <TableColumn fx:id="nr_miejscaCol" prefWidth="75.0" text="nr. miejsca" />
                         <TableColumn fx:id="nr_przedzialuCol" prefWidth="83.99993896484375" text="nr. przedziału" />
                         <TableColumn fx:id="cechyCol" />
                      </columns>
@@ -29,8 +29,8 @@
                   <Label text="Miejsca klasa II :" />
                   <TableView fx:id="tableView2" maxHeight="600.0" maxWidth="278.0" minHeight="400.0" prefHeight="400.0" prefWidth="278.0">
                      <columns>
-                        <TableColumn fx:id="nr_wagonuCol2" prefWidth="75.0" text="nr. miejsca" />
-                        <TableColumn fx:id="nr_miejscaCol2" prefWidth="75.0" text="nr. wagonu" />
+                        <TableColumn fx:id="nr_wagonuCol2" prefWidth="75.0" text="nr. wagonu" />
+                        <TableColumn fx:id="nr_miejscaCol2" prefWidth="75.0" text="nr. miejsca" />
                         <TableColumn fx:id="nr_przedzialuCol2" prefWidth="84.800048828125" text="nr. przedziału" />
                         <TableColumn fx:id="cechyCol2" />
                      </columns>

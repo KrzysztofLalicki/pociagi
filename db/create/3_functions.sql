@@ -294,7 +294,7 @@ CREATE OR REPLACE FUNCTION wszystkie_wolne_dla_polaczenia_dla_klasy(
     czy_dla_rowerow BOOLEAN) AS $$
     BEGIN
         RETURN QUERY SELECT * FROM wszystkie_miejsca_polaczenie(id_pol) m WHERE
-        czy_miejsce_wolne(id_pol,dzien_odjazdu,id_stacji_start,id_stacji_koniec,m.nr_miejsca,m.nr_wagonu)
+        czy_miejsce_wolne(id_pol,dzien_odjazdu,id_stacji_start,id_stacji_koniec,m.nr_wagonu,m.nr_miejsca)
         AND m.klasa = klasa_miejsca;
     END;
 $$ LANGUAGE plpgsql;
@@ -677,6 +677,7 @@ END;
 $$ LANGUAGE plpgsql;
 
 create or replace function cena_przejazdu(
+    id_prze INTEGER,
     id_pol integer,
     dzien DATE,
     id_start INTEGER,
@@ -690,13 +691,20 @@ DECLARE id_ INTEGER;
         cena_two NUMERIC(10,2);
         cena_bike NUMERIC(10,2);
         droga INTEGER;
+        ulga numeric(5,2);
 BEGIN
     SELECT id_przewoznika INTO id_ FROM polaczenia WHERE id_polaczenia = id_pol;
     SELECT cena_za_km_kl1 INTO cena_one FROM historia_cen WHERE id_przewoznika = id_ AND dzien BETWEEN data_od AND data_do;
     SELECT cena_za_km_kl2 INTO cena_two FROM historia_cen WHERE id_przewoznika = id_ AND dzien BETWEEN data_od AND data_do;
     SELECT cena_za_rower INTO cena_bike FROM historia_cen WHERE id_przewoznika = id_ AND dzien BETWEEN data_od AND data_do;
+
+    SELECT SUM(u.znizka) INTO ulga FROM bilety_miejsca bm JOIN ulgi u ON bm.id_ulgi = u.id_ulgi
+    WHERE bm.id_przejazdu = id_prze GROUP BY bm.id_przejazdu;
+
     SELECT dlugosc_drogi(id_pol,id_start,id_koniec) INTO droga;
-    RETURN number_of_one * droga * cena_one + number_of_two * droga * cena_two + number_of_bikes * cena_bike;
+    RETURN ROUND(number_of_one * droga * cena_one + (number_of_two - (ulga / 100)) * droga * cena_two + number_of_bikes * cena_bike,2);
 
 END;
 $$ LANGUAGE plpgsql;
+
+

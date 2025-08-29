@@ -999,6 +999,7 @@ END;
 $$ LANGUAGE plpgsql;
 
 create or replace function cena_przejazdu(
+    id_prze INTEGER,
     id_pol integer,
     dzien DATE,
     id_start INTEGER,
@@ -1012,13 +1013,18 @@ DECLARE id_ INTEGER;
         cena_two NUMERIC(10,2);
         cena_bike NUMERIC(10,2);
         droga INTEGER;
+        ulga numeric(5,2);
 BEGIN
     SELECT id_przewoznika INTO id_ FROM polaczenia WHERE id_polaczenia = id_pol;
     SELECT cena_za_km_kl1 INTO cena_one FROM historia_cen WHERE id_przewoznika = id_ AND dzien BETWEEN data_od AND data_do;
     SELECT cena_za_km_kl2 INTO cena_two FROM historia_cen WHERE id_przewoznika = id_ AND dzien BETWEEN data_od AND data_do;
     SELECT cena_za_rower INTO cena_bike FROM historia_cen WHERE id_przewoznika = id_ AND dzien BETWEEN data_od AND data_do;
+
+    SELECT SUM(u.znizka) INTO ulga FROM bilety_miejsca bm JOIN ulgi u ON bm.id_ulgi = u.id_ulgi
+    WHERE bm.id_przejazdu = id_prze GROUP BY bm.id_przejazdu;
+
     SELECT dlugosc_drogi(id_pol,id_start,id_koniec) INTO droga;
-    RETURN number_of_one * droga * cena_one + number_of_two * droga * cena_two + number_of_bikes * cena_bike;
+    RETURN ROUND(number_of_one * droga * cena_one + (number_of_two - (ulga / 100)) * droga * cena_two + number_of_bikes * cena_bike,2);
 
 END;
 $$ LANGUAGE plpgsql;
@@ -1614,6 +1620,81 @@ INSERT INTO historia_polaczenia (id_polaczenia, data_od, data_do) VALUES
     (17, '2023-01-01', '2026-12-31');
 INSERT INTO polaczenia_wagony(id_polaczenia, nr_wagonu, id_wagonu) VALUES
                                                                        (17, 1, 4), (17, 2, 4), (17, 3, 3);
+
+
+
+
+INSERT INTO polaczenia (godzina_startu, id_harmonogramu, id_przewoznika)
+VALUES ('08:00:00', 1, 1);
+INSERT INTO stacje_posrednie VALUES
+                                 (18, 1,   0,   5, true, 1),   -- Warszawa Centralna
+                                 (18, 14, 60,  65, true, 1),   -- Radom
+                                 (18, 17,120, 125, true, 1),   -- Kielce
+                                 (18, 2, 180, 185, true, 1);   -- Kraków Główny
+
+INSERT INTO historia_polaczenia (id_polaczenia, data_od, data_do) VALUES
+    (18, '2023-01-01', '2026-12-31');
+INSERT INTO polaczenia_wagony (id_polaczenia, nr_wagonu, id_wagonu) VALUES
+                                                                        (18, 1, 1),
+                                                                        (18, 2, 1),
+                                                                        (18, 3, 2),
+                                                                        (18, 4, 3);
+
+INSERT INTO linie VALUES
+                      (1,14,150),
+                      (14,17,80),
+                      (17,2,150);
+
+INSERT INTO polaczenia (godzina_startu, id_harmonogramu, id_przewoznika)
+VALUES ('10:00:00', 1, 3);
+INSERT INTO stacje_posrednie VALUES
+                                 (19, 1,   0,   5, true, 1),   -- Warszawa Centralna
+                                 (19, 14, 60,  65, true, 1),   -- Radom
+                                 (19, 17,120, 125, true, 1),   -- Kielce
+                                 (19, 2, 180, 185, true, 1);   -- Kraków Główny
+
+INSERT INTO historia_polaczenia (id_polaczenia, data_od, data_do) VALUES
+    (19, '2023-01-01', '2026-12-31');
+INSERT INTO polaczenia_wagony (id_polaczenia, nr_wagonu, id_wagonu) VALUES
+                                                                        (19, 1, 1),
+                                                                        (19, 2, 1),
+                                                                        (19, 3, 2),
+                                                                        (19, 4, 3);
+INSERT INTO polaczenia (godzina_startu, id_harmonogramu, id_przewoznika)
+VALUES ('12:00:00', 1, 2);
+INSERT INTO stacje_posrednie VALUES
+                                 (20, 1,   0,   5, true, 1),   -- Warszawa Centralna
+                                 (20, 14, 60,  65, true, 1),   -- Radom
+                                 (20, 17,120, 125, true, 1),   -- Kielce
+                                 (20, 2, 180, 185, true, 1);   -- Kraków Główny
+
+INSERT INTO historia_polaczenia (id_polaczenia, data_od, data_do) VALUES
+    (20, '2023-01-01', '2026-12-31');
+INSERT INTO polaczenia_wagony (id_polaczenia, nr_wagonu, id_wagonu) VALUES
+                                                                        (20, 1, 1),
+                                                                        (20, 2, 1),
+                                                                        (20, 3, 2),
+                                                                        (20, 4, 3);
+
+INSERT INTO polaczenia (godzina_startu, id_harmonogramu, id_przewoznika)
+VALUES ('22:00:00', 1, 2);
+INSERT INTO stacje_posrednie VALUES
+                                 (21, 1,   0,   5, true, 1),   -- Warszawa Centralna
+                                 (21, 14, 60,  65, true, 1),   -- Radom
+                                 (21, 17,120, 125, true, 1),   -- Kielce
+                                 (21, 2, 180, 185, true, 1);   -- Kraków Główny
+
+INSERT INTO historia_polaczenia (id_polaczenia, data_od, data_do) VALUES
+    (21, '2023-01-01', '2026-12-31');
+INSERT INTO polaczenia_wagony (id_polaczenia, nr_wagonu, id_wagonu) VALUES
+                                                                        (21, 1, 1),
+                                                                        (21, 2, 1),
+                                                                        (21, 3, 2),
+                                                                        (21, 4, 3);
+
+
+
+
 
 
 insert into pasazerowie (imie, nazwisko, email) values ('Gregg', 'Parkeson', 'gparkeson0@digg.com');
@@ -2617,7 +2698,7 @@ insert into pasazerowie (imie, nazwisko, email) values ('Curtice', 'Andrieu', 'c
 insert into pasazerowie (imie, nazwisko, email) values ('Pauline', 'Torvey', 'ptorveyrq@salon.com');
 insert into pasazerowie (imie, nazwisko, email) values ('Isidore', 'Champneys', 'ichampneysrr@vinaora.com');
 insert into pasazerowie (imie, nazwisko, email) values ('Mieczysław', 'Zorro', 'tabaluga@vinaora.com');
-
+insert into pasazerowie (imie, nazwisko, email) values ('Oskar','Prusik','oskar.prusik@gmail.com');
 INSERT INTO swieta_stale (nazwa, dzien, miesiac) VALUES
 ('Nowy Rok', 1, 1),
 ('Święto Trzech Króli', 6, 1),

@@ -28,49 +28,6 @@ public class TicketChosingUlgiViewModel {
 
     public void setData(){
         mainHBox.getChildren().clear();
-        if( TicketFactory.getActualPrzeazd().getNumberOfPlacesOne() > 0) {
-            for (Place place : TicketFactory.getActualPrzeazd().getPlacesOne()) {
-                vbox11.getChildren().add(new Label( String.valueOf(place.getNr_miejsca())));
-                vbox12.getChildren().add(new Label( String.valueOf(place.getNr_wagonu())));
-                vbox13.getChildren().add(new Label( String.valueOf(place.getNr_przedzialu())));
-                ComboBox<UlgiTableEntry> cb = new ComboBox<>();
-                cb.setCellFactory(param -> new ListCell<UlgiTableEntry>() {
-                    @Override
-                    protected void updateItem(UlgiTableEntry item, boolean empty) {
-                        super.updateItem(item, empty);
-                        if (empty || item == null) {
-                            setText(null);
-                        } else {
-                            setText(item.getNazwa()); // Tylko nazwa
-                        }
-                    }
-                });
-                cb.setButtonCell(new ListCell<UlgiTableEntry>() {
-                    @Override
-                    protected void updateItem(UlgiTableEntry item, boolean empty) {
-                        super.updateItem(item, empty);
-                        if (empty || item == null) {
-                            setText("Wybierz ulgę");
-                            setStyle("");
-                        } else {
-                            setText(item.getNazwa());
-                            setStyle("-fx-font-weight: bold;");
-                        }
-                    }
-                });
-                cb.getSelectionModel().selectedIndexProperty().addListener((observable, oldValue, newValue) -> {
-                    place.setId_ulgi(cb.getSelectionModel().getSelectedItem().getId_ulgi());
-                });
-                cb.setPrefWidth(120);
-                cb.setMinWidth(120);
-                cb.setMaxWidth(120);
-                cb.getItems().addAll(DaoFactory.getUlgiDao().getUlgiTable());
-                cb.getSelectionModel().selectFirst();
-                vbox14.getChildren().add(cb);
-            }
-            System.out.println("Set data in ulgi One");
-            mainHBox.getChildren().add(vbox1scroll);
-        }
         if( TicketFactory.getActualPrzeazd().getNumberOfPlacesTwo() > 0) {
             for (Place place : TicketFactory.getActualPrzeazd().getPlacesTwo()) {
                 System.out.println("Set data in ulgi Two");
@@ -107,6 +64,11 @@ public class TicketChosingUlgiViewModel {
                 cb.setMaxWidth(120);
                 cb.getItems().addAll(DaoFactory.getUlgiDao().getUlgiTable());
                 cb.getSelectionModel().selectFirst();
+
+                cb.getSelectionModel().selectedItemProperty().addListener((obs, oldVal, newVal) -> {
+                    place.setId_ulgi(newVal.getId_ulgi());
+                });
+
                 vbox24.getChildren().add(cb);
             }
             mainHBox.getChildren().add(vbox2scroll);
