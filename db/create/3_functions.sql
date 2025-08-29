@@ -647,3 +647,55 @@ begin
     return;
 end;
 $$ language plpgsql;
+
+create or replace function dijkstra(stacja_startowa integer, stacja_koncowa integer, czas timestamp)
+    returns table(_prev_stacja integer, _next_stacja integer, _odjazd_prev timestamp, _przyjazd_curr timestamp, _id_polaczenia integer) as $$
+    declare
+        call_id uuid := gen_random_uuid();
+        curr record;
+        e record;
+        temp timestamp;
+    begin
+        create temp table if not exists p_q(function_call_id uuid, stacja_id integer, distance timestamp);
+        create temp table if not exists d(function_call_id uuid, stacja_id integer, distance timestamp);
+        create temp table if not exists prev(function_call_id uuid, prev_stacja integer, next_stacja integer, odjazd_prev timestamp, przyjazd_curr timestamp, id_polaczenia integer);
+
+        insert into p_q values (call_id, stacja_startowa, czas);
+        insert into d values (call_id, stacja_startowa, czas);
+
+        loop
+            select stacja_id, distance into curr from p_q order by distance desc limit 1;
+            exit when not found;
+            raise notice 'v(%, %)', curr.stacja_id, curr.distance;
+            delete from p_q where function_call_id = call_id and stacja_id = curr.stacja_id and distance = curr.distance;
+
+            for e in select * from get_edges(curr.stacja_id, curr.distance) loop
+                raise notice '   e(%, %, %)', e.next_station_id, e.departure_time, e.arrival_time;
+                select distance into temp from d where function_call_id = call_id and stacja_id = e.next_station_id limit 1;
+                temp := coalesce(temp, 'infinity'::timestamp);
+                if e.arrival_time < temp then
+                    insert into p_q values (call_id, e.next_station_id, e.arrival_time);
+                    insert into d values (call_id, e.next_station_id, e.arrival_time);
+                    insert into prev values (call_id, curr.stacja_id, e.next_station_id, e.departure_time, e.arrival_time, e.next_id_polaczenia);
+                end if;
+            end loop;
+
+        end loop;
+
+        FOR curr IN SELECT * FROM prev WHERE function_call_id = call_id LOOP
+                RAISE NOTICE 'prev row: prev=% next=% odjazd=% przyjazd=% id_polaczenia=%',
+                    curr.prev_stacja, curr.next_stacja, curr.odjazd_prev, curr.przyjazd_curr, curr.id_polaczenia;
+        end loop;
+
+        return query
+        with recursive route as(
+            select prev_stacja, next_stacja, odjazd_prev, przyjazd_curr, id_polaczenia
+            from prev where function_call_id = call_id and next_stacja = stacja_koncowa
+            union all
+            select p.prev_stacja, r.prev_stacja as next_stacja, p.odjazd_prev, p.przyjazd_curr, p.id_polaczenia
+            from prev p join route r on p.next_stacja = r.prev_stacja
+            where p.function_call_id = call_id
+        ) select * from route order by _odjazd_prev;
+
+    end;
+$$ language plpgsql;
