@@ -75,7 +75,7 @@ drop function if exists is_harmonogram_active(integer, date);
 
 drop function if exists swieto(date);
 
-drop function if exists is_poloczenie_active(integer, date);
+drop function if exists is_polaczenie_active(integer, date);
 
 drop function if exists get_timetable(integer, date);
 
