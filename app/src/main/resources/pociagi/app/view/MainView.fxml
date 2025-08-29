@@ -1,18 +1,29 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.scene.control.*?>
-<?import javafx.scene.layout.*?>
+<?import javafx.scene.control.Tab?>
+<?import javafx.scene.control.TabPane?>
+<?import javafx.scene.layout.AnchorPane?>
 
-<TabPane fx:controller="pociagi.app.viewmodel.MainViewModel" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" tabClosingPolicy="UNAVAILABLE" xmlns:fx="http://javafx.com/fxml/1" xmlns="http://javafx.com/javafx/17.0.12">
+<TabPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" tabClosingPolicy="UNAVAILABLE" xmlns="http://javafx.com/javafx/24.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="pociagi.app.viewmodel.MainViewModel">
   <tabs>
     <Tab fx:id="rozkladJazdy" text="Rozkład Jazdy">
       <content>
-          <fx:include fx:id="timetableView" source="TimetableView.fxml"/>
+          <fx:include fx:id="timetableView" source="TimetableView.fxml" />
       </content>
     </Tab>
     <Tab fx:id="wyszukiwarkaPolaczen" text="Wyszukiwarka połączeń">
       <content>
-          <fx:include fx:id="selectStartAndEndStationView" source="SelectStartAndEndStationView.fxml"/>
+          <fx:include fx:id="selectStartAndEndStationView" source="SelectStartAndEndStationView.fxml" />
+      </content>
+    </Tab>
+      <Tab fx:id="bilet" text="Bilet" >
+        <content>
+          <fx:include fx:id="loggingViewModel" source="Logging.fxml" />
+        </content>
+      </Tab>
+    <Tab fx:id="registration" text="Rejestracja" >
+      <content>
+        <fx:include fx:id="registrationViewModel" source="RegistrationView.fxml" />
       </content>
     </Tab>
   </tabs>

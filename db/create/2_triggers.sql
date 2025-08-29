@@ -111,10 +111,10 @@ BEGIN
         THEN RAISE EXCEPTION ''; END IF;
     IF swieto(NEW.data_odjazdu) = TRUE AND (SELECT czy_swieta FROM harmonogramy NATURAL JOIN polaczenia
         WHERE id_polaczenia = NEW.id_polaczenia) = FALSE THEN RAISE EXCEPTION ''; END IF;
-    stacja1 := (SELECT * FROM stacje_posrednie WHERE id_stacji = NEW.id_stacji_poczatkowej
-        AND id_polaczenia = NEW.id_polaczenia);
-    stacja2 := (SELECT * FROM stacje_posrednie WHERE id_stacji = NEW.id_stacji_koncowej
-        AND id_polaczenia = NEW.id_polaczenia);
+    SELECT * INTO stacja1 FROM stacje_posrednie WHERE id_stacji = NEW.id_stacji_poczatkowej
+        AND id_polaczenia = NEW.id_polaczenia;
+     SELECT * INTO stacja2 FROM stacje_posrednie WHERE id_stacji = NEW.id_stacji_koncowej
+        AND id_polaczenia = NEW.id_polaczenia;
     IF stacja1 IS NULL OR stacja2 IS NULL THEN RAISE EXCEPTION ''; END IF;
     IF stacja1.odjazd >= stacja2.przyjazd THEN RAISE EXCEPTION ''; END IF;
     RETURN NEW;
@@ -126,14 +126,15 @@ FOR EACH ROW EXECUTE PROCEDURE sprawdz_przejazd();
 
 -- Wagon i miejsce istnieje, miejsce jest wolne ca calej trasie przejazdu
 
-CREATE FUNCTION sprawdz_miejsce() RETURNS TRIGGER AS
+//DO POPrawy nie wiadomo co się dzieje
+/*CREATE FUNCTION sprawdz_miejsce() RETURNS TRIGGER AS
 $$
 BEGIN
     IF (SELECT COUNT(*) FROM polaczenia_wagony WHERE id_polaczenia = (SELECT id_polaczenia FROM przejazdy
         WHERE id_przejazdu = NEW.id_przejazdu) AND nr_wagonu = NEW.nr_wagonu) = 0 THEN RAISE EXCEPTION ''; END IF;
     IF (SELECT COUNT(*) FROM miejsca WHERE id_wagonu = (SELECT id_wagonu FROM polaczenia
         WHERE id_polaczenia = (SELECT id_polaczenia FROM przejazdy WHERE id_przejazdu = NEW.id_przejazdu)
-        AND nr_wagonu = NEW.nr_wagonu) AND nr_miejsca = NEW.nr_miejsca) = 0 THEN RAISE EXCEPTION ''; END IF;
+        /*AND nr_wagonu = NEW.nr_wagonu*/) AND nr_miejsca = NEW.nr_miejsca) = 0 THEN RAISE EXCEPTION ''; END IF;
     IF (SELECT COUNT(*) FROM bilety_miejsca bm WHERE (SELECT id_polaczenia, data_odjazdu FROM przejazdy
         WHERE id_przejazdu = bm.id_przejazdu) = (SELECT id_polaczenia, data_odjazdu FROM przejazdy
         WHERE id_przejazdu = NEW.id_przejazdu) AND nr_wagonu = NEW.nr_wagonu AND nr_miejsca = NEW.nr_miejsca
@@ -151,7 +152,7 @@ END;
 $$ LANGUAGE plpgsql;
 
 CREATE TRIGGER sprawdz_miejsce BEFORE INSERT ON bilety_miejsca
-FOR EACH ROW EXECUTE PROCEDURE sprawdz_miejsce();
+FOR EACH ROW EXECUTE PROCEDURE sprawdz_miejsce();*/
 
 -- Data istnieje
 
