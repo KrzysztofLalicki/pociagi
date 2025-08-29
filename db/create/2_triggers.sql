@@ -125,8 +125,7 @@ CREATE TRIGGER sprawdz_przejazd BEFORE INSERT ON przejazdy
 FOR EACH ROW EXECUTE PROCEDURE sprawdz_przejazd();
 
 -- Wagon i miejsce istnieje, miejsce jest wolne ca calej trasie przejazdu
-
-//DO POPrawy nie wiadomo co się dzieje
+--TODO: Do poprawy nie wiadomo co się dzieje
 /*CREATE FUNCTION sprawdz_miejsce() RETURNS TRIGGER AS
 $$
 BEGIN

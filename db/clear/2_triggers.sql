@@ -1,8 +1,8 @@
-DROP FUNCTION sprawdz_ceny CASCADE;
-DROP FUNCTION sprawdz_droge CASCADE;
-DROP FUNCTION sprawdz_przystanek CASCADE;
-DROP FUNCTION sprawdz_polaczenie CASCADE;
-DROP FUNCTION sprawdz_zwrot CASCADE;
-DROP FUNCTION sprawdz_przejazd CASCADE;
-DROP FUNCTION sprawdz_miejsce CASCADE;
-DROP FUNCTION sprawdz_date CASCADE;
+drop function if exists sprawdz_ceny cascade;
+drop function if exists sprawdz_droge cascade;
+drop function if exists sprawdz_przystanek cascade;
+drop function if exists sprawdz_polaczenie cascade;
+drop function if exists sprawdz_zwrot cascade;
+drop function if exists sprawdz_przejazd cascade;
+drop function if exists sprawdz_miejsce cascade;
+drop function if exists sprawdz_date cascade;

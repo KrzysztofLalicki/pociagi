@@ -311,7 +311,7 @@ INSERT INTO miejsca (nr_miejsca, id_wagonu, nr_przedzialu, czy_dla_niepelnospraw
 -- 1. TLK Warszawa - Kraków (PKP Intercity)
 BEGIN;
 INSERT INTO polaczenia (godzina_startu, id_harmonogramu, id_przewoznika) VALUES
-    ('06:00:00', 1, 1) RETURNING id_polaczenia;
+    ('06:00:00', 1, 1);
 INSERT INTO stacje_posrednie VALUES
                                  (1, 1, 0, 5, true, 1),     -- Warszawa Centralna
                                  (1, 46, 85, 85, false, 1),  -- Skierniewice
@@ -327,7 +327,7 @@ INSERT INTO polaczenia_wagony(id_polaczenia, nr_wagonu, id_wagonu) VALUES
 -- 2. IC Warszawa - Wrocław (PKP Intercity)
 BEGIN;
 INSERT INTO polaczenia (godzina_startu, id_harmonogramu, id_przewoznika) VALUES
-    ('07:30:00', 1, 1) RETURNING id_polaczenia;
+    ('07:30:00', 1, 1);
 INSERT INTO stacje_posrednie VALUES
                                  (2, 1, 0, 5, true, 1),     -- Warszawa Centralna
                                  (2, 3, 135, 135, false, 1), -- Łódź Fabryczna
@@ -341,7 +341,7 @@ INSERT INTO polaczenia_wagony(id_polaczenia, nr_wagonu, id_wagonu) VALUES
 -- 3. EIP Warszawa - Gdańsk (PKP Intercity)
 BEGIN;
 INSERT INTO polaczenia (godzina_startu, id_harmonogramu, id_przewoznika) VALUES
-    ('08:15:00', 1, 1) RETURNING id_polaczenia;
+    ('08:15:00', 1, 1);
 INSERT INTO stacje_posrednie VALUES
                                  (3, 1, 0, 5, true, 2),     -- Warszawa Centralna
                                  (3, 46, 85, 85, false, 1),  -- Skierniewice
@@ -356,7 +356,7 @@ INSERT INTO polaczenia_wagony(id_polaczenia, nr_wagonu, id_wagonu) VALUES
 -- 4. TLK Kraków - Warszawa (PKP Intercity)
 BEGIN;
 INSERT INTO polaczenia (godzina_startu, id_harmonogramu, id_przewoznika) VALUES
-    ('16:00:00', 1, 1) RETURNING id_polaczenia;
+    ('16:00:00', 1, 1);
 INSERT INTO stacje_posrednie VALUES
                                  (4, 2, 0, 5, true, 4),     -- Kraków Główny
                                  (4, 13, 120, 122, true, 2), -- Częstochowa Osobowa
@@ -372,7 +372,7 @@ INSERT INTO polaczenia_wagony(id_polaczenia, nr_wagonu, id_wagonu) VALUES
 -- 5. Warszawa - Łódź (PolRegio)
 BEGIN;
 INSERT INTO polaczenia (godzina_startu, id_harmonogramu, id_przewoznika) VALUES
-    ('05:30:00', 2, 2) RETURNING id_polaczenia;
+    ('05:30:00', 2, 2);
 INSERT INTO stacje_posrednie VALUES
                                  (5, 1, 0, 5, true, 3),     -- Warszawa Centralna
                                  (5, 46, 85, 85, false, 2),  -- Skierniewice
@@ -388,7 +388,7 @@ INSERT INTO polaczenia_wagony(id_polaczenia, nr_wagonu, id_wagonu) VALUES
 -- 6. Katowice - Kraków (PolRegio)
 BEGIN;
 INSERT INTO polaczenia (godzina_startu, id_harmonogramu, id_przewoznika) VALUES
-    ('06:45:00', 2, 2) RETURNING id_polaczenia;
+    ('06:45:00', 2, 2);
 INSERT INTO stacje_posrednie VALUES
                                  (6, 10, 0, 5, true, 4),    -- Katowice
                                  (6, 15, 15, 15, false, 2),  -- Sosnowiec Główny
@@ -402,7 +402,7 @@ INSERT INTO polaczenia_wagony(id_polaczenia, nr_wagonu, id_wagonu) VALUES
 -- 7. Warszawa - Skierniewice (Koleje Mazowieckie)
 BEGIN;
 INSERT INTO polaczenia (godzina_startu, id_harmonogramu, id_przewoznika) VALUES
-    ('06:00:00', 2, 3) RETURNING id_polaczenia;
+    ('06:00:00', 2, 3);
 INSERT INTO stacje_posrednie VALUES
                                  (7, 1, 0, 5, true, 5),     -- Warszawa Centralna
                                  (7, 102, 45, 45, false, 1),-- Łowicz Główny
@@ -416,7 +416,7 @@ INSERT INTO polaczenia_wagony(id_polaczenia, nr_wagonu, id_wagonu) VALUES
 -- 8. Gdańsk - Gdynia (SKM Trójmiasto)
 BEGIN;
 INSERT INTO polaczenia (godzina_startu, id_harmonogramu, id_przewoznika) VALUES
-    ('05:45:00', 1, 4) RETURNING id_polaczenia;
+    ('05:45:00', 1, 4);
 INSERT INTO stacje_posrednie VALUES
                                  (8, 6, 0, 5, true, 3),     -- Gdańsk Główny
                                  (8, 74, 15, 15, false, 1),  -- Tczew
@@ -431,7 +431,7 @@ INSERT INTO polaczenia_wagony(id_polaczenia, nr_wagonu, id_wagonu) VALUES
 -- 9. Wrocław - Wałbrzych (Koleje Dolnośląskie)
 BEGIN;
 INSERT INTO polaczenia (godzina_startu, id_harmonogramu, id_przewoznika) VALUES
-    ('06:20:00', 2, 5) RETURNING id_polaczenia;
+    ('06:20:00', 2, 5);
 INSERT INTO stacje_posrednie VALUES
                                  (9, 4, 0, 5, true, 2),     -- Wrocław Główny
                                  (9, 56, 30, 30, false, 1),  -- Głogów
@@ -445,7 +445,7 @@ INSERT INTO polaczenia_wagony(id_polaczenia, nr_wagonu, id_wagonu) VALUES
 -- 10. Katowice - Żory (PolRegio - Śląsk)
 BEGIN;
 INSERT INTO polaczenia (godzina_startu, id_harmonogramu, id_przewoznika) VALUES
-    ('08:00:00', 2, 2) RETURNING id_polaczenia;
+    ('08:00:00', 2, 2);
 INSERT INTO stacje_posrednie VALUES
                                  (10, 10, 0, 5, true, 3),    -- Katowice
                                  (10, 23, 20, 25, true, 1),   -- Bytom
@@ -466,7 +466,7 @@ INSERT INTO polaczenia_wagony(id_polaczenia, nr_wagonu, id_wagonu) VALUES
 -- 11. Warszawa - Kozienice (Koleje Mazowieckie)
 BEGIN;
 INSERT INTO polaczenia (godzina_startu, id_harmonogramu, id_przewoznika) VALUES
-    ('09:00:00', 1, 3) RETURNING id_polaczenia;
+    ('09:00:00', 1, 3);
 INSERT INTO stacje_posrednie VALUES
                                  (11, 1, 0, 5, true, 4),     -- Warszawa Centralna
                                  (11, 31, 65, 70, true, 1),  -- Płock
@@ -487,7 +487,7 @@ INSERT INTO polaczenia_wagony(id_polaczenia, nr_wagonu, id_wagonu) VALUES
 -- 12. Gdańsk - Mrągowo (PolRegio - Pomorze/Warmia)
 BEGIN;
 INSERT INTO polaczenia (godzina_startu, id_harmonogramu, id_przewoznika) VALUES
-    ('10:00:00', 1, 2) RETURNING id_polaczenia;
+    ('10:00:00', 1, 2);
 INSERT INTO stacje_posrednie VALUES
                                  (12, 6, 0, 5, true, 3),     -- Gdańsk Główny
                                  (12, 32, 50, 55, true, 1),  -- Elbląg
@@ -505,7 +505,7 @@ INSERT INTO polaczenia_wagony(id_polaczenia, nr_wagonu, id_wagonu) VALUES
 -- 13. Wrocław - Brzeg (Koleje Dolnośląskie)
 BEGIN;
 INSERT INTO polaczenia (godzina_startu, id_harmonogramu, id_przewoznika) VALUES
-    ('11:00:00', 2, 5) RETURNING id_polaczenia;
+    ('11:00:00', 2, 5);
 INSERT INTO stacje_posrednie VALUES
                                  (13, 4, 0, 5, true, 2),     -- Wrocław Główny
                                  (13, 43, 60, 65, true, 1),  -- Jelenia Góra
@@ -523,7 +523,7 @@ INSERT INTO polaczenia_wagony(id_polaczenia, nr_wagonu, id_wagonu) VALUES
 -- 14. Poznań - Kutno (PolRegio - Wielkopolska)
 BEGIN;
 INSERT INTO polaczenia (godzina_startu, id_harmonogramu, id_przewoznika) VALUES
-    ('12:00:00', 1, 2) RETURNING id_polaczenia;
+    ('12:00:00', 1, 2);
 INSERT INTO stacje_posrednie VALUES
                                  (14, 5, 0, 5, true, 3),     -- Poznań Główny
                                  (14, 37, 50, 55, true, 1),  -- Kalisz
@@ -540,7 +540,7 @@ INSERT INTO polaczenia_wagony(id_polaczenia, nr_wagonu, id_wagonu) VALUES
 -- 15. Warszawa - Sokołów Podlaski (PolRegio - Podlasie)
 BEGIN;
 INSERT INTO polaczenia (godzina_startu, id_harmonogramu, id_przewoznika) VALUES
-    ('13:00:00', 1, 2) RETURNING id_polaczenia;
+    ('13:00:00', 1, 2);
 INSERT INTO stacje_posrednie VALUES
                                  (15, 1, 0, 5, true, 5),     -- Warszawa Centralna
                                  (15, 48, 60, 65, true, 1),  -- Siedlce
@@ -560,7 +560,7 @@ INSERT INTO polaczenia_wagony(id_polaczenia, nr_wagonu, id_wagonu) VALUES
 -- 16. Bydgoszcz - Złotów (PolRegio - Kujawy/Pomorze)
 BEGIN;
 INSERT INTO polaczenia (godzina_startu, id_harmonogramu, id_przewoznika) VALUES
-    ('14:00:00', 2, 2) RETURNING id_polaczenia;
+    ('14:00:00', 2, 2);
 INSERT INTO stacje_posrednie VALUES
                                  (16, 8, 0, 5, true, 2),     -- Bydgoszcz Główna
                                  (16, 39, 40, 45, true, 1),  -- Grudziądz
@@ -578,7 +578,7 @@ INSERT INTO polaczenia_wagony(id_polaczenia, nr_wagonu, id_wagonu) VALUES
 -- 17. Rzeszów - Starachowice (PolRegio - Podkarpacie)
 BEGIN;
 INSERT INTO polaczenia (godzina_startu, id_harmonogramu, id_przewoznika) VALUES
-    ('15:00:00', 1, 2) RETURNING id_polaczenia;
+    ('15:00:00', 1, 2);
 INSERT INTO stacje_posrednie VALUES
                                  (17, 18, 0, 5, true, 3),    -- Rzeszów Główny
                                  (17, 65, 50, 55, true, 1),  -- Przemyśl Główny

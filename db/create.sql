@@ -149,7 +149,6 @@ CREATE TABLE daty_swiat (
 COMMIT;
 -- 2_triggers.sql
 -- Okresy obowiazywania cennikow sa parami rozlaczne
--- Okresy obowiazywania cennikow sa parami rozlaczne
 
 CREATE FUNCTION sprawdz_ceny() RETURNS TRIGGER AS
 $$
@@ -172,22 +171,22 @@ DECLARE
     nastepna RECORD;
 BEGIN
     SELECT id_stacji, przyjazd INTO poprzednia FROM stacje_posrednie WHERE id_polaczenia = NEW.id_polaczenia
-    ORDER BY przyjazd LIMIT 1;
+        ORDER BY przyjazd LIMIT 1;
     LOOP
         SELECT id_stacji, przyjazd INTO nastepna FROM stacje_posrednie WHERE id_polaczenia = NEW.id_polaczenia
-                                                                         AND przyjazd > poprzednia.przyjazd ORDER BY przyjazd LIMIT 1;
+            AND przyjazd > poprzednia.przyjazd ORDER BY przyjazd LIMIT 1;
         IF nastepna IS NULL THEN RETURN NEW; END IF;
         IF (SELECT COUNT(*) FROM linie WHERE (stacja1 = poprzednia.id_stacji AND stacja2 = nastepna.id_stacji)
-                                          OR (stacja1 = nastepna.id_stacji AND stacja2 = poprzednia.id_stacji)) = 0 THEN DELETE FROM stacje_posrednie
-                                                                                                                         WHERE id_polaczenia = NEW.id_polaczenia; DELETE FROM polaczenia WHERE id_polaczenia = NEW.id_polaczenia;
-        RAISE EXCEPTION ''; END IF;
+            OR (stacja1 = nastepna.id_stacji AND stacja2 = poprzednia.id_stacji)) = 0 THEN DELETE FROM stacje_posrednie
+            WHERE id_polaczenia = NEW.id_polaczenia; DELETE FROM polaczenia WHERE id_polaczenia = NEW.id_polaczenia;
+            RAISE EXCEPTION ''; END IF;
         poprzednia := nastepna;
     END LOOP;
 END;
 $$ LANGUAGE plpgsql;
 
 CREATE CONSTRAINT TRIGGER sprawdz_droge AFTER INSERT ON polaczenia DEFERRABLE INITIALLY DEFERRED
-    FOR EACH ROW EXECUTE PROCEDURE sprawdz_droge();
+FOR EACH ROW EXECUTE PROCEDURE sprawdz_droge();
 
 -- Pociag na nieistniejacym torze, dwa pociagi na jednym torze, jeden pociag na dwoch stacjach
 
@@ -195,10 +194,10 @@ CREATE OR REPLACE FUNCTION sprawdz_przystanek() RETURNS TRIGGER AS
 $$
 BEGIN
     IF NEW.tor > (SELECT tory FROM stacje WHERE id_stacji = NEW.id_stacji) THEN RAISE EXCEPTION ''; END IF;
-    --     IF (SELECT COUNT(*) FROM stacje_posrednie WHERE tor = NEW.tor AND przyjazd < NEW.odjazd
+--     IF (SELECT COUNT(*) FROM stacje_posrednie WHERE tor = NEW.tor AND przyjazd < NEW.odjazd
 --         AND odjazd > NEW.przyjazd) > 0 THEN RAISE EXCEPTION ''; END IF;
     IF (SELECT COUNT(*) FROM stacje_posrednie WHERE id_polaczenia = NEW.id_polaczenia AND (przyjazd <= NEW.odjazd)
-                                                AND (odjazd >= NEW.przyjazd)) > 0 THEN RAISE EXCEPTION ''; END IF;
+        AND (odjazd >= NEW.przyjazd)) > 0 THEN RAISE EXCEPTION ''; END IF;
     RETURN NEW;
 END;
 $$ LANGUAGE plpgsql;
@@ -215,12 +214,12 @@ DECLARE
     okres RECORD;
 BEGIN
     IF (SELECT COUNT(*) FROM historia_polaczenia WHERE id_polaczenia = NEW.id_polaczenia
-                                                   AND data_od <= NEW.data_do AND data_do >= NEW.data_od) > 0 THEN RAISE EXCEPTION ''; END IF;
+        AND data_od <= NEW.data_do AND data_do >= NEW.data_od) > 0 THEN RAISE EXCEPTION ''; END IF;
     data := NEW.data_od;
     LOOP
         SELECT data_od, data_do INTO okres FROM historia_cen WHERE id_przewoznika = (SELECT id_przewoznika
-                                                                                     FROM polaczenia WHERE id_polaczenia = NEW.id_polaczenia) AND data_do > data ORDER BY data_od
-        LIMIT 1;
+            FROM polaczenia WHERE id_polaczenia = NEW.id_polaczenia) AND data_do > data ORDER BY data_od
+            LIMIT 1;
         IF okres.data_od > data + 1 THEN RAISE EXCEPTION ''; END IF;
         data := okres.data_do;
         IF data >= NEW.data_do THEN RETURN NEW; END IF;
@@ -229,7 +228,7 @@ END;
 $$ LANGUAGE plpgsql;
 
 CREATE TRIGGER sprawdz_polaczenie BEFORE INSERT ON historia_polaczenia
-    FOR EACH ROW EXECUTE PROCEDURE sprawdz_polaczenie();
+FOR EACH ROW EXECUTE PROCEDURE sprawdz_polaczenie();
 
 -- Zwrot biletu przed odjazdem
 
@@ -254,18 +253,18 @@ DECLARE
     stacja2 RECORD;
 BEGIN
     IF NEW.data_odjazdu < (SELECT data_zakupu FROM bilety WHERE id_biletu = NEW.id_biletu)
-    THEN RAISE EXCEPTION ''; END IF;
+        THEN RAISE EXCEPTION ''; END IF;
     IF (SELECT COUNT(*) FROM historia_polaczenia WHERE id_polaczenia = NEW.id_polaczenia
-                                                   AND data_od <= NEW.data_odjazdu AND data_do >= NEW.data_odjazdu) = 0 THEN RAISE EXCEPTION ''; END IF;
+        AND data_od <= NEW.data_odjazdu AND data_do >= NEW.data_odjazdu) = 0 THEN RAISE EXCEPTION ''; END IF;
     IF swieto(NEW.data_odjazdu) = FALSE AND (SELECT czy_tydzien[extract('day' FROM NEW.data_odjazdu) + 1]
-                                             FROM harmonogramy NATURAL JOIN polaczenia WHERE id_polaczenia = NEW.id_polaczenia) = FALSE
-    THEN RAISE EXCEPTION ''; END IF;
+        FROM harmonogramy NATURAL JOIN polaczenia WHERE id_polaczenia = NEW.id_polaczenia) = FALSE
+        THEN RAISE EXCEPTION ''; END IF;
     IF swieto(NEW.data_odjazdu) = TRUE AND (SELECT czy_swieta FROM harmonogramy NATURAL JOIN polaczenia
-                                            WHERE id_polaczenia = NEW.id_polaczenia) = FALSE THEN RAISE EXCEPTION ''; END IF;
+        WHERE id_polaczenia = NEW.id_polaczenia) = FALSE THEN RAISE EXCEPTION ''; END IF;
     SELECT * INTO stacja1 FROM stacje_posrednie WHERE id_stacji = NEW.id_stacji_poczatkowej
-                                                  AND id_polaczenia = NEW.id_polaczenia;
-    SELECT * INTO stacja2 FROM stacje_posrednie WHERE id_stacji = NEW.id_stacji_koncowej
-                                                  AND id_polaczenia = NEW.id_polaczenia;
+        AND id_polaczenia = NEW.id_polaczenia;
+     SELECT * INTO stacja2 FROM stacje_posrednie WHERE id_stacji = NEW.id_stacji_koncowej
+        AND id_polaczenia = NEW.id_polaczenia;
     IF stacja1 IS NULL OR stacja2 IS NULL THEN RAISE EXCEPTION ''; END IF;
     IF stacja1.odjazd >= stacja2.przyjazd THEN RAISE EXCEPTION ''; END IF;
     RETURN NEW;
@@ -273,11 +272,10 @@ END;
 $$ LANGUAGE plpgsql;
 
 CREATE TRIGGER sprawdz_przejazd BEFORE INSERT ON przejazdy
-    FOR EACH ROW EXECUTE PROCEDURE sprawdz_przejazd();
+FOR EACH ROW EXECUTE PROCEDURE sprawdz_przejazd();
 
 -- Wagon i miejsce istnieje, miejsce jest wolne ca calej trasie przejazdu
-
---DO POPrawy nie wiadomo co się dzieje
+--TODO: Do poprawy nie wiadomo co się dzieje
 /*CREATE FUNCTION sprawdz_miejsce() RETURNS TRIGGER AS
 $$
 BEGIN
@@ -317,7 +315,7 @@ END;
 $$ LANGUAGE plpgsql;
 
 CREATE TRIGGER sprawdz_date BEFORE INSERT ON swieta_stale
-    FOR EACH ROW EXECUTE PROCEDURE sprawdz_date();
+FOR EACH ROW EXECUTE PROCEDURE sprawdz_date();
 
 -- 3_functions.sql
 
@@ -551,14 +549,14 @@ END;
 $$ LANGUAGE plpgsql;
 
 CREATE OR REPLACE FUNCTION wszystkie_miejsca_polaczenie(id_pol INTEGER)
-    RETURNS TABLE(nr_wagonu INTEGER,nr_miejsca INTEGER, nr_przedzialu INTEGER, KLASA INTEGER, czy_dla_niepelnosprawnych BOOLEAN, czy_dla_rowerow BOOLEAN ) AS $$
-BEGIN
-    RETURN QUERY SELECT pw.nr_wagonu, m.nr_miejsca, p.nr_przedzialu, p.klasa, m.czy_dla_niepelnosprawnych, m.czy_dla_rowerow FROM polaczenia_wagony pw
-                                                                                                                                      JOIN wagony w ON pw.id_wagonu = w.id_wagonu
-                                                                                                                                      JOIN miejsca m ON w.id_wagonu = m.id_wagonu
-                                                                                                                                      JOIN przedzialy p ON m.nr_przedzialu = p.nr_przedzialu and m.id_wagonu = p.id_wagonu
-                 WHERE pw.id_polaczenia = id_pol ORDER BY nr_wagonu,nr_przedzialu,nr_miejsca;
-END;
+RETURNS TABLE(nr_wagonu INTEGER,nr_miejsca INTEGER, nr_przedzialu INTEGER, KLASA INTEGER, czy_dla_niepelnosprawnych BOOLEAN, czy_dla_rowerow BOOLEAN ) AS $$
+    BEGIN
+        RETURN QUERY SELECT pw.nr_wagonu, m.nr_miejsca, p.nr_przedzialu, p.klasa, m.czy_dla_niepelnosprawnych, m.czy_dla_rowerow FROM polaczenia_wagony pw
+            JOIN wagony w ON pw.id_wagonu = w.id_wagonu
+            JOIN miejsca m ON w.id_wagonu = m.id_wagonu
+            JOIN przedzialy p ON m.nr_przedzialu = p.nr_przedzialu and m.id_wagonu = p.id_wagonu
+            WHERE pw.id_polaczenia = id_pol ORDER BY nr_wagonu,nr_przedzialu,nr_miejsca;
+    END;
 $$ LANGUAGE plpgsql;
 
 
@@ -613,12 +611,12 @@ CREATE OR REPLACE FUNCTION wszystkie_wolne_dla_polaczenia_dla_klasy(
     id_stacji_koniec INTEGER,
     klasa_miejsca INTEGER
 ) RETURNS TABLE(nr_wagonu INTEGER,nr_miejsca INTEGER, nr_przedzialu INTEGER, klasa INTEGER, czy_dla_niepelnosprawnych BOOLEAN,
-                czy_dla_rowerow BOOLEAN) AS $$
-BEGIN
-    RETURN QUERY SELECT * FROM wszystkie_miejsca_polaczenie(id_pol) m WHERE
-        czy_miejsce_wolne(id_pol,dzien_odjazdu,id_stacji_start,id_stacji_koniec,m.nr_miejsca,m.nr_wagonu)
-                                                                        AND m.klasa = klasa_miejsca;
-END;
+    czy_dla_rowerow BOOLEAN) AS $$
+    BEGIN
+        RETURN QUERY SELECT * FROM wszystkie_miejsca_polaczenie(id_pol) m WHERE
+        czy_miejsce_wolne(id_pol,dzien_odjazdu,id_stacji_start,id_stacji_koniec,m.nr_wagonu,m.nr_miejsca)
+        AND m.klasa = klasa_miejsca;
+    END;
 $$ LANGUAGE plpgsql;
 
 
@@ -629,7 +627,7 @@ $$ LANGUAGE plpgsql;
 --to jest debesciak ostateczna funkcja szukająca połączen pewnie jeszcze beda modyfikacje zeby nie było problemu jeśli będzie 23
 
 CREATE OR REPLACE FUNCTION czas_trasy(id_pol INTEGER, id_stacji_start INTEGER, id_stacji_koniec INTEGER)
-    RETURNS TIME AS $$
+RETURNS TIME AS $$
 DECLARE
     czas_odjazdu INTEGER;
     czas_przyjazdu INTEGER;
@@ -643,29 +641,29 @@ $$ LANGUAGE plpgsql;
 
 
 CREATE OR REPLACE FUNCTION koszt_przejazdu(liczba_osob INTEGER, czy_dla_rowerow BOOLEAN, id_pol INTEGER, id_stacji_start INTEGER, id_stacji_koniec INTEGER, klasa integer, data DATE)
-    RETURNS NUMERIC(8,2) AS $$
+RETURNS NUMERIC(8,2) AS $$
 DECLARE
     koszt_km NUMERIC(8,2);
     koszt_rower NUMERIC(8,2) = 0;
-BEGIN
+    BEGIN
     IF czy_dla_rowerow  THEN
         SELECT cena_za_rower INTO koszt_rower FROM polaczenia p JOIN przewoznicy pw ON pw.id_przewoznika = p.id_przewoznika
-                                                                JOIN historia_cen h ON h.id_przewoznika = pw.id_przewoznika WHERE ((data BETWEEN h.data_od AND h.data_do) OR
-                                                                                                                                   (h.data_do IS NULL AND data >= h.data_od)) AND p.id_polaczenia = id_pol;
+        JOIN historia_cen h ON h.id_przewoznika = pw.id_przewoznika WHERE ((data BETWEEN h.data_od AND h.data_do) OR
+            (h.data_do IS NULL AND data >= h.data_od)) AND p.id_polaczenia = id_pol;
     END IF;
     IF klasa = 1 THEN
         SELECT cena_za_km_kl1 INTO koszt_km FROM polaczenia p JOIN przewoznicy pw ON pw.id_przewoznika = p.id_przewoznika
-                                                              JOIN historia_cen h ON h.id_przewoznika = pw.id_przewoznika WHERE ((data BETWEEN h.data_od AND h.data_do) OR
-                                                                                                                                 (h.data_do IS NULL AND data >= h.data_od)) AND p.id_polaczenia = id_pol;
+        JOIN historia_cen h ON h.id_przewoznika = pw.id_przewoznika WHERE ((data BETWEEN h.data_od AND h.data_do) OR
+        (h.data_do IS NULL AND data >= h.data_od)) AND p.id_polaczenia = id_pol;
     ELSE
         SELECT cena_za_km_kl2 INTO koszt_km FROM polaczenia p JOIN przewoznicy pw ON pw.id_przewoznika = p.id_przewoznika
-                                                              JOIN historia_cen h ON h.id_przewoznika = pw.id_przewoznika WHERE ((data BETWEEN h.data_od AND h.data_do) OR
-                                                                                                                                 (h.data_do IS NULL AND data >= h.data_od)) AND p.id_polaczenia = id_pol;
+        JOIN historia_cen h ON h.id_przewoznika = pw.id_przewoznika WHERE ((data BETWEEN h.data_od AND h.data_do) OR
+            (h.data_do IS NULL AND data >= h.data_od)) AND p.id_polaczenia = id_pol;
     end if;
-    RETURN liczba_osob * dlugosc_drogi(id_pol,id_stacji_start,id_stacji_koniec) * koszt_km + liczba_osob * koszt_rower;
+        RETURN liczba_osob * dlugosc_drogi(id_pol,id_stacji_start,id_stacji_koniec) * koszt_km + liczba_osob * koszt_rower;
 
 
-END;
+    END;
 $$ LANGUAGE plpgsql;
 
 CREATE OR REPLACE FUNCTION szukaj_polaczenia(
@@ -683,40 +681,40 @@ BEGIN
     SELECT id_stacji INTO id_stacji_start FROM stacje WHERE nazwa ILIKE stacja1;
     SELECT id_stacji INTO id_stacji_koniec FROM stacje WHERE nazwa ILIKE stacja2;
     IF(godzina < '18:00:00') THEN
-        RETURN QUERY
-            SELECT
-                p.id_polaczenia,
-                start.nazwa AS stacja_start,
-                koniec.nazwa AS stacja_koniec,
-                dzien_szukania AS data_odjazdu,
-                p.godzina_startu,
-                czas_trasy(p.id_polaczenia,id_stacji_start,id_stacji_koniec),
-                koszt_przejazdu(liczba_miejsc_klasa1,false,p.id_polaczenia,id_stacji_start,id_stacji_koniec,1,dzien_szukania) +
-                koszt_przejazdu(liczba_miejsc_klasa2,false,p.id_polaczenia,id_stacji_start,id_stacji_koniec,2,dzien_szukania)
-            FROM
-                dostepne_polaczenia_dzien_aktualnosc(id_stacji_start, id_stacji_koniec, dzien_szukania) p
-                    JOIN
-                stacje start ON start.id_stacji = id_stacji_start
-                    JOIN
-                stacje koniec ON koniec.id_stacji = id_stacji_koniec
-            WHERE
-                (SELECT COUNT(*)
-                 FROM wszystkie_wolne_dla_polaczenia_dla_klasy(p.id_polaczenia, dzien_szukania, id_stacji_start, id_stacji_koniec,1))
-                    >= liczba_miejsc_klasa1
-              AND
-                (SELECT COUNT(*)
-                 FROM wszystkie_wolne_dla_polaczenia_dla_klasy(p.id_polaczenia, dzien_szukania, id_stacji_start, id_stacji_koniec,2)
-                ) >= liczba_miejsc_klasa2
-              AND
-                p.godzina_startu >= godzina
-            ORDER BY p.godzina_startu;
+    RETURN QUERY
+        SELECT
+            p.id_polaczenia,
+            start.nazwa AS stacja_start,
+            koniec.nazwa AS stacja_koniec,
+            dzien_szukania AS data_odjazdu,
+            p.godzina_startu,
+            czas_trasy(p.id_polaczenia,id_stacji_start,id_stacji_koniec),
+            koszt_przejazdu(liczba_miejsc_klasa1,false,p.id_polaczenia,id_stacji_start,id_stacji_koniec,1,dzien_szukania) +
+            koszt_przejazdu(liczba_miejsc_klasa2,false,p.id_polaczenia,id_stacji_start,id_stacji_koniec,2,dzien_szukania)
+        FROM
+            dostepne_polaczenia_dzien_aktualnosc(id_stacji_start, id_stacji_koniec, dzien_szukania) p
+                JOIN
+            stacje start ON start.id_stacji = id_stacji_start
+                JOIN
+            stacje koniec ON koniec.id_stacji = id_stacji_koniec
+        WHERE
+            (SELECT COUNT(*)
+             FROM wszystkie_wolne_dla_polaczenia_dla_klasy(p.id_polaczenia, dzien_szukania, id_stacji_start, id_stacji_koniec,1))
+                >= liczba_miejsc_klasa1
+          AND
+            (SELECT COUNT(*)
+             FROM wszystkie_wolne_dla_polaczenia_dla_klasy(p.id_polaczenia, dzien_szukania, id_stacji_start, id_stacji_koniec,2)
+            ) >= liczba_miejsc_klasa2
+            AND
+            p.godzina_startu >= godzina
+        ORDER BY p.godzina_startu;
     ELSE
         RETURN QUERY
             SELECT
-                p.id_polaczenia,
+                 p.id_polaczenia,
                 start.nazwa AS stacja_start,
                 koniec.nazwa AS stacja_koniec,
-                dzien_szukania AS data_odjazdu,
+                 dzien_szukania AS data_odjazdu,
                 p.godzina_startu,
                 czas_trasy(p.id_polaczenia,id_stacji_start,id_stacji_koniec),
                 koszt_przejazdu(liczba_miejsc_klasa1,false,p.id_polaczenia,id_stacji_start,id_stacji_koniec,1,dzien_szukania) +
@@ -741,14 +739,14 @@ BEGIN
 
         Return QUERY
             SELECT
-                p.id_polaczenia,
+                 p.id_polaczenia,
                 start.nazwa AS stacja_start,
                 koniec.nazwa AS stacja_koniec,
                 dzien_szukania + 1 AS data_odjazdu,
                 p.godzina_startu,
                 czas_trasy(p.id_polaczenia,id_stacji_start,id_stacji_koniec),
                 koszt_przejazdu(liczba_miejsc_klasa1,false,p.id_polaczenia,id_stacji_start,id_stacji_koniec,1,dzien_szukania + 1) +
-                koszt_przejazdu(liczba_miejsc_klasa2,false,p.id_polaczenia,id_stacji_start,id_stacji_koniec,2,dzien_szukania + 1)
+                 koszt_przejazdu(liczba_miejsc_klasa2,false,p.id_polaczenia,id_stacji_start,id_stacji_koniec,2,dzien_szukania + 1)
             FROM
                 dostepne_polaczenia_dzien_aktualnosc(id_stacji_start, id_stacji_koniec, dzien_szukania + 1) p
                     JOIN
@@ -763,22 +761,22 @@ BEGIN
                 (SELECT COUNT(*)
                  FROM wszystkie_wolne_dla_polaczenia_dla_klasy(p.id_polaczenia, dzien_szukania + 1, id_stacji_start, id_stacji_koniec,2)
                 ) >= liczba_miejsc_klasa2
-              AND p.godzina_startu < '18:00:00'
+            AND p.godzina_startu < '18:00:00'
             ORDER BY p.godzina_startu;
     END IF;
 END;
 $$ LANGUAGE plpgsql;
 
 create or replace function godzina_odjazdu(id integer, id_s integer)
-    RETURNS TIME AS $$
-DECLARE
-    MINUTY INTEGER;
-    poczatek TIME;
-BEGIN
-    SELECT odjazd INTO minuty FROM stacje_posrednie WHERE id_polaczenia = id AND id_stacji = id_s;
-    SELECT godzina_startu INTO poczatek FROM polaczenia where id_polaczenia = id;
-    RETURN poczatek + (minuty * INTERVAL '1 minute');
-end;
+RETURNS TIME AS $$
+    DECLARE
+        MINUTY INTEGER;
+        poczatek TIME;
+    BEGIN
+        SELECT odjazd INTO minuty FROM stacje_posrednie WHERE id_polaczenia = id AND id_stacji = id_s;
+        SELECT godzina_startu INTO poczatek FROM polaczenia where id_polaczenia = id;
+        RETURN poczatek + (minuty * INTERVAL '1 minute');
+    end;
 $$ LANGUAGE plpgsql;
 
 create or replace function czy_do_zwrotu(bilet integer)
@@ -811,14 +809,14 @@ $$ language plpgsql;
 create or replace function wszystkie_bilety(
     user_id INTEGER
 )
-    RETURNS TABLE (id_biletu INTEGER, data_odjazdu DATE, godzina_odjazdu TIME, data_zwrotu DATE, czy_mozna_zwrocic BOOLEAN) AS $$
-BEGIN
-    RETURN QUERY
+RETURNS TABLE (id_biletu INTEGER, data_odjazdu DATE, godzina_odjazdu TIME, data_zwrotu DATE, czy_mozna_zwrocic BOOLEAN) AS $$
+    BEGIN
+        RETURN QUERY
         SELECT b.id_biletu, p.data_odjazdu, godzina_odjazdu(p.id_polaczenia,p.id_stacji_poczatkowej), b.data_zwrotu, czy_do_zwrotu(b.id_biletu) FROM bilety b JOIN przejazdy p ON b.id_biletu = p.id_biletu
-                                                                                                                                                              Join polaczenia p2 ON p.id_polaczenia = p2.id_polaczenia WHERE p.id_przejazdu = (SELECT k.id_przejazdu FROM przejazdy k JOIN polaczenia k2 ON k.id_polaczenia = k2.id_polaczenia
-                                                                                                                                                                                                                                               WHERE k.id_biletu = b.id_biletu ORDER BY k.data_odjazdu, godzina_odjazdu(k.id_polaczenia,k.id_stacji_poczatkowej) LIMIT 1)
-                                                                                                                                                                                                                         AND b.id_pasazera = user_id ORDER BY 2 DESC,3 DESC;
-end;
+            Join polaczenia p2 ON p.id_polaczenia = p2.id_polaczenia WHERE p.id_przejazdu = (SELECT k.id_przejazdu FROM przejazdy k JOIN polaczenia k2 ON k.id_polaczenia = k2.id_polaczenia
+            WHERE k.id_biletu = b.id_biletu ORDER BY k.data_odjazdu, godzina_odjazdu(k.id_polaczenia,k.id_stacji_poczatkowej) LIMIT 1)
+            AND b.id_pasazera = user_id ORDER BY 2 DESC,3 DESC;
+    end;
 $$ LANGUAGE plpgsql;
 
 
@@ -865,7 +863,7 @@ BEGIN
                 pasujace_dni := pasujace_dni || "current_date";
             END IF;
 
-            "current_date" := "current_date" + INTERVAL '1 day';
+                    "current_date" := "current_date" + INTERVAL '1 day';
         END LOOP;
 
     IF array_length(pasujace_dni, 1) IS NULL THEN
@@ -953,7 +951,7 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
-CREATE OR REPLACE FUNCTION is_poloczenie_active(id INTEGER, data DATE)
+CREATE OR REPLACE FUNCTION is_polaczenie_active(id INTEGER, data DATE)
     RETURNS BOOLEAN AS $$
 DECLARE
     id_harmonogram INTEGER := (SELECT id_harmonogramu FROM polaczenia WHERE id_polaczenia = id);
@@ -978,7 +976,7 @@ BEGIN
                             WHEN id_stac = id_stac_koniec THEN NULL
                             ELSE oblicz_godzine_odjazdu(id_stac,id_pol)
                             END
-                 FROM polaczenia_wraz_z_dana_stacja(id_stac) WHERE is_poloczenie_active(id_pol,data);
+                 FROM polaczenia_wraz_z_dana_stacja(id_stac) WHERE is_polaczenie_active(id_pol,data);
 
 END;
 $$ LANGUAGE plpgsql;
@@ -1029,6 +1027,98 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
+
+
+
+create or replace function get_edges(station_id integer, search_start timestamp)
+    returns table(next_station_id integer, departure_time timestamp, arrival_time timestamp, next_id_polaczenia integer) as $$
+declare
+    MAX_CZAS_PRZESIADKI interval = '8 hours';
+    _polaczenie record;
+begin
+    for _polaczenie in
+        select p.id_polaczenia, search_start::date + p.godzina_startu as czas_startu_polaczenia, search_start::date + p.godzina_startu + s_p.odjazd * '1 minute'::interval as czas_odjazdu
+        from stacje_posrednie s_p
+        join polaczenia p on s_p.id_polaczenia = p.id_polaczenia
+        where s_p.id_stacji = station_id  and is_polaczenie_active(p.id_polaczenia, search_start::date) and s_p.zatrzymanie
+          and search_start::date + p.godzina_startu + s_p.odjazd * '1 minute'::interval between search_start and search_start + MAX_CZAS_PRZESIADKI
+    loop
+        select id_stacji, _polaczenie.czas_odjazdu, _polaczenie.czas_startu_polaczenia + odjazd * '1 minute'::interval, _polaczenie.id_polaczenia
+        into next_station_id, departure_time, arrival_time, next_id_polaczenia
+        from stacje_posrednie
+        where id_polaczenia = _polaczenie.id_polaczenia and zatrzymanie
+            and _polaczenie.czas_odjazdu < _polaczenie.czas_startu_polaczenia + przyjazd * '1 minute'::interval
+        order by przyjazd limit 1;
+        if found then
+            return next;
+        end if;
+    end loop;
+
+    return;
+end;
+$$ language plpgsql;
+
+create or replace function search_routes_with_transfers(stacja_startowa integer, stacja_koncowa integer, czas timestamp)
+    returns table(id_polaczenia integer, stacja1 varchar, data_odjazdu date, czas_odjazdu time,
+                  stacja2 varchar, data_przyjazdu date, czas_przyjazdu time) as $$
+    declare
+        DEBUG boolean := true;
+        call_id uuid := gen_random_uuid();
+        curr record;
+        e record;
+        temp timestamp;
+    begin
+        create temp table if not exists p_q(function_call_id uuid, stacja_id integer, distance timestamp);
+        create temp table if not exists d(function_call_id uuid, stacja_id integer, distance timestamp);
+        create temp table if not exists prev(function_call_id uuid, prev_stacja integer, next_stacja integer, odjazd_prev timestamp, przyjazd_curr timestamp, id_polaczenia integer);
+
+        insert into p_q values (call_id, stacja_startowa, czas);
+        insert into d values (call_id, stacja_startowa, czas);
+
+        loop
+            select stacja_id, distance into curr from p_q order by distance desc limit 1;
+            exit when not found;
+            delete from p_q where function_call_id = call_id and stacja_id = curr.stacja_id and distance = curr.distance;
+
+            if debug then raise notice 'v(%, %)', curr.stacja_id, curr.distance; end if;
+
+            for e in select * from get_edges(curr.stacja_id, curr.distance) loop
+                raise notice '   e(%, %, %)', e.next_station_id, e.departure_time, e.arrival_time;
+                select distance into temp from d where function_call_id = call_id and stacja_id = e.next_station_id limit 1;
+                temp := coalesce(temp, 'infinity'::timestamp);
+                if e.arrival_time < temp then
+                    insert into p_q values (call_id, e.next_station_id, e.arrival_time);
+                    insert into d values (call_id, e.next_station_id, e.arrival_time);
+                    insert into prev values (call_id, curr.stacja_id, e.next_station_id, e.departure_time, e.arrival_time, e.next_id_polaczenia);
+                end if;
+            end loop;
+
+        end loop;
+
+        if debug then
+            for curr in select * from prev where function_call_id = call_id loop
+                    raise notice 'prev row: prev=% next=% odjazd=% przyjazd=% id_polaczenia=%',
+                        curr.prev_stacja, curr.next_stacja, curr.odjazd_prev, curr.przyjazd_curr, curr.id_polaczenia;
+            end loop;
+        end if;
+
+        return query
+        with recursive route as(
+            select prev_stacja, next_stacja, odjazd_prev, przyjazd_curr, p.id_polaczenia
+            from prev p where function_call_id = call_id and next_stacja = stacja_koncowa
+            union all
+            select p.prev_stacja, r.prev_stacja as next_stacja, p.odjazd_prev, p.przyjazd_curr, p.id_polaczenia
+            from prev p join route r on p.next_stacja = r.prev_stacja
+            where p.function_call_id = call_id
+        ) select r.id_polaczenia, get_nazwa_stacji(prev_stacja) as stacja1, odjazd_prev::date as data_odjazdu, odjazd_prev::time as czas_odjazdu,
+                get_nazwa_stacji(next_stacja) as stacja2, przyjazd_curr::date as data_przyjazdu, przyjazd_curr::time as czas_przyjazdu
+        from route r order by odjazd_prev asc;
+
+        delete from p_q where function_call_id = call_id;
+        delete from d where function_call_id = call_id;
+        delete from prev where function_call_id = call_id;
+    end;
+$$ language plpgsql;
 
 -- 4_inserts.sql
 INSERT INTO ulgi (nazwa, znizka) VALUES
@@ -1344,7 +1434,7 @@ INSERT INTO miejsca (nr_miejsca, id_wagonu, nr_przedzialu, czy_dla_niepelnospraw
 -- 1. TLK Warszawa - Kraków (PKP Intercity)
 BEGIN;
 INSERT INTO polaczenia (godzina_startu, id_harmonogramu, id_przewoznika) VALUES
-    ('06:00:00', 1, 1) RETURNING id_polaczenia;
+    ('06:00:00', 1, 1);
 INSERT INTO stacje_posrednie VALUES
                                  (1, 1, 0, 5, true, 1),     -- Warszawa Centralna
                                  (1, 46, 85, 85, false, 1),  -- Skierniewice
@@ -1360,7 +1450,7 @@ INSERT INTO polaczenia_wagony(id_polaczenia, nr_wagonu, id_wagonu) VALUES
 -- 2. IC Warszawa - Wrocław (PKP Intercity)
 BEGIN;
 INSERT INTO polaczenia (godzina_startu, id_harmonogramu, id_przewoznika) VALUES
-    ('07:30:00', 1, 1) RETURNING id_polaczenia;
+    ('07:30:00', 1, 1);
 INSERT INTO stacje_posrednie VALUES
                                  (2, 1, 0, 5, true, 1),     -- Warszawa Centralna
                                  (2, 3, 135, 135, false, 1), -- Łódź Fabryczna
@@ -1374,7 +1464,7 @@ INSERT INTO polaczenia_wagony(id_polaczenia, nr_wagonu, id_wagonu) VALUES
 -- 3. EIP Warszawa - Gdańsk (PKP Intercity)
 BEGIN;
 INSERT INTO polaczenia (godzina_startu, id_harmonogramu, id_przewoznika) VALUES
-    ('08:15:00', 1, 1) RETURNING id_polaczenia;
+    ('08:15:00', 1, 1);
 INSERT INTO stacje_posrednie VALUES
                                  (3, 1, 0, 5, true, 2),     -- Warszawa Centralna
                                  (3, 46, 85, 85, false, 1),  -- Skierniewice
@@ -1389,7 +1479,7 @@ INSERT INTO polaczenia_wagony(id_polaczenia, nr_wagonu, id_wagonu) VALUES
 -- 4. TLK Kraków - Warszawa (PKP Intercity)
 BEGIN;
 INSERT INTO polaczenia (godzina_startu, id_harmonogramu, id_przewoznika) VALUES
-    ('16:00:00', 1, 1) RETURNING id_polaczenia;
+    ('16:00:00', 1, 1);
 INSERT INTO stacje_posrednie VALUES
                                  (4, 2, 0, 5, true, 4),     -- Kraków Główny
                                  (4, 13, 120, 122, true, 2), -- Częstochowa Osobowa
@@ -1405,7 +1495,7 @@ INSERT INTO polaczenia_wagony(id_polaczenia, nr_wagonu, id_wagonu) VALUES
 -- 5. Warszawa - Łódź (PolRegio)
 BEGIN;
 INSERT INTO polaczenia (godzina_startu, id_harmonogramu, id_przewoznika) VALUES
-    ('05:30:00', 2, 2) RETURNING id_polaczenia;
+    ('05:30:00', 2, 2);
 INSERT INTO stacje_posrednie VALUES
                                  (5, 1, 0, 5, true, 3),     -- Warszawa Centralna
                                  (5, 46, 85, 85, false, 2),  -- Skierniewice
@@ -1421,7 +1511,7 @@ INSERT INTO polaczenia_wagony(id_polaczenia, nr_wagonu, id_wagonu) VALUES
 -- 6. Katowice - Kraków (PolRegio)
 BEGIN;
 INSERT INTO polaczenia (godzina_startu, id_harmonogramu, id_przewoznika) VALUES
-    ('06:45:00', 2, 2) RETURNING id_polaczenia;
+    ('06:45:00', 2, 2);
 INSERT INTO stacje_posrednie VALUES
                                  (6, 10, 0, 5, true, 4),    -- Katowice
                                  (6, 15, 15, 15, false, 2),  -- Sosnowiec Główny
@@ -1435,7 +1525,7 @@ INSERT INTO polaczenia_wagony(id_polaczenia, nr_wagonu, id_wagonu) VALUES
 -- 7. Warszawa - Skierniewice (Koleje Mazowieckie)
 BEGIN;
 INSERT INTO polaczenia (godzina_startu, id_harmonogramu, id_przewoznika) VALUES
-    ('06:00:00', 2, 3) RETURNING id_polaczenia;
+    ('06:00:00', 2, 3);
 INSERT INTO stacje_posrednie VALUES
                                  (7, 1, 0, 5, true, 5),     -- Warszawa Centralna
                                  (7, 102, 45, 45, false, 1),-- Łowicz Główny
@@ -1449,7 +1539,7 @@ INSERT INTO polaczenia_wagony(id_polaczenia, nr_wagonu, id_wagonu) VALUES
 -- 8. Gdańsk - Gdynia (SKM Trójmiasto)
 BEGIN;
 INSERT INTO polaczenia (godzina_startu, id_harmonogramu, id_przewoznika) VALUES
-    ('05:45:00', 1, 4) RETURNING id_polaczenia;
+    ('05:45:00', 1, 4);
 INSERT INTO stacje_posrednie VALUES
                                  (8, 6, 0, 5, true, 3),     -- Gdańsk Główny
                                  (8, 74, 15, 15, false, 1),  -- Tczew
@@ -1464,7 +1554,7 @@ INSERT INTO polaczenia_wagony(id_polaczenia, nr_wagonu, id_wagonu) VALUES
 -- 9. Wrocław - Wałbrzych (Koleje Dolnośląskie)
 BEGIN;
 INSERT INTO polaczenia (godzina_startu, id_harmonogramu, id_przewoznika) VALUES
-    ('06:20:00', 2, 5) RETURNING id_polaczenia;
+    ('06:20:00', 2, 5);
 INSERT INTO stacje_posrednie VALUES
                                  (9, 4, 0, 5, true, 2),     -- Wrocław Główny
                                  (9, 56, 30, 30, false, 1),  -- Głogów
@@ -1478,7 +1568,7 @@ INSERT INTO polaczenia_wagony(id_polaczenia, nr_wagonu, id_wagonu) VALUES
 -- 10. Katowice - Żory (PolRegio - Śląsk)
 BEGIN;
 INSERT INTO polaczenia (godzina_startu, id_harmonogramu, id_przewoznika) VALUES
-    ('08:00:00', 2, 2) RETURNING id_polaczenia;
+    ('08:00:00', 2, 2);
 INSERT INTO stacje_posrednie VALUES
                                  (10, 10, 0, 5, true, 3),    -- Katowice
                                  (10, 23, 20, 25, true, 1),   -- Bytom
@@ -1499,7 +1589,7 @@ INSERT INTO polaczenia_wagony(id_polaczenia, nr_wagonu, id_wagonu) VALUES
 -- 11. Warszawa - Kozienice (Koleje Mazowieckie)
 BEGIN;
 INSERT INTO polaczenia (godzina_startu, id_harmonogramu, id_przewoznika) VALUES
-    ('09:00:00', 1, 3) RETURNING id_polaczenia;
+    ('09:00:00', 1, 3);
 INSERT INTO stacje_posrednie VALUES
                                  (11, 1, 0, 5, true, 4),     -- Warszawa Centralna
                                  (11, 31, 65, 70, true, 1),  -- Płock
@@ -1520,7 +1610,7 @@ INSERT INTO polaczenia_wagony(id_polaczenia, nr_wagonu, id_wagonu) VALUES
 -- 12. Gdańsk - Mrągowo (PolRegio - Pomorze/Warmia)
 BEGIN;
 INSERT INTO polaczenia (godzina_startu, id_harmonogramu, id_przewoznika) VALUES
-    ('10:00:00', 1, 2) RETURNING id_polaczenia;
+    ('10:00:00', 1, 2);
 INSERT INTO stacje_posrednie VALUES
                                  (12, 6, 0, 5, true, 3),     -- Gdańsk Główny
                                  (12, 32, 50, 55, true, 1),  -- Elbląg
@@ -1538,7 +1628,7 @@ INSERT INTO polaczenia_wagony(id_polaczenia, nr_wagonu, id_wagonu) VALUES
 -- 13. Wrocław - Brzeg (Koleje Dolnośląskie)
 BEGIN;
 INSERT INTO polaczenia (godzina_startu, id_harmonogramu, id_przewoznika) VALUES
-    ('11:00:00', 2, 5) RETURNING id_polaczenia;
+    ('11:00:00', 2, 5);
 INSERT INTO stacje_posrednie VALUES
                                  (13, 4, 0, 5, true, 2),     -- Wrocław Główny
                                  (13, 43, 60, 65, true, 1),  -- Jelenia Góra
@@ -1556,7 +1646,7 @@ INSERT INTO polaczenia_wagony(id_polaczenia, nr_wagonu, id_wagonu) VALUES
 -- 14. Poznań - Kutno (PolRegio - Wielkopolska)
 BEGIN;
 INSERT INTO polaczenia (godzina_startu, id_harmonogramu, id_przewoznika) VALUES
-    ('12:00:00', 1, 2) RETURNING id_polaczenia;
+    ('12:00:00', 1, 2);
 INSERT INTO stacje_posrednie VALUES
                                  (14, 5, 0, 5, true, 3),     -- Poznań Główny
                                  (14, 37, 50, 55, true, 1),  -- Kalisz
@@ -1573,7 +1663,7 @@ INSERT INTO polaczenia_wagony(id_polaczenia, nr_wagonu, id_wagonu) VALUES
 -- 15. Warszawa - Sokołów Podlaski (PolRegio - Podlasie)
 BEGIN;
 INSERT INTO polaczenia (godzina_startu, id_harmonogramu, id_przewoznika) VALUES
-    ('13:00:00', 1, 2) RETURNING id_polaczenia;
+    ('13:00:00', 1, 2);
 INSERT INTO stacje_posrednie VALUES
                                  (15, 1, 0, 5, true, 5),     -- Warszawa Centralna
                                  (15, 48, 60, 65, true, 1),  -- Siedlce
@@ -1581,6 +1671,9 @@ INSERT INTO stacje_posrednie VALUES
                                  (15, 11, 150, 155, true, 1),-- Białystok
                                  (15, 53, 200, 205, true, 2),-- Suwałki
                                  (15, 98, 230, 235, true, 1);-- Sokołów Podlaski
+
+
+
 COMMIT;
 INSERT INTO historia_polaczenia (id_polaczenia, data_od, data_do) VALUES
     (15, '2023-03-15', '2026-12-31');
@@ -1590,7 +1683,7 @@ INSERT INTO polaczenia_wagony(id_polaczenia, nr_wagonu, id_wagonu) VALUES
 -- 16. Bydgoszcz - Złotów (PolRegio - Kujawy/Pomorze)
 BEGIN;
 INSERT INTO polaczenia (godzina_startu, id_harmonogramu, id_przewoznika) VALUES
-    ('14:00:00', 2, 2) RETURNING id_polaczenia;
+    ('14:00:00', 2, 2);
 INSERT INTO stacje_posrednie VALUES
                                  (16, 8, 0, 5, true, 2),     -- Bydgoszcz Główna
                                  (16, 39, 40, 45, true, 1),  -- Grudziądz
@@ -1608,7 +1701,7 @@ INSERT INTO polaczenia_wagony(id_polaczenia, nr_wagonu, id_wagonu) VALUES
 -- 17. Rzeszów - Starachowice (PolRegio - Podkarpacie)
 BEGIN;
 INSERT INTO polaczenia (godzina_startu, id_harmonogramu, id_przewoznika) VALUES
-    ('15:00:00', 1, 2) RETURNING id_polaczenia;
+    ('15:00:00', 1, 2);
 INSERT INTO stacje_posrednie VALUES
                                  (17, 18, 0, 5, true, 3),    -- Rzeszów Główny
                                  (17, 65, 50, 55, true, 1),  -- Przemyśl Główny
@@ -1623,27 +1716,26 @@ INSERT INTO polaczenia_wagony(id_polaczenia, nr_wagonu, id_wagonu) VALUES
 
 
 
-
 INSERT INTO polaczenia (godzina_startu, id_harmonogramu, id_przewoznika)
 VALUES ('08:00:00', 1, 1);
 INSERT INTO stacje_posrednie VALUES
-                                 (18, 1,   0,   5, true, 1),   -- Warszawa Centralna
-                                 (18, 14, 60,  65, true, 1),   -- Radom
-                                 (18, 17,120, 125, true, 1),   -- Kielce
-                                 (18, 2, 180, 185, true, 1);   -- Kraków Główny
+     (18, 1,   0,   5, true, 1),   -- Warszawa Centralna
+     (18, 14, 60,  65, true, 1),   -- Radom
+     (18, 17,120, 125, true, 1),   -- Kielce
+      (18, 2, 180, 185, true, 1);   -- Kraków Główny
 
 INSERT INTO historia_polaczenia (id_polaczenia, data_od, data_do) VALUES
     (18, '2023-01-01', '2026-12-31');
 INSERT INTO polaczenia_wagony (id_polaczenia, nr_wagonu, id_wagonu) VALUES
-                                                                        (18, 1, 1),
-                                                                        (18, 2, 1),
-                                                                        (18, 3, 2),
-                                                                        (18, 4, 3);
+     (18, 1, 1),
+      (18, 2, 1),
+      (18, 3, 2),
+     (18, 4, 3);
 
 INSERT INTO linie VALUES
-                      (1,14,150),
-                      (14,17,80),
-                      (17,2,150);
+    (1,14,150),
+    (14,17,80),
+    (17,2,150);
 
 INSERT INTO polaczenia (godzina_startu, id_harmonogramu, id_przewoznika)
 VALUES ('10:00:00', 1, 3);
@@ -2698,7 +2790,7 @@ insert into pasazerowie (imie, nazwisko, email) values ('Curtice', 'Andrieu', 'c
 insert into pasazerowie (imie, nazwisko, email) values ('Pauline', 'Torvey', 'ptorveyrq@salon.com');
 insert into pasazerowie (imie, nazwisko, email) values ('Isidore', 'Champneys', 'ichampneysrr@vinaora.com');
 insert into pasazerowie (imie, nazwisko, email) values ('Mieczysław', 'Zorro', 'tabaluga@vinaora.com');
-insert into pasazerowie (imie, nazwisko, email) values ('Oskar','Prusik','oskar.prusik@gmail.com');
+
 INSERT INTO swieta_stale (nazwa, dzien, miesiac) VALUES
 ('Nowy Rok', 1, 1),
 ('Święto Trzech Króli', 6, 1),
