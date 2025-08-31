@@ -124,35 +124,6 @@ $$ LANGUAGE plpgsql;
 CREATE TRIGGER sprawdz_przejazd BEFORE INSERT ON przejazdy
 FOR EACH ROW EXECUTE PROCEDURE sprawdz_przejazd();
 
--- Wagon i miejsce istnieje, miejsce jest wolne ca calej trasie przejazdu
---TODO: Do poprawy nie wiadomo co się dzieje
-/*CREATE FUNCTION sprawdz_miejsce() RETURNS TRIGGER AS
-$$
-BEGIN
-    IF (SELECT COUNT(*) FROM polaczenia_wagony WHERE id_polaczenia = (SELECT id_polaczenia FROM przejazdy
-        WHERE id_przejazdu = NEW.id_przejazdu) AND nr_wagonu = NEW.nr_wagonu) = 0 THEN RAISE EXCEPTION ''; END IF;
-    IF (SELECT COUNT(*) FROM miejsca WHERE id_wagonu = (SELECT id_wagonu FROM polaczenia
-        WHERE id_polaczenia = (SELECT id_polaczenia FROM przejazdy WHERE id_przejazdu = NEW.id_przejazdu)
-        /*AND nr_wagonu = NEW.nr_wagonu*/) AND nr_miejsca = NEW.nr_miejsca) = 0 THEN RAISE EXCEPTION ''; END IF;
-    IF (SELECT COUNT(*) FROM bilety_miejsca bm WHERE (SELECT id_polaczenia, data_odjazdu FROM przejazdy
-        WHERE id_przejazdu = bm.id_przejazdu) = (SELECT id_polaczenia, data_odjazdu FROM przejazdy
-        WHERE id_przejazdu = NEW.id_przejazdu) AND nr_wagonu = NEW.nr_wagonu AND nr_miejsca = NEW.nr_miejsca
-        AND (SELECT odjazd FROM stacje_posrednie WHERE (id_polaczenia, id_stacji) =
-        (SELECT id_polaczenia, id_stacji_poczatkowej FROM przejazdy WHERE id_przejazdu = bm.id_przejazdu)) <
-        (SELECT przyjazd FROM stacje_posrednie WHERE (id_polaczenia, id_stacji) =
-        (SELECT id_polaczenia, id_stacji_koncowej FROM przejazdy WHERE id_przejazdu = NEW.id_przejazdu))
-        AND (SELECT przyjazd FROM stacje_posrednie WHERE (id_polaczenia, id_stacji) =
-        (SELECT id_polaczenia, id_stacji_koncowej FROM przejazdy WHERE id_przejazdu = bm.id_przejazdu)) <
-        (SELECT odjazd FROM stacje_posrednie WHERE (id_polaczenia, id_stacji) =
-        (SELECT id_polaczenia, id_stacji_poczatkowej FROM przejazdy WHERE id_przejazdu = NEW.id_przejazdu))) > 0
-        THEN RAISE EXCEPTION ''; END IF;
-    RETURN NEW;
-END;
-$$ LANGUAGE plpgsql;
-
-CREATE TRIGGER sprawdz_miejsce BEFORE INSERT ON bilety_miejsca
-FOR EACH ROW EXECUTE PROCEDURE sprawdz_miejsce();*/
-
 -- Data istnieje
 
 CREATE FUNCTION sprawdz_date() RETURNS TRIGGER AS

@@ -34,7 +34,6 @@ drop function if exists sprawdz_przystanek cascade;
 drop function if exists sprawdz_polaczenie cascade;
 drop function if exists sprawdz_zwrot cascade;
 drop function if exists sprawdz_przejazd cascade;
-drop function if exists sprawdz_miejsce cascade;
 drop function if exists sprawdz_date cascade;
 -- 3_functions.sql
 drop function if exists stacje_na_polaczeniu(integer);
