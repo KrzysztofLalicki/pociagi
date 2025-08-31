@@ -1033,7 +1033,7 @@ $$ LANGUAGE plpgsql;
 create or replace function get_edges(station_id integer, search_start timestamp)
     returns table(next_station_id integer, departure_time timestamp, arrival_time timestamp, next_id_polaczenia integer) as $$
 declare
-    MAX_CZAS_PRZESIADKI interval = '8 hours';
+    MAX_CZAS_PRZESIADKI interval = '24 hours';
     _polaczenie record;
 begin
     for _polaczenie in
@@ -1042,6 +1042,12 @@ begin
         join polaczenia p on s_p.id_polaczenia = p.id_polaczenia
         where s_p.id_stacji = station_id  and is_polaczenie_active(p.id_polaczenia, search_start::date) and s_p.zatrzymanie
           and search_start::date + p.godzina_startu + s_p.odjazd * '1 minute'::interval between search_start and search_start + MAX_CZAS_PRZESIADKI
+        union
+        select p.id_polaczenia, search_start::date + interval '1 day' + p.godzina_startu as czas_startu_polaczenia, search_start::date + interval '1 day'+ p.godzina_startu + s_p.odjazd * '1 minute'::interval as czas_odjazdu
+        from stacje_posrednie s_p
+                 join polaczenia p on s_p.id_polaczenia = p.id_polaczenia
+        where s_p.id_stacji = station_id  and is_polaczenie_active(p.id_polaczenia, (search_start::date + interval '1 day')::date) and s_p.zatrzymanie
+          and search_start::date + interval '1 day' + p.godzina_startu + s_p.odjazd * '1 minute'::interval between search_start and search_start + MAX_CZAS_PRZESIADKI
     loop
         select id_stacji, _polaczenie.czas_odjazdu, _polaczenie.czas_startu_polaczenia + odjazd * '1 minute'::interval, _polaczenie.id_polaczenia
         into next_station_id, departure_time, arrival_time, next_id_polaczenia
@@ -1089,6 +1095,7 @@ create or replace function search_routes_with_transfers(stacja_startowa integer,
                 if e.arrival_time < temp then
                     insert into p_q values (call_id, e.next_station_id, e.arrival_time);
                     insert into d values (call_id, e.next_station_id, e.arrival_time);
+                    delete from prev where function_call_id = call_id and next_stacja = e.next_station_id;
                     insert into prev values (call_id, curr.stacja_id, e.next_station_id, e.departure_time, e.arrival_time, e.next_id_polaczenia);
                 end if;
             end loop;
@@ -1262,7 +1269,8 @@ INSERT INTO stacje (nazwa, tory) VALUES
 ('Gostynin', 2),
 ('Kozienice', 1),
 ('Szczytno', 2),
-('Mrągowo', 2)
+('Mrągowo', 2),
+('Siedlce',2)
 ON CONFLICT (nazwa) DO NOTHING;
 
 INSERT INTO linie (stacja1, stacja2, odleglosc) VALUES
@@ -1350,7 +1358,26 @@ INSERT INTO linie (stacja1, stacja2, odleglosc) VALUES
 (18, 65, 50),     -- Rzeszów Główny <-> Przemyśl Główny
 (65, 75, 40),     -- Przemyśl Główny <-> Jarosław
 (75, 78, 40),     -- Jarosław <-> Dębica
-(78, 71, 40);     -- Dębica <-> Starachowice Wschodnie
+(78, 71, 40),-- Dębica <-> Starachowice Wschodnie
+(6,72,30),
+(72,8,140),
+(8,5,150),
+(5,4,180),  -- Poznań -> Wrocław
+(4, 10, 200),  -- Wrocław -> Katowice
+(1, 21, 210),   -- Warszawa -> Olsztyn
+(21, 12, 210),  -- Olsztyn -> Gdynia
+(12, 6, 20),    -- Gdynia -> Gdańsk
+(10, 27, 90),   -- Katowice -> Opole
+(27, 4, 80),
+(10, 2, 80),   -- Katowice -> Kraków
+(17, 14, 120),
+(14, 47, 110),
+(47, 9, 80),
+(9, 18, 170),    -- Lublin -> Rzeszów
+(18, 78, 100),   -- Rzeszów -> Dębica
+(78, 2, 80);     -- Dębica -> Kraków
+
+
 
 INSERT INTO harmonogramy (czy_tydzien, czy_swieta) VALUES
 ('{true,true,true,true,true,true,true}', false),
@@ -1785,8 +1812,163 @@ INSERT INTO polaczenia_wagony (id_polaczenia, nr_wagonu, id_wagonu) VALUES
                                                                         (21, 4, 3);
 
 
+INSERT INTO polaczenia (godzina_startu, id_harmonogramu, id_przewoznika)
+VALUES ('16:00:00', 4, 1);
+INSERT INTO stacje_posrednie VALUES
+                                 (22, 1,   0,   5, true, 1),   -- Warszawa Centralna
+                                 (22, 14, 60,  65, true, 1),   -- Radom
+                                 (22, 17,120, 125, true, 1),   -- Kielce
+                                 (22, 2, 180, 185, true, 1);   -- Kraków Główny
+
+INSERT INTO historia_polaczenia (id_polaczenia, data_od, data_do) VALUES
+    (22, '2023-01-01', '2026-12-31');
+INSERT INTO polaczenia_wagony (id_polaczenia, nr_wagonu, id_wagonu) VALUES
+                                                                        (22, 1, 1),
+                                                                        (22, 2, 1),
+                                                                        (22, 3, 2),
+                                                                        (22, 4, 3);
+
+-- 1. Warszawa -> Kraków przez Radom i Kielce
+INSERT INTO polaczenia (godzina_startu, id_harmonogramu, id_przewoznika)
+VALUES ('17:00:00', 1, 1);
+
+INSERT INTO stacje_posrednie (id_polaczenia, id_stacji, przyjazd, odjazd, zatrzymanie, tor) VALUES
+                                                                                                (23, 1, 0, 5, true, 1),
+                                                                                                (23, 14, 60, 65, true, 1),
+                                                                                                (23, 17, 120, 125, true, 1),
+                                                                                                (23, 2, 180, 185, true, 1);
+
+INSERT INTO historia_polaczenia (id_polaczenia, data_od, data_do) VALUES
+    (23, '2024-01-01', '2026-12-31');
+
+INSERT INTO polaczenia_wagony (id_polaczenia, nr_wagonu, id_wagonu) VALUES
+                                                                        (23, 1, 1), (23, 2, 1), (23, 3, 2), (23, 4, 3);
 
 
+-- 2. Gdańsk -> Wrocław przez Tczew, Bydgoszcz, Poznań
+INSERT INTO polaczenia (godzina_startu, id_harmonogramu, id_przewoznika)
+VALUES ('07:30:00', 1, 2);
+
+INSERT INTO stacje_posrednie (id_polaczenia, id_stacji, przyjazd, odjazd, zatrzymanie, tor) VALUES
+                                                                                                (24, 6, 0, 5, true, 1),
+                                                                                                (24, 72, 60, 65, true, 1),
+                                                                                                (24, 8, 120, 125, true, 2),
+                                                                                                (24, 5, 200, 205, true, 1),
+                                                                                                (24, 4, 280, 285, true, 1);
+
+INSERT INTO historia_polaczenia (id_polaczenia, data_od, data_do) VALUES
+    (24, '2024-01-01', '2026-12-31');
+
+INSERT INTO polaczenia_wagony (id_polaczenia, nr_wagonu, id_wagonu) VALUES
+                                                                        (24, 1, 2), (24, 2, 3), (24, 3, 1);
+
+
+-- 3. Poznań -> Kraków przez Wrocław i Katowice
+INSERT INTO polaczenia (godzina_startu, id_harmonogramu, id_przewoznika)
+VALUES ('09:00:00', 1, 1);
+
+INSERT INTO stacje_posrednie VALUES
+                                 (25, 5, 0, 5, true, 1),
+                                 (25, 4, 120, 125, true, 2),
+                                 (25, 10, 200, 205, true, 1),
+                                 (25, 2, 260, 265, true, 1);
+
+INSERT INTO historia_polaczenia VALUES
+    (25, '2024-01-01', '2026-12-31');
+
+INSERT INTO polaczenia_wagony VALUES
+                                  (25, 1, 1), (25, 2, 2), (25, 3, 3);
+
+
+-- 4. Warszawa -> Gdańsk przez Olsztyn i Gdynię
+INSERT INTO polaczenia (godzina_startu, id_harmonogramu, id_przewoznika)
+VALUES ('08:00:00', 1, 2);
+
+INSERT INTO stacje_posrednie VALUES
+                                 (26, 1, 0, 5, true, 1),
+                                 (26, 21, 120, 125, true, 1),
+                                 (26, 12, 180, 185, true, 1),
+                                 (26, 6, 240, 245, true, 1);
+
+INSERT INTO historia_polaczenia VALUES
+    (26, '2024-01-01', '2026-12-31');
+
+INSERT INTO polaczenia_wagony VALUES
+                                  (26, 1, 2), (26, 2, 1), (26, 3, 3);
+
+
+-- 5. Kraków -> Wrocław przez Katowice i Opole
+INSERT INTO polaczenia (godzina_startu, id_harmonogramu, id_przewoznika)
+VALUES ('10:00:00', 1, 1);
+
+INSERT INTO stacje_posrednie VALUES
+                                 (27, 2, 0, 5, true, 1),
+                                 (27, 10, 60, 65, true, 1),
+                                 (27, 27, 120, 125, true, 2),
+                                 (27, 4, 180, 185, true, 1);
+
+INSERT INTO historia_polaczenia VALUES
+    (27, '2024-01-01', '2026-12-31');
+
+INSERT INTO polaczenia_wagony VALUES
+                                  (27, 1, 1), (27, 2, 2), (27, 3, 3);
+
+
+
+
+
+
+INSERT INTO polaczenia (godzina_startu, id_harmonogramu, id_przewoznika)
+VALUES ('08:45:00', 1, 1);
+
+INSERT INTO stacje_posrednie VALUES
+                                 (28, 1, 0, 5, true, 1),    -- Warszawa
+                                 (28, 14, 50, 50, false, 1), -- Radom (informacyjna)
+                                 (28, 17, 105, 105, false, 1), -- Kielce (informacyjna)
+                                 (28, 2, 150, 155, true, 1); -- Kraków
+
+INSERT INTO historia_polaczenia VALUES
+    (28, '2024-01-01', '2026-12-31');
+
+INSERT INTO polaczenia_wagony VALUES
+                                  (28, 1, 1), (28, 2, 2), (28, 3, 3);
+
+
+
+INSERT INTO polaczenia (godzina_startu, id_harmonogramu, id_przewoznika)
+VALUES ('15:00:00', 1, 2);
+
+INSERT INTO stacje_posrednie VALUES
+                                 (29, 17, 0, 5, true, 1),    -- Kielce
+                                 (29, 14, 120, 125, true, 1), -- Radom
+                                 (29, 47, 230, 235, true, 1), -- Siedlce
+                                 (29, 9, 310, 315, true, 1);   -- Lublin
+
+INSERT INTO historia_polaczenia VALUES
+    (29, '2024-01-01', '2026-12-31');
+
+INSERT INTO polaczenia_wagony VALUES
+                                  (29, 1, 1), (29, 2, 2), (29, 3, 3);
+
+
+
+-- Połączenie Lublin -> Kraków przez Rzeszów i Dębicę
+INSERT INTO polaczenia (id_polaczenia, godzina_startu, id_harmonogramu, id_przewoznika)
+VALUES (30, '06:30:00', 1, 1);
+
+INSERT INTO stacje_posrednie (id_polaczenia, id_stacji, przyjazd, odjazd, zatrzymanie, tor) VALUES
+                                                                                                (30, 9, 0, 5, true, 1),      -- Lublin
+                                                                                                (30, 18, 170, 170, false, 1), -- Rzeszów (pośrednia, brak zatrzymania)
+                                                                                                (30, 78, 270, 270, false, 1), -- Dębica (pośrednia)
+                                                                                                (30, 2, 350, 355, true, 1);   -- Kraków
+
+INSERT INTO historia_polaczenia (id_polaczenia, data_od, data_do) VALUES
+    (30, '2024-01-01', '2026-12-31');
+
+INSERT INTO polaczenia_wagony (id_polaczenia, nr_wagonu, id_wagonu) VALUES
+                                                                        (30, 1, 1),
+                                                                        (30, 2, 2),
+                                                                        (30, 3, 3);
 
 
 insert into pasazerowie (imie, nazwisko, email) values ('Gregg', 'Parkeson', 'gparkeson0@digg.com');
@@ -2610,186 +2792,6 @@ insert into pasazerowie (imie, nazwisko, email) values ('Coretta', 'Moth', 'cmot
 insert into pasazerowie (imie, nazwisko, email) values ('Beatrix', 'Gooble', 'bgooblemq@blinklist.com');
 insert into pasazerowie (imie, nazwisko, email) values ('Forester', 'Ewers', 'fewersmr@alexa.com');
 insert into pasazerowie (imie, nazwisko, email) values ('Sharl', 'Fomichyov', 'sfomichyovms@yahoo.co.jp');
-insert into pasazerowie (imie, nazwisko, email) values ('Maximo', 'Kleiser', 'mkleisermt@ifeng.com');
-insert into pasazerowie (imie, nazwisko, email) values ('Richmound', 'Mcimmie', 'rmcimmiemu@ezinearticles.com');
-insert into pasazerowie (imie, nazwisko, email) values ('Arlan', 'Le Breton', 'alebretonmv@bing.com');
-insert into pasazerowie (imie, nazwisko, email) values ('Cleveland', 'Pinner', 'cpinnermw@barnesandnoble.com');
-insert into pasazerowie (imie, nazwisko, email) values ('Englebert', 'Hynson', 'ehynsonmx@biglobe.ne.jp');
-insert into pasazerowie (imie, nazwisko, email) values ('Alix', 'Thal', 'athalmy@so-net.ne.jp');
-insert into pasazerowie (imie, nazwisko, email) values ('Kenna', 'Monery', 'kmonerymz@naver.com');
-insert into pasazerowie (imie, nazwisko, email) values ('Karlis', 'Oyley', 'koyleyn0@vk.com');
-insert into pasazerowie (imie, nazwisko, email) values ('Lindy', 'Ogborne', 'logbornen1@unesco.org');
-insert into pasazerowie (imie, nazwisko, email) values ('Brande', 'Coggin', 'bcogginn2@blogspot.com');
-insert into pasazerowie (imie, nazwisko, email) values ('Yehudi', 'Sumpton', 'ysumptonn3@mayoclinic.com');
-insert into pasazerowie (imie, nazwisko, email) values ('Jae', 'MacElroy', 'jmacelroyn4@mediafire.com');
-insert into pasazerowie (imie, nazwisko, email) values ('Gideon', 'Crafter', 'gcraftern5@gov.uk');
-insert into pasazerowie (imie, nazwisko, email) values ('Alejandrina', 'Classen', 'aclassenn6@slideshare.net');
-insert into pasazerowie (imie, nazwisko, email) values ('Noami', 'Durman', 'ndurmann7@wired.com');
-insert into pasazerowie (imie, nazwisko, email) values ('Georg', 'Lowseley', 'glowseleyn8@bbb.org');
-insert into pasazerowie (imie, nazwisko, email) values ('Cyndy', 'Robbert', 'crobbertn9@wikipedia.org');
-insert into pasazerowie (imie, nazwisko, email) values ('Hanson', 'Durie', 'hduriena@google.pl');
-insert into pasazerowie (imie, nazwisko, email) values ('Annie', 'Niemetz', 'aniemetznb@cnet.com');
-insert into pasazerowie (imie, nazwisko, email) values ('Linnell', 'Clinning', 'lclinningnc@issuu.com');
-insert into pasazerowie (imie, nazwisko, email) values ('Valry', 'Passo', 'vpassond@theguardian.com');
-insert into pasazerowie (imie, nazwisko, email) values ('Carri', 'Turnpenny', 'cturnpennyne@admin.ch');
-insert into pasazerowie (imie, nazwisko, email) values ('Anastasie', 'Ropkes', 'aropkesnf@symantec.com');
-insert into pasazerowie (imie, nazwisko, email) values ('Codie', 'Willson', 'cwillsonng@soundcloud.com');
-insert into pasazerowie (imie, nazwisko, email) values ('Kathryne', 'Moughton', 'kmoughtonnh@gnu.org');
-insert into pasazerowie (imie, nazwisko, email) values ('Shawn', 'Tiddy', 'stiddyni@mapquest.com');
-insert into pasazerowie (imie, nazwisko, email) values ('Rollin', 'Chellam', 'rchellamnj@newsvine.com');
-insert into pasazerowie (imie, nazwisko, email) values ('Bjorn', 'Cage', 'bcagenk@forbes.com');
-insert into pasazerowie (imie, nazwisko, email) values ('Leanora', 'Sherme', 'lshermenl@lulu.com');
-insert into pasazerowie (imie, nazwisko, email) values ('Karlotta', 'Chapelle', 'kchapellenm@soundcloud.com');
-insert into pasazerowie (imie, nazwisko, email) values ('Eirena', 'Bankes', 'ebankesnn@imdb.com');
-insert into pasazerowie (imie, nazwisko, email) values ('Pooh', 'Cosin', 'pcosinno@1und1.de');
-insert into pasazerowie (imie, nazwisko, email) values ('Carson', 'Strodder', 'cstroddernp@networkadvertising.org');
-insert into pasazerowie (imie, nazwisko, email) values ('Nelli', 'Renzini', 'nrenzininq@seesaa.net');
-insert into pasazerowie (imie, nazwisko, email) values ('Monty', 'Creelman', 'mcreelmannr@unicef.org');
-insert into pasazerowie (imie, nazwisko, email) values ('Swen', 'Sclater', 'ssclaterns@homestead.com');
-insert into pasazerowie (imie, nazwisko, email) values ('Shina', 'Hearnah', 'shearnahnt@over-blog.com');
-insert into pasazerowie (imie, nazwisko, email) values ('Heddi', 'Sanpher', 'hsanphernu@slashdot.org');
-insert into pasazerowie (imie, nazwisko, email) values ('Erna', 'Trew', 'etrewnv@ca.gov');
-insert into pasazerowie (imie, nazwisko, email) values ('Ariella', 'Argo', 'aargonw@walmart.com');
-insert into pasazerowie (imie, nazwisko, email) values ('Nathalia', 'Abrahamoff', 'nabrahamoffnx@washingtonpost.com');
-insert into pasazerowie (imie, nazwisko, email) values ('Mayne', 'Skirving', 'mskirvingny@wisc.edu');
-insert into pasazerowie (imie, nazwisko, email) values ('Carlo', 'Varian', 'cvariannz@washingtonpost.com');
-insert into pasazerowie (imie, nazwisko, email) values ('Benson', 'Truswell', 'btruswello0@yellowbook.com');
-insert into pasazerowie (imie, nazwisko, email) values ('Cherri', 'Lengthorn', 'clengthorno1@dailymail.co.uk');
-insert into pasazerowie (imie, nazwisko, email) values ('Marilyn', 'Bedward', 'mbedwardo2@google.co.jp');
-insert into pasazerowie (imie, nazwisko, email) values ('Alano', 'Steuart', 'asteuarto3@discovery.com');
-insert into pasazerowie (imie, nazwisko, email) values ('Margarethe', 'Havoc', 'mhavoco4@is.gd');
-insert into pasazerowie (imie, nazwisko, email) values ('Abran', 'Duffield', 'aduffieldo5@soup.io');
-insert into pasazerowie (imie, nazwisko, email) values ('Alexa', 'Orpen', 'aorpeno6@tripadvisor.com');
-insert into pasazerowie (imie, nazwisko, email) values ('Fulton', 'Readett', 'freadetto7@odnoklassniki.ru');
-insert into pasazerowie (imie, nazwisko, email) values ('Gizela', 'Ayres', 'gayreso8@unesco.org');
-insert into pasazerowie (imie, nazwisko, email) values ('Catrina', 'Kneale', 'cknealeo9@rambler.ru');
-insert into pasazerowie (imie, nazwisko, email) values ('Hesther', 'Josskowitz', 'hjosskowitzoa@census.gov');
-insert into pasazerowie (imie, nazwisko, email) values ('Amandi', 'Diable', 'adiableob@skype.com');
-insert into pasazerowie (imie, nazwisko, email) values ('Ivar', 'Bunner', 'ibunneroc@odnoklassniki.ru');
-insert into pasazerowie (imie, nazwisko, email) values ('Charlena', 'Gouck', 'cgouckod@unblog.fr');
-insert into pasazerowie (imie, nazwisko, email) values ('Sanford', 'Stockau', 'sstockauoe@apache.org');
-insert into pasazerowie (imie, nazwisko, email) values ('Standford', 'Nelthrop', 'snelthropof@angelfire.com');
-insert into pasazerowie (imie, nazwisko, email) values ('Deny', 'Alvarado', 'dalvaradoog@eventbrite.com');
-insert into pasazerowie (imie, nazwisko, email) values ('Dody', 'Norvell', 'dnorvelloh@sitemeter.com');
-insert into pasazerowie (imie, nazwisko, email) values ('Deanne', 'Neal', 'dnealoi@t-online.de');
-insert into pasazerowie (imie, nazwisko, email) values ('Sandor', 'Bushell', 'sbushelloj@miibeian.gov.cn');
-insert into pasazerowie (imie, nazwisko, email) values ('Filia', 'Roots', 'frootsok@technorati.com');
-insert into pasazerowie (imie, nazwisko, email) values ('Dun', 'Payle', 'dpayleol@dell.com');
-insert into pasazerowie (imie, nazwisko, email) values ('Andra', 'Penke', 'apenkeom@geocities.jp');
-insert into pasazerowie (imie, nazwisko, email) values ('Aubine', 'Hackworthy', 'ahackworthyon@google.es');
-insert into pasazerowie (imie, nazwisko, email) values ('Jelene', 'Genny', 'jgennyoo@princeton.edu');
-insert into pasazerowie (imie, nazwisko, email) values ('Alanah', 'Sidle', 'asidleop@symantec.com');
-insert into pasazerowie (imie, nazwisko, email) values ('Liliane', 'MacTrustey', 'lmactrusteyoq@themeforest.net');
-insert into pasazerowie (imie, nazwisko, email) values ('Aeriell', 'Chipperfield', 'achipperfieldor@netlog.com');
-insert into pasazerowie (imie, nazwisko, email) values ('Anson', 'Itzcak', 'aitzcakos@angelfire.com');
-insert into pasazerowie (imie, nazwisko, email) values ('Gerri', 'Kenworthey', 'gkenwortheyot@usda.gov');
-insert into pasazerowie (imie, nazwisko, email) values ('Otto', 'Grabban', 'ograbbanou@columbia.edu');
-insert into pasazerowie (imie, nazwisko, email) values ('Jone', 'Tivers', 'jtiversov@goo.ne.jp');
-insert into pasazerowie (imie, nazwisko, email) values ('Gustaf', 'Houchin', 'ghouchinow@acquirethisname.com');
-insert into pasazerowie (imie, nazwisko, email) values ('Alley', 'Roelofs', 'aroelofsox@telegraph.co.uk');
-insert into pasazerowie (imie, nazwisko, email) values ('Goraud', 'Gonnely', 'ggonnelyoy@xrea.com');
-insert into pasazerowie (imie, nazwisko, email) values ('Karisa', 'Averill', 'kaverilloz@java.com');
-insert into pasazerowie (imie, nazwisko, email) values ('Garrott', 'Sainsbury-Brown', 'gsainsburybrownp0@smugmug.com');
-insert into pasazerowie (imie, nazwisko, email) values ('Ginelle', 'Mulvagh', 'gmulvaghp1@freewebs.com');
-insert into pasazerowie (imie, nazwisko, email) values ('Christy', 'Muirhead', 'cmuirheadp2@usa.gov');
-insert into pasazerowie (imie, nazwisko, email) values ('Teddy', 'Polly', 'tpollyp3@ft.com');
-insert into pasazerowie (imie, nazwisko, email) values ('Sibelle', 'Cooper', 'scooperp4@arizona.edu');
-insert into pasazerowie (imie, nazwisko, email) values ('Glendon', 'Andrejs', 'gandrejsp5@booking.com');
-insert into pasazerowie (imie, nazwisko, email) values ('Emanuel', 'Slucock', 'eslucockp6@drupal.org');
-insert into pasazerowie (imie, nazwisko, email) values ('Stephannie', 'Hawse', 'shawsep7@about.com');
-insert into pasazerowie (imie, nazwisko, email) values ('Emmeline', 'Badrock', 'ebadrockp8@yelp.com');
-insert into pasazerowie (imie, nazwisko, email) values ('Jerrine', 'McPhelimy', 'jmcphelimyp9@phpbb.com');
-insert into pasazerowie (imie, nazwisko, email) values ('Cicely', 'Talby', 'ctalbypa@last.fm');
-insert into pasazerowie (imie, nazwisko, email) values ('Emmalynne', 'Haggidon', 'ehaggidonpb@alexa.com');
-insert into pasazerowie (imie, nazwisko, email) values ('Bartie', 'Wadhams', 'bwadhamspc@chronoengine.com');
-insert into pasazerowie (imie, nazwisko, email) values ('Sander', 'Marrows', 'smarrowspd@gov.uk');
-insert into pasazerowie (imie, nazwisko, email) values ('Valerie', 'Snead', 'vsneadpe@ted.com');
-insert into pasazerowie (imie, nazwisko, email) values ('Meir', 'Yegorovnin', 'myegorovninpf@webmd.com');
-insert into pasazerowie (imie, nazwisko, email) values ('Giorgi', 'Bransom', 'gbransompg@51.la');
-insert into pasazerowie (imie, nazwisko, email) values ('Betta', 'Coole', 'bcooleph@nih.gov');
-insert into pasazerowie (imie, nazwisko, email) values ('Dulcinea', 'Gregan', 'dgreganpi@plala.or.jp');
-insert into pasazerowie (imie, nazwisko, email) values ('Porter', 'Torritti', 'ptorrittipj@deviantart.com');
-insert into pasazerowie (imie, nazwisko, email) values ('Marguerite', 'Wakeley', 'mwakeleypk@devhub.com');
-insert into pasazerowie (imie, nazwisko, email) values ('Coraline', 'Pimbley', 'cpimbleypl@mit.edu');
-insert into pasazerowie (imie, nazwisko, email) values ('Neil', 'Gabe', 'ngabepm@ameblo.jp');
-insert into pasazerowie (imie, nazwisko, email) values ('Chrissie', 'Crawley', 'ccrawleypn@smugmug.com');
-insert into pasazerowie (imie, nazwisko, email) values ('Hillary', 'Sabatier', 'hsabatierpo@usatoday.com');
-insert into pasazerowie (imie, nazwisko, email) values ('Giselbert', 'Allison', 'gallisonpp@latimes.com');
-insert into pasazerowie (imie, nazwisko, email) values ('Georges', 'Staner', 'gstanerpq@goodreads.com');
-insert into pasazerowie (imie, nazwisko, email) values ('Neysa', 'Yvon', 'nyvonpr@google.fr');
-insert into pasazerowie (imie, nazwisko, email) values ('Tove', 'Dilkes', 'tdilkesps@vk.com');
-insert into pasazerowie (imie, nazwisko, email) values ('Salvador', 'Wooler', 'swoolerpt@buzzfeed.com');
-insert into pasazerowie (imie, nazwisko, email) values ('Pip', 'Schaffel', 'pschaffelpu@amazon.co.jp');
-insert into pasazerowie (imie, nazwisko, email) values ('Travus', 'Baistow', 'tbaistowpv@java.com');
-insert into pasazerowie (imie, nazwisko, email) values ('Micky', 'Casaroli', 'mcasarolipw@squarespace.com');
-insert into pasazerowie (imie, nazwisko, email) values ('Sheilah', 'Baldree', 'sbaldreepx@mozilla.org');
-insert into pasazerowie (imie, nazwisko, email) values ('Christophe', 'Wegman', 'cwegmanpy@twitpic.com');
-insert into pasazerowie (imie, nazwisko, email) values ('Kerstin', 'MacTimpany', 'kmactimpanypz@creativecommons.org');
-insert into pasazerowie (imie, nazwisko, email) values ('Ferdinand', 'Pauleit', 'fpauleitq0@joomla.org');
-insert into pasazerowie (imie, nazwisko, email) values ('Lonny', 'Baylay', 'lbaylayq1@dedecms.com');
-insert into pasazerowie (imie, nazwisko, email) values ('Johna', 'Radband', 'jradbandq2@altervista.org');
-insert into pasazerowie (imie, nazwisko, email) values ('Ali', 'Gregolin', 'agregolinq3@marketwatch.com');
-insert into pasazerowie (imie, nazwisko, email) values ('Danyelle', 'Goldis', 'dgoldisq4@msu.edu');
-insert into pasazerowie (imie, nazwisko, email) values ('Arthur', 'Itzik', 'aitzikq5@prnewswire.com');
-insert into pasazerowie (imie, nazwisko, email) values ('Kennett', 'Montes', 'kmontesq6@facebook.com');
-insert into pasazerowie (imie, nazwisko, email) values ('Tobye', 'Golsby', 'tgolsbyq7@prlog.org');
-insert into pasazerowie (imie, nazwisko, email) values ('Andeee', 'Sabates', 'asabatesq8@google.cn');
-insert into pasazerowie (imie, nazwisko, email) values ('Hart', 'Bussen', 'hbussenq9@discuz.net');
-insert into pasazerowie (imie, nazwisko, email) values ('Marleah', 'Duff', 'mduffqa@baidu.com');
-insert into pasazerowie (imie, nazwisko, email) values ('Alexis', 'Belmont', 'abelmontqb@scientificamerican.com');
-insert into pasazerowie (imie, nazwisko, email) values ('Donny', 'Trunby', 'dtrunbyqc@pen.io');
-insert into pasazerowie (imie, nazwisko, email) values ('Dorian', 'Garman', 'dgarmanqd@freewebs.com');
-insert into pasazerowie (imie, nazwisko, email) values ('Prisca', 'Bauldrey', 'pbauldreyqe@4shared.com');
-insert into pasazerowie (imie, nazwisko, email) values ('Amalie', 'Robbert', 'arobbertqf@ihg.com');
-insert into pasazerowie (imie, nazwisko, email) values ('Yard', 'Styant', 'ystyantqg@topsy.com');
-insert into pasazerowie (imie, nazwisko, email) values ('Mitchell', 'Calleja', 'mcallejaqh@over-blog.com');
-insert into pasazerowie (imie, nazwisko, email) values ('Lyssa', 'Airlie', 'lairlieqi@upenn.edu');
-insert into pasazerowie (imie, nazwisko, email) values ('Hazel', 'Laphorn', 'hlaphornqj@ameblo.jp');
-insert into pasazerowie (imie, nazwisko, email) values ('Lanie', 'Swanborrow', 'lswanborrowqk@howstuffworks.com');
-insert into pasazerowie (imie, nazwisko, email) values ('Donnie', 'Puxley', 'dpuxleyql@slashdot.org');
-insert into pasazerowie (imie, nazwisko, email) values ('Lara', 'Pennycord', 'lpennycordqm@house.gov');
-insert into pasazerowie (imie, nazwisko, email) values ('Chevalier', 'Jirik', 'cjirikqn@weather.com');
-insert into pasazerowie (imie, nazwisko, email) values ('Flynn', 'Reddoch', 'freddochqo@netlog.com');
-insert into pasazerowie (imie, nazwisko, email) values ('Madelaine', 'Prince', 'mprinceqp@dropbox.com');
-insert into pasazerowie (imie, nazwisko, email) values ('Culver', 'Dufaur', 'cdufaurqq@123-reg.co.uk');
-insert into pasazerowie (imie, nazwisko, email) values ('Reamonn', 'Dishman', 'rdishmanqr@un.org');
-insert into pasazerowie (imie, nazwisko, email) values ('Tann', 'Rubinlicht', 'trubinlichtqs@godaddy.com');
-insert into pasazerowie (imie, nazwisko, email) values ('Nikos', 'Redholls', 'nredhollsqt@slideshare.net');
-insert into pasazerowie (imie, nazwisko, email) values ('Desdemona', 'Bage', 'dbagequ@free.fr');
-insert into pasazerowie (imie, nazwisko, email) values ('Ricky', 'Naish', 'rnaishqv@mozilla.org');
-insert into pasazerowie (imie, nazwisko, email) values ('Wadsworth', 'Dwine', 'wdwineqw@youtube.com');
-insert into pasazerowie (imie, nazwisko, email) values ('Rayshell', 'Cripwell', 'rcripwellqx@w3.org');
-insert into pasazerowie (imie, nazwisko, email) values ('Gerti', 'Kells', 'gkellsqy@noaa.gov');
-insert into pasazerowie (imie, nazwisko, email) values ('Neils', 'Blose', 'nbloseqz@comcast.net');
-insert into pasazerowie (imie, nazwisko, email) values ('Winonah', 'Orpin', 'worpinr0@tinyurl.com');
-insert into pasazerowie (imie, nazwisko, email) values ('Collie', 'Brezlaw', 'cbrezlawr1@wired.com');
-insert into pasazerowie (imie, nazwisko, email) values ('Rheba', 'Jenckes', 'rjenckesr2@facebook.com');
-insert into pasazerowie (imie, nazwisko, email) values ('Ilsa', 'Brownbill', 'ibrownbillr3@vistaprint.com');
-insert into pasazerowie (imie, nazwisko, email) values ('Christiane', 'Jenken', 'cjenkenr4@webeden.co.uk');
-insert into pasazerowie (imie, nazwisko, email) values ('Garvey', 'Breem', 'gbreemr5@wikispaces.com');
-insert into pasazerowie (imie, nazwisko, email) values ('Ulrica', 'Witchell', 'uwitchellr6@cloudflare.com');
-insert into pasazerowie (imie, nazwisko, email) values ('Jenelle', 'Habbijam', 'jhabbijamr7@home.pl');
-insert into pasazerowie (imie, nazwisko, email) values ('Gaylord', 'Jephcott', 'gjephcottr8@jiathis.com');
-insert into pasazerowie (imie, nazwisko, email) values ('Walsh', 'Gyurkovics', 'wgyurkovicsr9@facebook.com');
-insert into pasazerowie (imie, nazwisko, email) values ('Damara', 'Verdun', 'dverdunra@sun.com');
-insert into pasazerowie (imie, nazwisko, email) values ('Marcelline', 'Handyside', 'mhandysiderb@omniture.com');
-insert into pasazerowie (imie, nazwisko, email) values ('Reuben', 'Butler', 'rbutlerrc@eventbrite.com');
-insert into pasazerowie (imie, nazwisko, email) values ('Terese', 'Regnard', 'tregnardrd@prlog.org');
-insert into pasazerowie (imie, nazwisko, email) values ('Erich', 'Alders', 'ealdersre@ucoz.ru');
-insert into pasazerowie (imie, nazwisko, email) values ('Dominique', 'Aire', 'dairerf@stanford.edu');
-insert into pasazerowie (imie, nazwisko, email) values ('Elga', 'Jeynes', 'ejeynesrg@deviantart.com');
-insert into pasazerowie (imie, nazwisko, email) values ('Irma', 'Spendlove', 'ispendloverh@jigsy.com');
-insert into pasazerowie (imie, nazwisko, email) values ('Briny', 'Tisor', 'btisorri@wikia.com');
-insert into pasazerowie (imie, nazwisko, email) values ('Karia', 'Barbery', 'kbarberyrj@sourceforge.net');
-insert into pasazerowie (imie, nazwisko, email) values ('Nadia', 'Abrashkin', 'nabrashkinrk@artisteer.com');
-insert into pasazerowie (imie, nazwisko, email) values ('Peterus', 'Linde', 'plinderl@g.co');
-insert into pasazerowie (imie, nazwisko, email) values ('Germaine', 'Roder', 'groderrm@studiopress.com');
-insert into pasazerowie (imie, nazwisko, email) values ('Sigismundo', 'Mc Caughen', 'smccaughenrn@shop-pro.jp');
-insert into pasazerowie (imie, nazwisko, email) values ('Yank', 'Ringsell', 'yringsellro@mapquest.com');
-insert into pasazerowie (imie, nazwisko, email) values ('Curtice', 'Andrieu', 'candrieurp@etsy.com');
-insert into pasazerowie (imie, nazwisko, email) values ('Pauline', 'Torvey', 'ptorveyrq@salon.com');
-insert into pasazerowie (imie, nazwisko, email) values ('Isidore', 'Champneys', 'ichampneysrr@vinaora.com');
-insert into pasazerowie (imie, nazwisko, email) values ('Mieczysław', 'Zorro', 'tabaluga@vinaora.com');
 
 INSERT INTO swieta_stale (nazwa, dzien, miesiac) VALUES
 ('Nowy Rok', 1, 1),
