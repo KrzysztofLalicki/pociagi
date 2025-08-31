@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.*?>
+
+<HBox spacing="10.0" VBox.vgrow="ALWAYS" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="pociagi.app.viewmodel.SelectStartAndEndStationViewController">
+         <children>
+            <VBox spacing="10.0" VBox.vgrow="ALWAYS">
+               <children>
+                  <VBox spacing="10.0" style="-fx-border-color: derive(-fx-base, -20%); -fx-border-width: 1; -fx-padding: 5;" VBox.vgrow="ALWAYS">
+                     <children>
+                        <Label text="Wybierz stacje początkową:">
+                           <font>
+                              <Font name="System Bold" size="13.0" />
+                           </font>
+                        </Label>
+                        <fx:include fx:id="startStationView" source="SelectStationView.fxml" VBox.vgrow="ALWAYS" />
+                     </children>
+                  </VBox>
+                  <VBox spacing="10.0" style="-fx-border-color: derive(-fx-base, -20%); -fx-border-width: 1; -fx-padding: 5;" VBox.vgrow="ALWAYS">
+                     <children>
+                        <Label text="Wybierz stacje końcową:">
+                           <font>
+                              <Font name="System Bold" size="13.0" />
+                           </font>
+                        </Label>
+                        <fx:include fx:id="endStationView" source="SelectStationView.fxml" VBox.vgrow="ALWAYS" />
+                     </children>
+                  </VBox>
+               </children>
+            </VBox>
+      <VBox spacing="10.0" HBox.hgrow="ALWAYS">
+         <children>
+                  <HBox alignment="CENTER_LEFT" spacing="10.0" style="-fx-border-color: derive(-fx-base, -20%); -fx-border-width: 1; -fx-padding: 5;" VBox.vgrow="NEVER">
+                     <children>
+                        <Label text="Wybierz datę i godzinę:">
+                           <font>
+                              <Font name="System Bold" size="13.0" />
+                           </font>
+                     <HBox.margin>
+                        <Insets />
+                     </HBox.margin>
+                        </Label>
+                        <Region HBox.hgrow="ALWAYS" />
+                        <DatePicker fx:id="datePicker" />
+                        <Spinner fx:id="timeSpinner" editable="true" />
+                     </children>
+                  </HBox>
+            <VBox spacing="10.0" VBox.vgrow="ALWAYS" style="-fx-border-color: derive(-fx-base, -20%); -fx-border-width: 1; -fx-padding: 5;">
+               <Label text="Najszybsza trasa:">
+                  <font>
+                     <Font name="System Bold" size="13.0" />
+                  </font>
+               </Label>
+
+               <TableView fx:id="tableView" focusTraversable="false" VBox.vgrow="ALWAYS">
+                  <placeholder>
+                     <Label text="Brak trasy do wyświetlenia" />
+                  </placeholder>
+                  <columns>
+                     <TableColumn fx:id="id_polaczenia" prefWidth="100" text="Id połączenia" style="-fx-border-color: transparent derive(-fx-base, -20%) transparent transparent" />
+                     <TableColumn fx:id="stacja1" prefWidth="150" text="Stacja 1" />
+                     <TableColumn fx:id="data_odjazdu" prefWidth="150" text="Data odjazdu" />
+                     <TableColumn fx:id="czas_odjazdu" prefWidth="100" text="Godzina odjazdu" style="-fx-border-color: transparent derive(-fx-base, -20%) transparent transparent"/>
+                     <TableColumn fx:id="stacja2" prefWidth="100" text="Stacja 2" />
+                     <TableColumn fx:id="data_przyjazdu" prefWidth="100" text="Data przyjazdu" />
+                     <TableColumn fx:id="czas_przyjazdu" prefWidth="100" text="Godzina przyjazdu" />
+                  </columns>
+                  <VBox.margin>
+                     <Insets />
+                  </VBox.margin>
+                  <columnResizePolicy>
+                     <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
+                  </columnResizePolicy>
+               </TableView>
+            </VBox>
+         </children>
+      </VBox>
+         </children>
+
+   <padding>
+      <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+   </padding>
+</HBox>
